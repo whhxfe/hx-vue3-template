@@ -1,0 +1,52 @@
+{
+	"extends": "@vue/tsconfig/tsconfig.dom.json",
+	"compilerOptions": {
+		/* 基础设置 */
+		"target": "ESNext",
+		"module": "ESNext",
+		"lib": ["DOM", "ESNext"],
+		"moduleResolution": "Bundler", // ✅ Vite 7 推荐：更快的模块解析方式
+		"allowImportingTsExtensions": true,
+		"skipLibCheck": true, // ✅ 跳过库检查，提升构建速度
+		"allowJs": false,
+		// "jsx": "preserve",             // ✅ 支持 JSX/TSX
+		"resolveJsonModule": true, // ✅ 允许导入 JSON 文件
+		"useDefineForClassFields": true, // ✅ Vue3 官方推荐
+
+		/* 路径映射 */
+		"paths": {
+			"@/*": ["./src/*"],
+			"~/*": ["./src/assets/*"]
+		},
+
+		/* 严格检查 */
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitOverride": true, // ✅ 现代 TS 推荐
+		"noPropertyAccessFromIndexSignature": false,
+
+		/* 模块兼容性 */
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+
+		/* 调试相关 */
+		"sourceMap": true,
+		"inlineSources": true,
+		"noEmit": true, // ✅ 不输出编译文件，只做类型检查
+
+		"jsx": "preserve",
+		"jsxImportSource": "vue",
+		"types": ["vite/client", "unocss"]
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.d.ts",
+		"src/**/*.vue",
+		"src/**/*.tsx",
+		"src/env.d.ts", // ✅ Vite 默认定义
+		"uno.config.ts" // ✅ UnoCSS 类型提示
+	],
+	"exclude": ["node_modules", "dist"]
+}

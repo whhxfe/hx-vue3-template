@@ -1,0 +1,24 @@
+// =============================================
+// Style Entry
+// Use @use instead of @import (Dart Sass best practice)
+// =============================================
+
+// 1. Tools — SCSS utilities
+@use "./_mixins.scss";
+
+// 2. Constants — 不随主题变化的变量（品牌色、圆角、阴影、过渡）
+@use "./_variables.scss";
+
+// 3. Base — global reset & common elements
+@use "./base/_reset.scss";
+@use "./base/_scrollbar.scss";
+
+// 4. Themes — light & dark CSS variables
+@use "./themes/_light.scss";
+@use "./themes/_dark.scss";
+
+// 5. Components — UI library overrides & custom component styles
+@use "./components/_menu.scss";
+
+// 6. External assets
+@use "../assets/font/font.css";

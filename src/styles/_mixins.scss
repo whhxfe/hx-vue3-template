@@ -1,0 +1,73 @@
+@mixin flex-center($val: space-between) {
+	display: flex;
+	align-items: center;
+	justify-content: $val;
+}
+
+@mixin text-ellipsis($line: 1) {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	@if $line ==1 {
+		white-space: nowrap;
+	} @else {
+		word-wrap: break-word;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: $line;
+		display: -webkit-box;
+	}
+}
+
+// 滚动条样式 mixin
+@mixin scrollbar(
+	$track-color: rgba(241, 241, 241, 1),
+	// 轨道颜色
+	$thumb-color: rgba(180, 180, 180, 1),
+	// 滑块颜色
+	$thumb-hover-color: rgba(130, 130, 130, 1),
+	// 滑块悬停颜色
+	$width: 8px,
+	// 滚动条宽度
+	$border-radius: 4px,
+	// 圆角半径
+	$button-color: rgba(180, 180, 180, 1) // 按钮颜色
+) {
+	// 针对 WebKit 浏览器 (Chrome, Safari, Edge)
+	&::-webkit-scrollbar {
+		width: $width;
+		height: $width;
+	}
+
+	// 滚动条轨道
+	&::-webkit-scrollbar-track {
+		background: $track-color;
+		border-radius: $border-radius;
+	}
+
+	// 滚动条滑块
+	&::-webkit-scrollbar-thumb {
+		background-color: $thumb-color;
+		border-radius: $border-radius;
+		transition: background-color 0.3s ease;
+
+		&:hover {
+			background-color: $thumb-hover-color;
+		}
+	}
+
+	// 滚动条按钮 (上下/左右箭头)
+	&::-webkit-scrollbar-button {
+		background-color: $button-color;
+		height: 0;
+		width: 0;
+		// 现代浏览器通常隐藏按钮，如需显示可调整这里的尺寸
+	}
+
+	// 滚动条角落
+	&::-webkit-scrollbar-corner {
+		background-color: $track-color;
+	}
+
+	// 针对 Firefox 的基本样式
+	scrollbar-width: thin;
+	scrollbar-color: $thumb-color $track-color;
+}

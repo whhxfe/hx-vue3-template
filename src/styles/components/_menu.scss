@@ -1,0 +1,125 @@
+// =============================================
+// HxMenu Component Styles
+//   - Light: uses CSS variables from _light.scss
+//   - Dark: auto-applies via html.dark scope in _dark.scss
+// =============================================
+
+// ---- Horizontal Menu ----
+.hx-menu--horizontal {
+	background-color: transparent !important;
+	border-bottom: 0 !important;
+
+	.el-menu-item {
+		min-width: 100px;
+		padding: 0 12px;
+		color: rgba(255, 255, 255, 0.85) !important;
+		transition: background-color 0.2s, color 0.2s;
+
+		&:hover {
+			color: #fff !important;
+			background-color: rgba(255, 255, 255, 0.2) !important;
+		}
+
+		&.is-active {
+			color: #fff !important;
+			background-color: rgba(255, 255, 255, 0.25) !important;
+			border-bottom: 0 !important;
+		}
+	}
+
+	.el-sub-menu {
+		.el-sub-menu__title {
+			padding: 0 16px;
+			color: rgba(255, 255, 255, 0.85) !important;
+			transition: background-color 0.2s, color 0.2s;
+
+			&:hover {
+				color: #fff !important;
+				background-color: rgba(255, 255, 255, 0.2) !important;
+			}
+		}
+
+		&.is-active .el-sub-menu__title {
+			color: #fff !important;
+			background-color: rgba(255, 255, 255, 0.25) !important;
+		}
+
+		.el-menu {
+			background-color: var(--el-sub-menu-bg-color);
+		}
+	}
+}
+
+// ---- Vertical Menu ----
+.hx-menu--vertical {
+	height: 100%;
+	border-right: 1px solid var(--el-menu-border-color);
+
+	.el-menu-item {
+		color: var(--el-menu-text-color);
+		background-color: var(--el-menu-bg-color);
+
+		&:hover {
+			color: var(--el-menu-hover-text-color);
+			background-color: var(--el-menu-hover-bg-color);
+		}
+
+		&.is-active {
+			color: var(--el-menu-active-color);
+			background-color: var(--el-menu-active-bg-color);
+		}
+	}
+
+	.el-sub-menu {
+		&.is-active {
+			.el-sub-menu__title {
+				color: var(--el-menu-active-color);
+				border-bottom: 0;
+			}
+		}
+
+		.el-sub-menu__title {
+			color: var(--el-menu-text-color);
+			background-color: var(--el-menu-bg-color);
+
+			&:hover {
+				color: var(--el-menu-hover-text-color);
+				background-color: var(--el-menu-hover-bg-color);
+			}
+		}
+
+		.el-menu {
+			background-color: var(--el-sub-menu-bg-color);
+
+			.el-menu-item {
+				color: var(--el-menu-text-color);
+				background-color: var(--el-sub-menu-bg-color);
+
+				&:hover {
+					color: var(--el-menu-hover-text-color);
+					background-color: var(--el-menu-hover-bg-color);
+				}
+
+				&.is-active {
+					color: var(--el-menu-active-color);
+					background-color: var(--el-menu-active-bg-color);
+				}
+			}
+		}
+	}
+}
+
+// ---- Other Element Plus Component Tweaks ----
+.el-sub-menu > .el-sub-menu__title {
+	font-size: 16px;
+}
+
+.hx-menu-popper {
+	.el-menu--popup {
+		min-width: 150px;
+	}
+}
+
+.el-popover.el-popper {
+	min-width: auto;
+}

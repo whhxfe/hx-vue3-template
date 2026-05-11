@@ -1,0 +1,77 @@
+// =============================================
+// Scrollbar Styles
+// =============================================
+
+// Firefox scrollbar (thin style)
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #8b8b8b #fcfcfc;
+}
+
+// ========== WebKit 内核滚动条样式 ==========
+
+/* 1. 滚动条整体尺寸 */
+::-webkit-scrollbar {
+	width: 16px;
+	height: 16px;
+}
+
+/* 2. 滚动条轨道样式 */
+::-webkit-scrollbar-track {
+	background: #fcfcfcfc;
+}
+
+/* 3. 滚动条滑块样式 */
+::-webkit-scrollbar-thumb {
+	background: #8b8b8b;
+	border-radius: 10px;
+	border: 4px solid #fcfcfc;
+	transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #636363;
+}
+
+/* 4. 滚动条箭头按钮通用样式 */
+::-webkit-scrollbar-button {
+	background: #fcfcfc;
+	cursor: pointer;
+	transition: background 0.2s;
+	display: -webkit-box;
+}
+
+::-webkit-scrollbar-button:hover {
+	background: #e6e6e6;
+}
+
+::-webkit-scrollbar-button:active {
+	background: #d9d9d9;
+}
+
+/* 5. 垂直滚动条 - 上箭头 */
+::-webkit-scrollbar-button:vertical:start {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 8 8'%3E%3Cpath fill='currentColor' d='M4 1L0 5h8L4 1z'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: center;
+	margin-bottom: 4px;
+}
+
+/* 6. 垂直滚动条 - 下箭头 */
+::-webkit-scrollbar-button:vertical:end {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 8 8'%3E%3Cpath fill='currentColor' d='M4 7L0 3h8L4 7z'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: center;
+	margin-top: 4px;
+}
+
+// ========== Slim scrollbar utility class ==========
+.scrollbar-slim::-webkit-scrollbar {
+	width: 12px;
+	height: 12px;
+}
+
+.scrollbar-slim::-webkit-scrollbar-thumb {
+	border-radius: 6px;
+	border: 3px solid #fcfcfc;
+}

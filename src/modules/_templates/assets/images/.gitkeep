@@ -1,0 +1,13 @@
+/**
+ * 图片资源目录
+ *
+ * 建议分类：
+ * - avatars/      - 用户头像
+ * - backgrounds/  - 背景图
+ * - logos/        - Logo 图标
+ * - banners/      - 横幅广告
+ * - placeholders/ - 占位图
+ *
+ * 使用示例：
+ * import avatarImg from '@/modules/_templates/assets/images/avatars/default.png'
+ */

@@ -1,0 +1,37 @@
+@font-face {
+	font-family: "siyuan_medium";
+	src: url(./SourceHanSansCN-Medium-2.otf);
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: "siyuan_bold";
+	src: url(./SourceHanSansCN-Bold-2.otf);
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: "siyuan_heavy";
+	src: url(./SourceHanSansCN-Heavy-2.otf);
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: "siyuan_normal";
+	src: url(./SourceHanSansCN-Normal-2.otf);
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'Source Han Sans CN';
+	src:url(./SourceHanSansCN-Regular-2.otf);
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "bebas";
+	src: url(./BEBAS.ttf);
+	font-weight: normal;
+	font-style: normal;
+}

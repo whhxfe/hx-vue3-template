@@ -1,0 +1,14 @@
+/**
+ * SVG 图标资源目录
+ *
+ * 建议分类：
+ * - common/       - 通用图标
+ * - nav/          - 导航图标
+ * - actions/      - 操作图标
+ *
+ * 使用示例：
+ * import userIcon from '@/modules/_templates/assets/icons/user.svg'
+ *
+ * 或通过 vite-plugin-svg-icons 自动导入：
+ * <svg><use href="#icon-user" /></svg>
+ */

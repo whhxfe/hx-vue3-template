@@ -1,0 +1,15 @@
+/**
+ * 字体资源目录
+ *
+ * 建议放置模块专用字体文件：
+ * - .ttf
+ * - .woff
+ * - .woff2
+ * - .eot
+ *
+ * 使用示例（在 CSS 中）：
+ * @font-face {
+ *   font-family: 'ModuleFont';
+ *   src: url('./fonts/CustomFont.woff2') format('woff2');
+ * }
+ */

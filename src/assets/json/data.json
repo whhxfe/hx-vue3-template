@@ -1,0 +1,17 @@
+{
+	"status": 0,
+	"message": "",
+	"data": {
+		"value": "用AI助手回答：utools",
+		"btn_text": "去AI搜索",
+		"rewrite_query": "utools",
+		"qa_list": [],
+		"default_follow_type": "FOLLOW_CHAT",
+		"qa_list_follow_type": "FOLLOW_CHAT",
+		"req_spec_list": [],
+		"url": "",
+		"is_danger": "0",
+		"is_generate": false
+	},
+	"logid": "9309335669151043042"
+}
