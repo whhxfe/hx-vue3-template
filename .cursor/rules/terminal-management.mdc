@@ -1,0 +1,175 @@
+---
+description: Terminal Management Rule - 终端复用优先，每次操作前必须先检查现有终端状态
+globs: ""
+---
+
+# Terminal Management Rule
+
+## 核心原则
+
+**复用优先 + 先检查后行动**
+
+每次需要操作终端前，**必须先读取 `terminals/` 文件夹**了解当前有哪些终端及其状态，绝不能基于假设采取行动。
+
+---
+
+## 铁律
+
+> **警告**：以下行为是严格禁止的，违反将导致终端管理混乱：
+>
+> 1. **不检查就行动**：不读取 terminals/ 文件夹就直接执行 kill、restart 等操作
+> 2. **杀死运行中的服务**：不验证进程是否正在执行有用任务就 kill
+> 3. **创建重复终端**：存在可用终端的情况下创建新的终端
+
+---
+
+## 检查流程（每次操作终端前必须执行）
+
+### 第 1 步：读取所有终端状态
+
+在执行任何终端操作前，**立即读取** `C:\Users\10233\.cursor\projects\d-Work-whhxfe-hx-vue3-template\terminals\*.txt` 文件：
+
+```powershell
+Get-ChildItem "C:\Users\10233\.cursor\projects\d-Work-whhxfe-hx-vue3-template\terminals" -Filter "*.txt" | ForEach-Object { Get-Content $_.FullName -TotalCount 10 }
+```
+
+获取每个终端的关键信息：
+- `pid` - 进程 ID
+- `cwd` - 当前工作目录
+- `active_command` - 当前运行的命令（判断是否还在执行）
+- `last_exit_code` - 上次退出码
+
+### 第 2 步：验证进程存活
+
+对于需要操作的终端，必须验证进程是否存活：
+
+```powershell
+# Windows 检查进程
+tasklist /FI "PID eq <PID>"
+```
+
+### 第 3 步：根据状态决策
+
+| 状态 | 判断条件 | 操作 |
+|------|----------|------|
+| 服务正在运行 | cwd 匹配 + 进程存活 + exit_code 无错误 | **直接使用该终端**，无需任何操作 |
+| 服务已停止 | cwd 匹配 + 进程已死 + 有错误退出码 | 在该终端内重启服务 |
+| 终端空闲 | exit_code=0 + 无 active_command | 复用执行新命令 |
+| 找不到终端 | 无匹配 cwd 的终端 | 最后才考虑创建新终端 |
+
+---
+
+## 复用决策树
+
+```
+开始
+  ↓
+读取 terminals/*.txt 所有文件
+  ↓
+遍历每个终端，解析 pid/cwd/active_command/last_exit_code
+  ↓
+┌─────────────────────────────────────────┐
+│ 检查是否有 cwd 匹配的终端？               │
+└─────────────────────────────────────────┘
+          ↓ 是                              ↓ 否
+┌──────────────────┐              ┌─────────────────────┐
+│ 进程是否存活？    │              │ 寻找空闲终端复用？    │
+└──────────────────┘              └─────────────────────┘
+    ↓ 是                    ↓ 是           ↓ 否
+┌─────────────┐    ┌──────────────────┐   ┌──────────────────┐
+│ ✅ 直接使用  │    │ 复用空闲终端     │   │ 创建新终端        │
+│ 无需任何操作 │    │ 执行新命令       │   │ 最后手段          │
+└─────────────┘    └──────────────────┘   └──────────────────┘
+    ↓ 否
+┌──────────────────┐
+│ 在该终端内重启   │
+│ 清理后重新启动   │
+└──────────────────┘
+```
+
+---
+
+## 常见场景处理
+
+### 场景 1：测试后台服务接口
+
+**错误做法**：
+- 直接使用 `kill` 命令
+- 在新终端启动服务
+- 假设服务没有运行
+
+**正确做法**：
+1. 读取 terminals/ 文件夹
+2. 找到 cwd 匹配后台服务的终端（如 `D:\Work\whhxfe\hx-vue3-template\server`）
+3. 验证进程是否存活
+4. 如果服务正在运行 → **直接使用该终端的输出查看接口响应**
+5. 如果服务已停止 → 在该终端重启
+
+### 场景 2：遇到端口被占用 (EADDRINUSE)
+
+1. 先读取 terminals/ 文件夹，找到占用该端口的终端
+2. 检查该终端的服务是否应该继续运行
+3. 如果是重复启动 → 停止重复的进程
+4. 如果是正常服务 → 复用它
+
+### 场景 3：启动开发服务
+
+| 端口 | 服务 | 终端判断依据 |
+|------|------|-------------|
+| 3000 | Mock Server | cwd 包含 `server` |
+| 5173/8000 | Vite Frontend | cwd 包含项目根目录或 `frontend` |
+
+---
+
+## 操作规范
+
+### ✅ 正确做法
+
+```powershell
+# 1. 先读取终端状态
+Get-ChildItem "C:\Users\10233\.cursor\projects\d-Work-whhxfe-hx-vue3-template\terminals" -Filter "*.txt" | ForEach-Object { Get-Content $_.FullName -TotalCount 10 }
+
+# 2. 验证进程存活
+tasklist /FI "PID eq <PID>"
+
+# 3. 根据结果决定下一步
+```
+
+### ❌ 禁止做法
+
+```powershell
+# 错误：直接 kill 不检查
+taskkill /F /PID <PID>
+
+# 错误：假设服务没运行
+cd server && npm run dev
+
+# 错误：创建新终端而不检查现有
+```
+
+---
+
+## 终端清理
+
+定期检查并清理：
+- 进程已死亡的终端记录
+- `last_exit_code: 0` 且不再需要的终端
+- 用户不可见的孤立终端记录
+
+---
+
+## 快速参考
+
+```powershell
+# 查看所有终端状态
+Get-ChildItem "C:\Users\10233\.cursor\projects\d-Work-whhxfe-hx-vue3-template\terminals" -Filter "*.txt" | ForEach-Object { Get-Content $_.FullName -TotalCount 10 }
+
+# 检查特定端口占用
+netstat -ano | findstr :<PORT>
+
+# 检查进程存活
+tasklist /FI "PID eq <PID>"
+
+# 清理终端脚本
+.\scripts\cleanup-terminals.ps1
+```

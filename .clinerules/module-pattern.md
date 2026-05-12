@@ -51,6 +51,61 @@ export default { name: '<module-name>', routes } as ModuleConfig
 - 共享逻辑提取到 `src/composables/`、`src/utils/` 等公共目录
 - 共享组件放在 `src/components/` 公共目录
 
+## API 命名空间封装
+
+模块 API 使用命名空间对象封装，保持清晰的调用层级。
+
+### 子模块 API 文件结构
+
+```
+api/
+├── index.ts      # API 统一导出
+├── types.ts     # 共享类型定义
+├── rrgk/        # 业务子模块 API
+│   ├── index.ts
+│   └── types.ts
+└── xtsz/        # 系统配置 API
+    ├── index.ts
+    └── types.ts
+```
+
+### 子模块 API 写法
+
+使用命名空间对象封装 API 方法和类型：
+
+```typescript
+// api/rrgk/index.ts
+import request from '@/api/request'
+import type { TreeNode } from './types'
+
+export type { TreeNode }
+
+export const rrgk = {
+  getTreeData(type: 'yhgl' | 'gxjg') {
+    return request.get<{ state: number; message: string; data: TreeNode[] }>('/zddxgk/tree', {
+      params: { type }
+    })
+  }
+}
+```
+
+### 主入口统一导出
+
+```typescript
+// api/index.ts
+export { rrgk } from './rrgk'
+export type { TreeNode } from './rrgk'
+```
+
+### 使用方式
+
+```typescript
+// 在组件中调用
+import { rrgk, type TreeNode } from '@/modules/zddxgk/api'
+
+const res = await rrgk.getTreeData('yhgl')
+```
+
 ## 模块模板
 
 `src/modules/_templates/` 提供了模块的标准模板，创建新模块时复制此模板修改。
