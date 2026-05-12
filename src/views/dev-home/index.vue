@@ -1,6 +1,19 @@
 <template>
 	<div class="page">
 		<div class="panel">
+			<!-- Admin 后台管理 -->
+			<section class="section">
+				<h2 class="section__title">Admin 后台管理</h2>
+				<div class="card-grid">
+					<template v-for="item in adminMenu" :key="item.path">
+						<router-link :to="item.path" class="card card--admin">
+							<div class="card__title">{{ item.title }}</div>
+							<div class="card__path">{{ item.path }}</div>
+						</router-link>
+					</template>
+				</div>
+			</section>
+
 			<!-- 可用模块 -->
 			<section class="section">
 				<h2 class="section__title">可用模块</h2>
@@ -51,10 +64,18 @@ const basicMenu: MenuItem[] = [
 	{ title: "403", path: "/403" },
 ]
 
+// Admin 后台管理菜单（固定显示）
+const adminMenu: MenuItem[] = [
+	{ title: "用户中心", path: "/admin/ucenter" },
+	{ title: "系统配置", path: "/admin/sysconfig" },
+	{ title: "系统日志", path: "/admin/syslog" },
+	{ title: "数据字典", path: "/admin/dict" },
+	{ title: "通知公告", path: "/admin/notice" },
+]
+
 const moduleMap: Record<string, MenuItem> = {
-	_templates: { title: "templates", path: "/templates/user-list" },
-	zddxgk: { title: "zddxgk", path: "/zddxgk/rrgk" },
-	ucenter: { title: "ucenter", path: "/ucenter" },
+	_templates: { title: "templates", path: "/templates" },
+	zddxgk: { title: "zddxgk", path: "/zddxgk" },
 }
 
 const moduleMenu = computed<MenuItem[]>(() => {
@@ -103,6 +124,10 @@ const moduleMenu = computed<MenuItem[]>(() => {
 	&:hover {
 		background-color: var(--el-fill-color-light);
 		border-color: var(--el-color-primary-light-5);
+	}
+
+	&--admin {
+		border-left: 3px solid var(--el-color-success);
 	}
 
 	&__title {

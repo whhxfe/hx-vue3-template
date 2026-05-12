@@ -48,7 +48,7 @@ $thumb-gap: 3px;
 		position: relative;
 		width: $track-width;
 		height: $track-height;
-		border-radius: $track-height / 2;
+		border-radius: calc($track-height / 2);
 		background: rgba(255, 255, 255, 0.2);
 		transition: background-color 0.3s ease;
 	}

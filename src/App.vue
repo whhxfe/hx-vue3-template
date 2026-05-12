@@ -62,7 +62,7 @@ const requestConfig = {
 
 
 <template>
-	<el-watermark class="h-full" :content="userInfo?.accountName"  >
+	<el-watermark class="h-full" :content="userInfo?.accountName ||'hx-v3-template'"  >
 		<HxConfigProvider :icon="iconConfig" :request="requestConfig" >
 			<router-view></router-view>
 		</HxConfigProvider>

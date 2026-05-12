@@ -40,11 +40,12 @@ export function setupDynamicRoutes(): void {
 
 	// 登录场景：首次注册动态路由
 	const allowedModules = sysStore.authorizedModules || []
-	registerModuleRoutes(router, allowedModules)
+	const allowedAdminModules = sysStore.authorizedAdminModules || []
+	registerModuleRoutes(router, allowedModules, allowedAdminModules)
 	_dynamicRoutesRegistered = true
 	sysStore.setRoutesLoaded(true)
 
-	console.log("[Router] 动态路由注册完成:", allowedModules)
+	console.log("[Router] 动态路由注册完成:", { allowedModules, allowedAdminModules })
 }
 
 // =============================================
@@ -66,10 +67,11 @@ function preRegisterRoutesFromCache() {
 	try {
 		const parsed = JSON.parse(cachedUserInfo)
 		const modules: string[] = parsed?.modules || []
-		if (modules.length > 0) {
-			registerModuleRoutes(router, modules)
+		const adminModules: string[] = parsed?.adminModules || []
+		if (modules.length > 0 || adminModules.length > 0) {
+			registerModuleRoutes(router, modules, adminModules)
 			_dynamicRoutesRegistered = true
-			console.log("[Router] 已从 sessionStorage 预注册路由:", modules)
+			console.log("[Router] 已从 sessionStorage 预注册路由:", { modules, adminModules })
 		}
 	} catch {
 		console.warn("[Router] 解析缓存的 user_info 失败，跳过预注册")

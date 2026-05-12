@@ -12,6 +12,9 @@ export interface LoginParams {
 export interface LoginData {
 	info: string
 	level?: string
+	modules?: string[]
+	adminModules?: string[]
+	expiresIn?: number
 }
 
 /**
@@ -27,10 +30,14 @@ export interface GetUserInfoParams {
 export interface UserInfo {
 	accountId: string
 	accountName: string
-	accountMemo: string
+	username: string
+	email?: string
+	phone?: string
+	avatar?: string
 	roleName: string
 	roleLevel: string
 	modules?: string[]
+	adminModules?: string[]
 }
 
 /**
@@ -45,4 +52,14 @@ export interface LogoutParams {
  */
 export interface CheckTokenParams {
 	token: string
+}
+
+/**
+ * Token 状态
+ */
+export interface TokenState {
+	valid: boolean
+	accountId?: string
+	accountName?: string
+	expiresIn: number
 }

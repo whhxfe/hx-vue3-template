@@ -5,10 +5,11 @@ import type {
 	GetUserInfoParams,
 	UserInfo,
 	LogoutParams,
-	CheckTokenParams
+	CheckTokenParams,
+	TokenState
 } from './types'
 
-export type { LoginParams, LoginData, GetUserInfoParams, UserInfo, LogoutParams, CheckTokenParams }
+export type { LoginParams, LoginData, GetUserInfoParams, UserInfo, LogoutParams, CheckTokenParams, TokenState }
 
 /**
  * 登录
@@ -28,7 +29,7 @@ export function logout(params?: LogoutParams) {
  * 校验 Token
  */
 export function checkToken(params?: CheckTokenParams) {
-	return request.get<ApiResponse<unknown>>('/account/getAccState', params)
+	return request.get<ApiResponse<TokenState>>('/account/getAccState', params)
 }
 
 /**

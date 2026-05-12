@@ -18,6 +18,7 @@
 			<!-- 树结构 -->
 			<div class="tree-container">
 				<el-tree
+					v-loading="treeLoading"
 					ref="treeRef"
 					:data="treeData"
 					:props="treeProps"
@@ -158,73 +159,23 @@
 </template>
 
 <script setup lang="tsx">
-import { ref, reactive, computed } from "vue"
+import { ref, reactive, computed, onMounted } from "vue"
 import { ElMessage, ElMessageBox, ElTag } from "element-plus"
 import { HxForm, HxTable, HxIcon } from "@hx/ui"
 import type { FormColumn, TableColumn } from "@hx/ui"
+import { rrgk, type TreeNode } from '@/modules/zddxgk/api'
 
 // Tab 配置
 const tabs = [
-	{ key: "category", label: "分类", icon: "folder" },
-	{ key: "department", label: "部门", icon: "building" },
-	{ key: "region", label: "区域", icon: "map" }
+	{ key: "yhgl", label: "业务管理", icon: "folder" },
+	{ key: "gxjg", label: "关系机构", icon: "building" }
 ]
 
-const activeTab = ref("category")
+const activeTab = ref("yhgl")
 
 // 树形数据
-const treeData = ref([
-	{
-		id: 1,
-		label: "全部数据",
-		count: 100,
-		icon: "folder-open",
-		children: [
-			{
-				id: 11,
-				label: "类别一",
-				count: 30,
-				icon: "document",
-				children: [
-					{ id: 111, label: "子类别 1-1", count: 10, icon: "file" },
-					{ id: 112, label: "子类别 1-2", count: 20, icon: "file" }
-				]
-			},
-			{
-				id: 12,
-				label: "类别二",
-				count: 40,
-				icon: "document",
-				children: [
-					{ id: 121, label: "子类别 2-1", count: 15, icon: "file" },
-					{ id: 122, label: "子类别 2-2", count: 25, icon: "file" }
-				]
-			},
-			{
-				id: 13,
-				label: "类别三",
-				count: 30,
-				icon: "document"
-			}
-		]
-	},
-	{
-		id: 2,
-		label: "已标记",
-		count: 50,
-		icon: "star",
-		children: [
-			{ id: 21, label: "重要数据", count: 25, icon: "star-filled" },
-			{ id: 22, label: "待处理", count: 25, icon: "clock" }
-		]
-	},
-	{
-		id: 3,
-		label: "回收站",
-		count: 10,
-		icon: "delete"
-	}
-])
+const treeData = ref<TreeNode[]>([])
+const treeLoading = ref(false)
 
 const treeProps = {
 	children: "children",
@@ -411,10 +362,23 @@ const handleTabChange = (key: string) => {
 }
 
 // 加载树形数据
-const loadTreeData = (type: string) => {
-	// 模拟根据类型加载不同数据
-	console.log("加载树形数据:", type)
+const loadTreeData = async (type: string) => {
+	treeLoading.value = true
+	try {
+		const res = await rrgk.getTreeData(type as 'yhgl' | 'gxjg')
+		treeData.value = res.data || []
+	} catch (error) {
+		console.error('加载树数据失败:', error)
+		treeData.value = []
+	} finally {
+		treeLoading.value = false
+	}
 }
+
+// 初始化加载树数据
+onMounted(() => {
+	loadTreeData(activeTab.value)
+})
 
 // 树节点点击
 const handleTreeNodeClick = (data: Record<string, unknown>) => {

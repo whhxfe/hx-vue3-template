@@ -16,6 +16,9 @@ const useSysStore = defineStore("sys", () => {
 	// 用户已授权的模块列表（从 userInfo 派生）
 	const authorizedModules = computed(() => userInfo.value?.modules || [])
 
+	// 用户已授权的后台系统模块列表（从 userInfo 派生）
+	const authorizedAdminModules = computed(() => userInfo.value?.adminModules || [])
+
 	// 标识是否正在加载用户信息
 	const isLoadingUserInfo = ref(false)
 
@@ -145,7 +148,8 @@ const useSysStore = defineStore("sys", () => {
 		logout,
 		routesLoaded,
 		setRoutesLoaded,
-		authorizedModules
+		authorizedModules,
+		authorizedAdminModules
 	}
 })
 

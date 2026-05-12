@@ -67,4 +67,22 @@
 	--transition-function: cubic-bezier(0.4, 0, 0.2, 1);
 	--transition-base: all var(--transition-duration) var(--transition-function);
 	--transition-fast: all var(--transition-duration-fast) var(--transition-function);
+
+	// ---- Spacing / Padding / Margin ----
+	--space-xs: 4px;
+	--space-sm: 8px;
+	--space-base: 12px;
+	--space-md: 16px;
+	--space-lg: 24px;
+	--space-xl: 32px;
+	--space-2xl: 48px;
+	--space-3xl: 64px;
+
+	// Gap 间距（Flex/Grid 布局）
+	--gap-xs: 4px;
+	--gap-sm: 8px;
+	--gap-base: 12px;
+	--gap-md: 16px;
+	--gap-lg: 24px;
+	--gap-xl: 32px;
 }
