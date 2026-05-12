@@ -6,27 +6,50 @@ const routes: RouteRecordRaw[] = [
 		name: '_templates',
 		path: '/templates',
 		component: layout,
-		redirect: '/templates/user-list',
+		redirect: '/templates/data-management',
 		meta: {
 			moduleKey: '_templates',
 			title: 'templates'
 		},
 		children: [
 			{
-				name: 'UserList',
-				path: '/templates/user-list',
-				component: () => import('../views/UserList.vue'),
+				name: 'Dashboard',
+				path: '/templates/dashboard',
+				component: () => import('../views/dashboard/index.vue'),
 				meta: {
-					title: 'userList'
+					title: 'dashboard'
 				}
 			},
 			{
-				name: 'UserDetail',
-				path: '/templates/user-detail/:id',
-				component: () => import('../views/UserDetail.vue'),
+				name: 'DataManagement',
+				path: '/templates/data-management',
+				component: () => import('../views/data-management/index.vue'),
 				meta: {
-					title: 'userDetail',
-					hidden: true
+					title: 'dataManagement'
+				}
+			},
+			{
+				name: 'Approval',
+				path: '/templates/approval',
+				component: () => import('../views/approval/index.vue'),
+				meta: {
+					title: 'approval'
+				}
+			},
+			{
+				name: 'Settings',
+				path: '/templates/settings',
+				component: () => import('../views/settings/index.vue'),
+				meta: {
+					title: 'settings'
+				}
+			},
+			{
+				name: 'Analytics',
+				path: '/templates/analytics',
+				component: () => import('../views/analytics/index.vue'),
+				meta: {
+					title: 'analytics'
 				}
 			}
 		]

@@ -3,12 +3,24 @@ const menu = [
 		title: 'templates',
 		children: [
 			{
-				title: 'userList',
-				path: '/templates/user-list'
+				title: 'dashboard',
+				path: '/templates/dashboard'
 			},
 			{
-				title: 'userDetail',
-				path: '/templates/user-detail/:id'
+				title: 'dataManagement',
+				path: '/templates/data-management'
+			},
+			{
+				title: 'approval',
+				path: '/templates/approval'
+			},
+			{
+				title: 'settings',
+				path: '/templates/settings'
+			},
+			{
+				title: 'analytics',
+				path: '/templates/analytics'
 			}
 		]
 	}
