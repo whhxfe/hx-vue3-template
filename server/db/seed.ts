@@ -103,12 +103,17 @@ async function seed() {
 		roleMap[row[1] as string] = row[0] as number
 	})
 
-	// super 角色拥有全部模块
+	// super 角色拥有全部模块（包括所有后台系统模块）
 	db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.super, "ucenter"])
+	db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.super, "sysconfig"])
+	db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.super, "syslog"])
+	db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.super, "dict"])
+	db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.super, "notice"])
 	db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.super, "_templates"])
 	db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.super, "zddxgk"])
 	// admin 角色
 	db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.admin, "ucenter"])
+	db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.admin, "sysconfig"])
 	db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.admin, "_templates"])
 	// user 角色
 	db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.user, "_templates"])

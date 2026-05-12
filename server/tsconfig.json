@@ -9,7 +9,14 @@
 		"outDir": "./dist",
 		"rootDir": ".",
 		"types": ["node"],
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./*"],
+			"@db/*": ["db/*"],
+			"@routes/*": ["routes/*"],
+			"@utils/*": ["utils/*"]
+		}
 	},
 	"include": ["./**/*.ts"]
 }

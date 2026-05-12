@@ -1,10 +1,13 @@
 /**
  * 用户中心（ucenter）路由实现
  * 账号管理、角色管理、权限分配 CRUD
+ * 
+ * 层级路由: /wzsys/admin/ucenter/...
+ * prefix 由 registerAdmin 传入，Fastify 自动添加到所有路由
  */
-import type { FastifyInstance, FastifyRequest } from "fastify"
-import { getDb, saveDatabase } from "../../../db/db"
-import { success, fail, pagedList } from "../../../utils/response"
+import type { FastifyInstance, FastifyPluginAsync, FastifyRequest } from "fastify"
+import { getDb, saveDatabase } from "@db/db"
+import { success, fail, pagedList } from "@utils/response"
 import {
 	getRolesSchema,
 	getRoleDetailSchema,
@@ -66,10 +69,13 @@ function lastInsertId(): number {
 
 // ==================== Routes ====================
 
-export async function ucenterRoutes(app: FastifyInstance) {
+export const ucenterRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
+	// Fastify register 会自动添加 prefix (/wzsys/admin)
+	// 所以路由路径只需要定义当前层级: /ucenter/...
+
 	// ---------- 角色 CRUD ----------
 
-	app.get("/ucenter/roles", getRolesSchema, async (request: FastifyRequest) => {
+	app.get("/admin/ucenter/roles", getRolesSchema, async (request: FastifyRequest) => {
 		const q = request.query as any
 		const page = Number(q["params[page]"] || q.page || 1)
 		const pageSize = Number(q["params[pageSize]"] || q.pageSize || 100)
@@ -90,14 +96,14 @@ export async function ucenterRoutes(app: FastifyInstance) {
 		return pagedList(list, total, page, pageSize)
 	})
 
-	app.get("/ucenter/roles/:id", getRoleDetailSchema, async (request: FastifyRequest) => {
+	app.get("/admin/ucenter/roles/:id", getRoleDetailSchema, async (request: FastifyRequest) => {
 		const { id } = request.params as { id: number }
 		const role = queryOne("SELECT * FROM roles WHERE id = ?", [id])
 		if (!role) return fail("角色不存在")
 		return success(role)
 	})
 
-	app.post("/ucenter/roles", createRoleSchema, async (request: FastifyRequest) => {
+	app.post("/admin/ucenter/roles", createRoleSchema, async (request: FastifyRequest) => {
 		const { name, code, description, sort_order } = request.body as any
 		try {
 			runAndSave(
@@ -111,7 +117,7 @@ export async function ucenterRoutes(app: FastifyInstance) {
 		}
 	})
 
-	app.put("/ucenter/roles/:id", updateRoleSchema, async (request: FastifyRequest) => {
+	app.put("/admin/ucenter/roles/:id", updateRoleSchema, async (request: FastifyRequest) => {
 		const { id } = request.params as { id: number }
 		const body = request.body as any
 		const fields: string[] = []
@@ -133,7 +139,7 @@ export async function ucenterRoutes(app: FastifyInstance) {
 		}
 	})
 
-	app.delete("/ucenter/roles/:id", deleteRoleSchema, async (request: FastifyRequest) => {
+	app.delete("/admin/ucenter/roles/:id", deleteRoleSchema, async (request: FastifyRequest) => {
 		const { id } = request.params as { id: number }
 		// 检查是否有账号关联
 		const count = queryScalar("SELECT COUNT(*) FROM accounts WHERE role_id = ?", [id]) as number
@@ -145,13 +151,13 @@ export async function ucenterRoutes(app: FastifyInstance) {
 
 	// ---------- 权限分配 (角色-模块关联) ----------
 
-	app.get("/ucenter/roles/:id/menus", getRoleMenusSchema, async (request: FastifyRequest) => {
+	app.get("/admin/ucenter/roles/:id/menus", getRoleMenusSchema, async (request: FastifyRequest) => {
 		const { id } = request.params as { id: number }
 		const list = queryAll("SELECT * FROM role_menus WHERE role_id = ?", [id])
 		return success(list.map(m => m.module_key))
 	})
 
-	app.put("/ucenter/roles/:id/menus", assignRoleMenusSchema, async (request: FastifyRequest) => {
+	app.put("/admin/ucenter/roles/:id/menus", assignRoleMenusSchema, async (request: FastifyRequest) => {
 		const { id } = request.params as { id: number }
 		const { module_keys } = request.body as { module_keys: string[] }
 		// 先清除旧权限，再插入新权限
@@ -164,11 +170,10 @@ export async function ucenterRoutes(app: FastifyInstance) {
 
 	// ---------- 可用模块列表 ----------
 
-	app.get("/ucenter/modules", getModulesSchema, async () => {
+	app.get("/admin/ucenter/modules", getModulesSchema, async () => {
 		// 从 src/modules 目录注册的模块在此硬编码，前端可选
 		// 后续可以改为从数据库或配置文件读取
 		const availableModules = [
-			{ key: "ucenter", name: "用户中心", description: "账号、角色、权限管理" },
 			{ key: "_templates", name: "模板示例", description: "功能模板示例" },
 			{ key: "zddxgk", name: "站点管理", description: "站点信息管理" }
 		]
@@ -177,7 +182,7 @@ export async function ucenterRoutes(app: FastifyInstance) {
 
 	// ---------- 账号 CRUD ----------
 
-	app.get("/ucenter/accounts", getAccountsSchema, async (request: FastifyRequest) => {
+	app.get("/admin/ucenter/accounts", getAccountsSchema, async (request: FastifyRequest) => {
 		const q = request.query as any
 		// 兼容前端 params[page]&params[pageSize] 的传参格式
 		// Fastify 默认 querystring parser 将 params[page] 解析为字面量键名 "params[page]"，而非嵌套对象
@@ -213,7 +218,7 @@ export async function ucenterRoutes(app: FastifyInstance) {
 		return pagedList(list, total, page, pageSize)
 	})
 
-	app.get("/ucenter/accounts/:id", getAccountDetailSchema, async (request: FastifyRequest) => {
+	app.get("/admin/ucenter/accounts/:id", getAccountDetailSchema, async (request: FastifyRequest) => {
 		const { id } = request.params as { id: number }
 		const account = queryOne(`
 			SELECT a.*, r.name as role_name, r.code as role_code
@@ -227,7 +232,7 @@ export async function ucenterRoutes(app: FastifyInstance) {
 		return success(info)
 	})
 
-	app.post("/ucenter/accounts", createAccountSchema, async (request: FastifyRequest) => {
+	app.post("/admin/ucenter/accounts", createAccountSchema, async (request: FastifyRequest) => {
 		const { username, password, display_name, email, phone, status, role_id } = request.body as any
 		try {
 			runAndSave(
@@ -241,7 +246,7 @@ export async function ucenterRoutes(app: FastifyInstance) {
 		}
 	})
 
-	app.put("/ucenter/accounts/:id", updateAccountSchema, async (request: FastifyRequest) => {
+	app.put("/admin/ucenter/accounts/:id", updateAccountSchema, async (request: FastifyRequest) => {
 		const { id } = request.params as { id: number }
 		const body = request.body as any
 		const fields: string[] = []
@@ -262,7 +267,7 @@ export async function ucenterRoutes(app: FastifyInstance) {
 		}
 	})
 
-	app.delete("/ucenter/accounts/:id", deleteAccountSchema, async (request: FastifyRequest) => {
+	app.delete("/admin/ucenter/accounts/:id", deleteAccountSchema, async (request: FastifyRequest) => {
 		const { id } = request.params as { id: number }
 		runAndSave("DELETE FROM accounts WHERE id = ?", [id])
 		return success(null, "删除成功")

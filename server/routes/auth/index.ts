@@ -5,14 +5,39 @@
  */
 import type { FastifyInstance, FastifyRequest } from "fastify"
 import type { MockUserInfo } from "./types"
-import { getDb } from "../../db/db"
-import { success, fail, tokenExpired } from "../../utils/response"
+import { getDb } from "@db/db"
+import { success, fail, tokenExpired } from "@utils/response"
 
-/** token 内存存储 */
-const tokenStore = new Map<string, MockUserInfo>()
+/** Token 有效期（秒）- 24小时 */
+const TOKEN_EXPIRES_IN = 24 * 60 * 60
+
+/** token 内存存储：token -> { user: 用户信息, expiresAt: 过期时间戳 } */
+const tokenStore = new Map<string, { user: MockUserInfo; expiresAt: number }>()
+
+/**
+ * 后台系统模块列表
+ * 这些模块归类为 adminModules，用于前端动态注册后台管理路由
+ */
+const ADMIN_MODULE_KEYS = ['ucenter', 'sysconfig', 'syslog', 'dict', 'notice']
 
 function generateToken(): string {
 	return "mock_token_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8)
+}
+
+/**
+ * 检查 token 是否存在且未过期
+ */
+function checkToken(token: string): { valid: boolean; user?: MockUserInfo; expiresIn?: number } {
+	const entry = tokenStore.get(token)
+	if (!entry) {
+		return { valid: false }
+	}
+	if (Date.now() > entry.expiresAt) {
+		tokenStore.delete(token)
+		return { valid: false }
+	}
+	const expiresIn = Math.floor((entry.expiresAt - Date.now()) / 1000)
+	return { valid: true, user: entry.user, expiresIn }
 }
 
 export async function authRoutes(app: FastifyInstance) {
@@ -43,7 +68,8 @@ export async function authRoutes(app: FastifyInstance) {
 							properties: {
 								info: { type: "string", description: "token" },
 								level: { type: "string", description: "角色等级" },
-								modules: { type: "array", items: { type: "string" }, description: "授权模块" }
+								modules: { type: "array", items: { type: "string" }, description: "授权业务模块" },
+								adminModules: { type: "array", items: { type: "string" }, description: "授权后台系统模块" }
 							}
 						}
 					}
@@ -80,26 +106,37 @@ export async function authRoutes(app: FastifyInstance) {
 		const menuStmt = db.prepare("SELECT module_key FROM role_menus WHERE role_id = ?")
 		menuStmt.bind([account.role_id])
 		const modules: string[] = []
+		const adminModules: string[] = []
 		while (menuStmt.step()) {
 			const row = menuStmt.getAsObject()
-			modules.push(row.module_key as string)
+			const moduleKey = row.module_key as string
+			// 后台系统模块归类为 adminModules
+			if (ADMIN_MODULE_KEYS.includes(moduleKey)) {
+				adminModules.push(moduleKey)
+			} else {
+				modules.push(moduleKey)
+			}
 		}
 		menuStmt.free()
 
 		const roleLevel = String(account.role_level ?? 99)
 		const userInfo: MockUserInfo = {
 			accountId: String(account.id),
-			accountName: account.display_name as string || account.username as string,
-			accountMemo: account.username as string,
+			accountName: (account.display_name as string) || (account.username as string),
+			username: account.username as string,
+			email: account.email as string | undefined,
+			phone: account.phone as string | undefined,
 			roleName: account.role_code as string,
 			roleLevel,
-			modules
+			modules,
+			adminModules
 		}
 
 		const token = generateToken()
-		tokenStore.set(token, userInfo)
+		const expiresAt = Date.now() + TOKEN_EXPIRES_IN * 1000
+		tokenStore.set(token, { user: userInfo, expiresAt })
 
-		return success({ info: token, level: roleLevel, modules }, "登录成功")
+		return success({ info: token, level: roleLevel, modules, adminModules, expiresIn: TOKEN_EXPIRES_IN }, "登录成功")
 	})
 
 	/**
@@ -122,7 +159,7 @@ export async function authRoutes(app: FastifyInstance) {
 		if (token) {
 			tokenStore.delete(token)
 		}
-		return success(null, "登出成功")
+		return success({ success: true }, "登出成功")
 	})
 
 	/**
@@ -144,8 +181,16 @@ export async function authRoutes(app: FastifyInstance) {
 		const query = request.query as { token?: string }
 		const token = query.token || (request.headers.token as string)
 
-		if (token && tokenStore.has(token)) {
-			return success(null, "token 有效")
+		if (token) {
+			const result = checkToken(token)
+			if (result.valid && result.user) {
+				return success({
+					valid: true,
+					accountId: result.user.accountId,
+					accountName: result.user.accountName,
+					expiresIn: result.expiresIn
+				}, "token 有效")
+			}
 		}
 		return tokenExpired()
 	})
@@ -176,10 +221,13 @@ export async function authRoutes(app: FastifyInstance) {
 							properties: {
 								accountId: { type: "string" },
 								accountName: { type: "string" },
-								accountMemo: { type: "string" },
+								username: { type: "string" },
+								email: { type: "string" },
+								phone: { type: "string" },
 								roleName: { type: "string" },
 								roleLevel: { type: "string" },
-								modules: { type: "array", items: { type: "string" } }
+								modules: { type: "array", items: { type: "string" } },
+								adminModules: { type: "array", items: { type: "string" } }
 							}
 						}
 					}
@@ -193,9 +241,9 @@ export async function authRoutes(app: FastifyInstance) {
 			return fail("token 不能为空")
 		}
 
-		const user = tokenStore.get(token)
-		if (user) {
-			return success(user, "获取成功")
+		const result = checkToken(token)
+		if (result.valid && result.user) {
+			return success(result.user, "获取成功")
 		}
 		return tokenExpired()
 	})
