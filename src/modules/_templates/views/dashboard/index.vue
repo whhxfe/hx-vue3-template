@@ -15,7 +15,7 @@
 						<el-icon v-if="stat.trend > 0"><ArrowUp /></el-icon>
 						<el-icon v-else><ArrowDown /></el-icon>
 						<span>{{ Math.abs(stat.trend) }}%</span>
-						<span class="trend-text">较上周</span>
+						<span class="trend-text">{{ text.common.trend }}</span>
 					</div>
 				</div>
 			</div>
@@ -26,11 +26,11 @@
 			<!-- 左侧柱状图 -->
 			<div class="chart-card bar-chart" v-loading="chartLoading">
 				<div class="chart-header">
-					<span class="chart-title">月度销售额统计</span>
+					<span class="chart-title">{{ text.dashboard.monthlySales }}</span>
 					<el-radio-group v-model="barPeriod" size="small" @change="handleBarPeriodChange">
-						<el-radio-button value="week">本周</el-radio-button>
-						<el-radio-button value="month">本月</el-radio-button>
-						<el-radio-button value="year">本年</el-radio-button>
+						<el-radio-button value="week">{{ text.common.week }}</el-radio-button>
+						<el-radio-button value="month">{{ text.common.month }}</el-radio-button>
+						<el-radio-button value="year">{{ text.common.year }}</el-radio-button>
 					</el-radio-group>
 				</div>
 				<div class="chart-body">
@@ -41,12 +41,12 @@
 			<!-- 右侧饼图 -->
 			<div class="chart-card pie-chart" v-loading="chartLoading">
 				<div class="chart-header">
-					<span class="chart-title">销售分类占比</span>
-					<el-select v-model="pieType" size="small" placeholder="选择分类" @change="handlePieTypeChange">
-						<el-option label="全部" value="all" />
-						<el-option label="电子产品" value="electronic" />
-						<el-option label="办公用品" value="office" />
-						<el-option label="生活用品" value="daily" />
+					<span class="chart-title">{{ text.dashboard.salesCategory }}</span>
+					<el-select v-model="pieType" size="small" :placeholder="text.dashboard.selectCategory" @change="handlePieTypeChange">
+						<el-option :label="text.dashboard.categoryAll" value="all" />
+						<el-option :label="text.dashboard.categoryElectronic" value="electronic" />
+						<el-option :label="text.dashboard.categoryOffice" value="office" />
+						<el-option :label="text.dashboard.categoryDaily" value="daily" />
 					</el-select>
 				</div>
 				<div class="chart-body">
@@ -58,18 +58,18 @@
 		<!-- 底部折线图 -->
 		<div class="chart-card line-chart" v-loading="chartLoading">
 			<div class="chart-header">
-				<span class="chart-title">年度销售趋势</span>
+				<span class="chart-title">{{ text.dashboard.annualTrend }}</span>
 				<div class="chart-actions">
 					<el-date-picker
 						v-model="lineYear"
 						type="year"
 						size="small"
-						placeholder="选择年份"
+						:placeholder="text.dashboard.selectYear"
 						format="YYYY"
 						value-format="YYYY"
 						@change="handleYearChange"
 					/>
-					<el-button size="small" @click="handleExportData">导出数据</el-button>
+					<el-button size="small" @click="handleExportData">{{ text.dashboard.exportData }}</el-button>
 				</div>
 			</div>
 			<div class="chart-body">
@@ -80,29 +80,29 @@
 		<!-- 底部数据列表 -->
 		<div class="data-list-section">
 			<div class="section-header">
-				<span class="section-title">最新订单</span>
-				<el-button type="primary" link @click="handleViewAllOrders">查看全部</el-button>
+				<span class="section-title">{{ text.dashboard.latestOrders }}</span>
+				<el-button type="primary" link @click="handleViewAllOrders">{{ text.common.viewAll }}</el-button>
 			</div>
 			<el-table v-loading="orderLoading" :data="orderList" stripe>
-				<el-table-column prop="orderNo" label="订单编号" width="180" />
-				<el-table-column prop="product" label="商品名称" min-width="200" />
-				<el-table-column prop="amount" label="订单金额" width="120" align="right">
+				<el-table-column prop="orderNo" :label="text.dashboard.orderNo" width="180" />
+				<el-table-column prop="product" :label="text.dashboard.productName" min-width="200" />
+				<el-table-column prop="amount" :label="text.dashboard.orderAmount" width="120" align="right">
 					<template #default="{ row }">
 						<span class="amount">¥{{ row.amount.toFixed(2) }}</span>
 					</template>
 				</el-table-column>
-				<el-table-column prop="status" label="订单状态" width="100" align="center">
+				<el-table-column prop="status" :label="text.dashboard.orderStatus" width="100" align="center">
 					<template #default="{ row }">
 						<el-tag :type="getStatusType(row.status)" size="small">
 							{{ getStatusText(row.status) }}
 						</el-tag>
 					</template>
 				</el-table-column>
-				<el-table-column prop="createTime" label="下单时间" width="180" />
-				<el-table-column label="操作" width="120" align="center">
+				<el-table-column prop="createTime" :label="text.dashboard.orderTime" width="180" />
+				<el-table-column :label="text.dashboard.action" width="120" align="center">
 					<template #default="{ row }">
-						<el-button type="primary" link @click="handleViewOrder(row)">查看</el-button>
-						<el-button type="primary" link @click="handleExportOrder(row)">导出</el-button>
+						<el-button type="primary" link @click="handleViewOrder(row)">{{ text.dashboard.view }}</el-button>
+						<el-button type="primary" link @click="handleExportOrder(row)">{{ text.dashboard.export }}</el-button>
 					</template>
 				</el-table-column>
 			</el-table>
@@ -118,6 +118,9 @@ import {
 	ArrowDown
 } from "@element-plus/icons-vue"
 import { dashboard, type StatItem, type ChartData, type PieItem, type OrderItem } from '@/modules/_templates/api'
+import { useTextAlias } from '@/modules/_templates/config'
+
+const text = useTextAlias()
 
 const statsData = ref<StatItem[]>([])
 const monthlySalesData = ref<ChartData[]>([])
@@ -437,10 +440,10 @@ const getStatusType = (status: OrderItem["status"]) => {
 
 const getStatusText = (status: OrderItem["status"]) => {
 	const map: Record<OrderItem["status"], string> = {
-		pending: "待处理",
-		processing: "处理中",
-		completed: "已完成",
-		cancelled: "已取消"
+		pending: text.dashboard.statusPending,
+		processing: text.dashboard.statusProcessing,
+		completed: text.dashboard.statusCompleted,
+		cancelled: text.dashboard.statusCancelled
 	}
 	return map[status]
 }
@@ -459,19 +462,19 @@ const handleYearChange = (year: string) => {
 }
 
 const handleExportData = () => {
-	ElMessage.success('导出数据成功')
+	ElMessage.success(text.common.success)
 }
 
 const handleViewAllOrders = () => {
-	ElMessage.info('查看全部订单')
+	ElMessage.info(text.common.viewAll)
 }
 
 const handleViewOrder = (row: OrderItem) => {
-	ElMessage.info(`查看订单: ${row.orderNo}`)
+	ElMessage.info(`${text.dashboard.view} ${row.orderNo}`)
 }
 
 const handleExportOrder = (row: OrderItem) => {
-	ElMessage.success(`导出订单: ${row.orderNo}`)
+	ElMessage.success(`${text.dashboard.export} ${row.orderNo}`)
 }
 
 // 初始化

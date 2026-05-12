@@ -1,17 +1,17 @@
 <template>
 	<div class="data-management-list">
 		<div class="header">
-			<h2>数据管理</h2>
+			<h2>{{ text.dataManagement.title }}</h2>
 			<el-button type="primary" @click="handleAdd">
 				<el-icon><Plus /></el-icon>
-				新增数据
+				{{ text.dataManagement.addData }}
 			</el-button>
 		</div>
 
 		<div class="filter-bar">
 			<el-input
 				v-model="searchKeyword"
-				placeholder="搜索名称、编码..."
+				:placeholder="text.dataManagement.searchPlaceholder"
 				clearable
 				style="width: 240px"
 				@clear="handleSearch"
@@ -21,31 +21,31 @@
 					<el-icon><Search /></el-icon>
 				</template>
 			</el-input>
-			<el-select v-model="filterCategory" placeholder="分类筛选" clearable style="width: 140px">
-				<el-option label="全部" value="" />
-				<el-option label="数据源" value="数据源" />
-				<el-option label="配置项" value="配置项" />
-				<el-option label="规则模板" value="规则模板" />
+			<el-select v-model="filterCategory" :placeholder="text.dataManagement.categoryFilter" clearable style="width: 140px">
+				<el-option :label="text.common.all" value="" />
+				<el-option :label="text.dataManagement.categoryDataSource" value="数据源" />
+				<el-option :label="text.dataManagement.categoryConfig" value="配置项" />
+				<el-option :label="text.dataManagement.categoryRuleTemplate" value="规则模板" />
 			</el-select>
-			<el-select v-model="filterStatus" placeholder="状态筛选" clearable style="width: 120px">
-				<el-option label="全部" value="" />
-				<el-option label="启用" value="active" />
-				<el-option label="禁用" value="inactive" />
+			<el-select v-model="filterStatus" :placeholder="text.dataManagement.statusFilter" clearable style="width: 120px">
+				<el-option :label="text.common.all" value="" />
+				<el-option :label="text.common.enabled" value="active" />
+				<el-option :label="text.common.disabled" value="inactive" />
 			</el-select>
-			<el-button type="primary" @click="handleSearch">搜索</el-button>
+			<el-button type="primary" @click="handleSearch">{{ text.common.search }}</el-button>
 		</div>
 
 		<div v-loading="loading" class="content">
 			<el-table :data="filteredList" stripe style="width: 100%">
-				<el-table-column prop="id" label="ID" width="80" />
-				<el-table-column prop="name" label="名称" min-width="150" />
-				<el-table-column prop="code" label="编码" width="120" />
-				<el-table-column prop="category" label="分类" width="100">
+				<el-table-column prop="id" :label="text.dataManagement.id" width="80" />
+				<el-table-column prop="name" :label="text.dataManagement.name" min-width="150" />
+				<el-table-column prop="code" :label="text.dataManagement.code" width="120" />
+				<el-table-column prop="category" :label="text.dataManagement.category" width="100">
 					<template #default="{ row }">
 						<el-tag size="small">{{ row.category }}</el-tag>
 					</template>
 				</el-table-column>
-				<el-table-column prop="status" label="状态" width="100">
+				<el-table-column prop="status" :label="text.dataManagement.status" width="100">
 					<template #default="{ row }">
 						<el-switch
 							v-model="row.status"
@@ -55,17 +55,17 @@
 						/>
 					</template>
 				</el-table-column>
-				<el-table-column prop="createTime" label="创建时间" width="180" />
-				<el-table-column prop="description" label="描述" min-width="150" show-overflow-tooltip />
-				<el-table-column label="操作" width="180" fixed="right">
+				<el-table-column prop="createTime" :label="text.dataManagement.createTime" width="180" />
+				<el-table-column prop="description" :label="text.dataManagement.description" min-width="150" show-overflow-tooltip />
+				<el-table-column :label="text.dataManagement.action" width="180" fixed="right">
 					<template #default="{ row }">
 						<el-button type="primary" text size="small" @click="handleEdit(row)">
 							<el-icon><Edit /></el-icon>
-							编辑
+							{{ text.common.edit }}
 						</el-button>
 						<el-button type="danger" text size="small" @click="handleDelete(row)">
 							<el-icon><Delete /></el-icon>
-							删除
+							{{ text.common.delete }}
 						</el-button>
 					</template>
 				</el-table-column>
@@ -87,37 +87,37 @@
 		<!-- 新增/编辑弹窗 -->
 		<el-dialog
 			v-model="dialogVisible"
-			:title="isEdit ? '编辑数据' : '新增数据'"
+			:title="isEdit ? text.dataManagement.editData : text.dataManagement.addData"
 			width="500px"
 			@closed="handleDialogClosed"
 		>
 			<el-form ref="formRef" :model="formData" :rules="formRules" label-width="80px">
-				<el-form-item label="名称" prop="name">
-					<el-input v-model="formData.name" placeholder="请输入名称" />
+				<el-form-item :label="text.dataManagement.name" prop="name">
+					<el-input v-model="formData.name" :placeholder="text.dataManagement.placeholder.name" />
 				</el-form-item>
-				<el-form-item label="编码" prop="code">
-					<el-input v-model="formData.code" placeholder="请输入编码" :disabled="isEdit" />
+				<el-form-item :label="text.dataManagement.code" prop="code">
+					<el-input v-model="formData.code" :placeholder="text.dataManagement.placeholder.code" :disabled="isEdit" />
 				</el-form-item>
-				<el-form-item label="分类" prop="category">
-					<el-select v-model="formData.category" placeholder="请选择分类" style="width: 100%">
-						<el-option label="数据源" value="数据源" />
-						<el-option label="配置项" value="配置项" />
-						<el-option label="规则模板" value="规则模板" />
+				<el-form-item :label="text.dataManagement.category" prop="category">
+					<el-select v-model="formData.category" :placeholder="text.dataManagement.placeholder.category" style="width: 100%">
+						<el-option :label="text.dataManagement.categoryDataSource" value="数据源" />
+						<el-option :label="text.dataManagement.categoryConfig" value="配置项" />
+						<el-option :label="text.dataManagement.categoryRuleTemplate" value="规则模板" />
 					</el-select>
 				</el-form-item>
-				<el-form-item label="状态" prop="status">
+				<el-form-item :label="text.dataManagement.status" prop="status">
 					<el-radio-group v-model="formData.status">
-						<el-radio value="active">启用</el-radio>
-						<el-radio value="inactive">禁用</el-radio>
+						<el-radio value="active">{{ text.common.enabled }}</el-radio>
+						<el-radio value="inactive">{{ text.common.disabled }}</el-radio>
 					</el-radio-group>
 				</el-form-item>
-				<el-form-item label="描述" prop="description">
-					<el-input v-model="formData.description" type="textarea" :rows="3" placeholder="请输入描述" />
+				<el-form-item :label="text.dataManagement.description" prop="description">
+					<el-input v-model="formData.description" type="textarea" :rows="3" :placeholder="text.dataManagement.placeholder.description" />
 				</el-form-item>
 			</el-form>
 			<template #footer>
-				<el-button @click="dialogVisible = false">取消</el-button>
-				<el-button type="primary" @click="handleSubmit">确定</el-button>
+				<el-button @click="dialogVisible = false">{{ text.common.cancel }}</el-button>
+				<el-button type="primary" @click="handleSubmit">{{ text.common.ok }}</el-button>
 			</template>
 		</el-dialog>
 	</div>
@@ -130,6 +130,9 @@ import { Plus, Search, Edit, Delete } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useDataManagementStore } from '../../store/data-management'
 import type { DataItem, DataFormData } from '../../api/data-management/types'
+import { useTextAlias } from '@/modules/_templates/config'
+
+const text = useTextAlias()
 
 const {
 	dataList,
@@ -162,10 +165,10 @@ const formData = ref<DataFormData>({
 })
 
 const formRules: FormRules = {
-	name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-	code: [{ required: true, message: '请输入编码', trigger: 'blur' }],
-	category: [{ required: true, message: '请选择分类', trigger: 'change' }],
-	status: [{ required: true, message: '请选择状态', trigger: 'change' }]
+	name: [{ required: true, message: text.dataManagement.placeholder.name, trigger: 'blur' }],
+	code: [{ required: true, message: text.dataManagement.placeholder.code, trigger: 'blur' }],
+	category: [{ required: true, message: text.dataManagement.placeholder.category, trigger: 'change' }],
+	status: [{ required: true, message: text.dataManagement.placeholder.status, trigger: 'change' }]
 }
 
 const filteredList = computed(() => {
@@ -215,11 +218,11 @@ const handleEdit = (row: DataItem) => {
 
 const handleDelete = async (row: DataItem) => {
 	try {
-		await ElMessageBox.confirm(`确定要删除「${row.name}」吗？`, '提示', {
+		await ElMessageBox.confirm(text.common.deleteConfirm.replace('{name}', row.name), text.common.tip, {
 			type: 'warning'
 		})
 		removeItem(row.id)
-		ElMessage.success('删除成功')
+		ElMessage.success(text.dataManagement.deleteSuccess)
 	} catch {
 		// 用户取消
 	}
@@ -227,7 +230,7 @@ const handleDelete = async (row: DataItem) => {
 
 const handleStatusChange = (row: DataItem) => {
 	updateItemStatus(row.id, row.status)
-	ElMessage.success(`已${row.status === 'active' ? '启用' : '禁用'}`)
+	ElMessage.success(`${row.status === 'active' ? text.common.enabled : text.common.disabled}`)
 }
 
 const handleSubmit = async () => {
@@ -240,7 +243,7 @@ const handleSubmit = async () => {
 					...formData.value,
 					updateTime: new Date().toLocaleString()
 				})
-				ElMessage.success('更新成功')
+				ElMessage.success(text.dataManagement.updateSuccess)
 			} else {
 				const newItem: DataItem = {
 					id: Date.now(),
@@ -249,7 +252,7 @@ const handleSubmit = async () => {
 					updateTime: new Date().toLocaleString()
 				}
 				addItem(newItem)
-				ElMessage.success('新增成功')
+				ElMessage.success(text.dataManagement.addSuccess)
 			}
 			dialogVisible.value = false
 		}

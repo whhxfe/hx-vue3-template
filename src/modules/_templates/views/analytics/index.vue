@@ -1,14 +1,14 @@
 <template>
 	<div class="analytics-page">
 		<div class="header">
-			<h2>数据分析</h2>
+			<h2>{{ text.analytics.title }}</h2>
 			<div class="date-range-picker">
 				<el-date-picker
 					v-model="dateRange"
 					type="daterange"
 					range-separator="至"
-					start-placeholder="开始日期"
-					end-placeholder="结束日期"
+					:start-placeholder="text.common.week"
+					:end-placeholder="text.common.month"
 					@change="handleDateChange"
 				/>
 			</div>
@@ -44,11 +44,11 @@
 				<el-card class="chart-card chart-line">
 					<template #header>
 						<div class="card-header">
-							<span>趋势分析</span>
+							<span>{{ text.analytics.trendAnalysis }}</span>
 							<el-radio-group v-model="trendPeriod" size="small" @change="handlePeriodChange">
-								<el-radio-button value="week">本周</el-radio-button>
-								<el-radio-button value="month">本月</el-radio-button>
-								<el-radio-button value="year">本年</el-radio-button>
+								<el-radio-button value="week">{{ text.common.week }}</el-radio-button>
+								<el-radio-button value="month">{{ text.common.month }}</el-radio-button>
+								<el-radio-button value="year">{{ text.common.year }}</el-radio-button>
 							</el-radio-group>
 						</div>
 					</template>
@@ -59,7 +59,7 @@
 				<el-card class="chart-card chart-bar">
 					<template #header>
 						<div class="card-header">
-							<span>分类统计</span>
+							<span>{{ text.analytics.categoryStats }}</span>
 						</div>
 					</template>
 					<div ref="barChartRef" class="chart-container"></div>
@@ -69,7 +69,7 @@
 				<el-card class="chart-card chart-pie">
 					<template #header>
 						<div class="card-header">
-							<span>占比分布</span>
+							<span>{{ text.analytics.distribution }}</span>
 						</div>
 					</template>
 					<div ref="pieChartRef" class="chart-container"></div>
@@ -83,42 +83,45 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { ArrowUp, ArrowDown, TrendCharts, DataLine, PieChart, User, Money, Document, ShoppingCart } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
+import { useTextAlias } from '@/modules/_templates/config'
+
+const text = useTextAlias()
 
 // 统计数据
 const statCards = ref([
 	{
-		title: '总访问量',
+		title: text.analytics.totalVisits,
 		value: 128947,
 		icon: 'TrendCharts',
 		color: '#409eff',
 		trend: 12.5,
-		trendText: '较上周'
+		trendText: text.common.trend
 	},
 	{
-		title: '活跃用户',
+		title: text.analytics.activeUsers,
 		value: 8562,
-		suffix: '人',
+		suffix: text.common.person,
 		icon: 'User',
 		color: '#67c23a',
 		trend: 8.3,
-		trendText: '较上周'
+		trendText: text.common.trend
 	},
 	{
-		title: '总订单数',
+		title: text.analytics.totalOrders,
 		value: 3456,
 		icon: 'ShoppingCart',
 		color: '#e6a23c',
 		trend: -2.1,
-		trendText: '较上周'
+		trendText: text.common.trend
 	},
 	{
-		title: '总销售额',
+		title: text.analytics.totalSales,
 		value: 156789,
-		suffix: '元',
+		suffix: text.common.yuan,
 		icon: 'Money',
 		color: '#f56c6c',
 		trend: 15.8,
-		trendText: '较上周'
+		trendText: text.common.trend
 	}
 ])
 

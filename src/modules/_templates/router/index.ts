@@ -2,10 +2,10 @@
  * 路由模块导出
  */
 import type { RouteRecordRaw } from 'vue-router'
-import routes from './routes'
+import { getRoutes } from './routes'
 
 export type { RouteRecordRaw }
 
-export { routes }
+export const routes: RouteRecordRaw[] = getRoutes()
 
 export default routes

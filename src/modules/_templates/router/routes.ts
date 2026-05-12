@@ -1,59 +1,56 @@
 import type { RouteRecordRaw } from 'vue-router'
 import layout from '../layout.vue'
+import { useTextAlias } from '../config'
 
-const routes: RouteRecordRaw[] = [
-	{
-		name: '_templates',
-		path: '/templates',
-		component: layout,
-		redirect: '/templates/data-management',
-		meta: {
-			moduleKey: '_templates',
-			title: 'templates'
-		},
-		children: [
-			{
-				name: 'Dashboard',
-				path: '/templates/dashboard',
-				component: () => import('../views/dashboard/index.vue'),
-				meta: {
-					title: 'dashboard'
-				}
-			},
-			{
-				name: 'DataManagement',
-				path: '/templates/data-management',
-				component: () => import('../views/data-management/index.vue'),
-				meta: {
-					title: 'dataManagement'
-				}
-			},
-			{
-				name: 'Approval',
-				path: '/templates/approval',
-				component: () => import('../views/approval/index.vue'),
-				meta: {
-					title: 'approval'
-				}
-			},
-			{
-				name: 'Settings',
-				path: '/templates/settings',
-				component: () => import('../views/settings/index.vue'),
-				meta: {
-					title: 'settings'
-				}
-			},
-			{
-				name: 'Analytics',
-				path: '/templates/analytics',
-				component: () => import('../views/analytics/index.vue'),
-				meta: {
-					title: 'analytics'
-				}
-			}
-		]
-	}
-]
+export const getRoutes = (): RouteRecordRaw[] => {
+	const text = useTextAlias()
 
-export default routes
+	return [
+		{
+			name: text.module.name,
+			path: '/templates',
+			component: layout,
+			redirect: '/templates/data-management',
+			meta: {
+				moduleKey: '_templates',
+				title: 'templates'
+			},
+			children: [
+				{
+					name: `${text.module.name}-dashboard`,
+					path: '/templates/dashboard',
+					component: () => import('../views/dashboard/index.vue'),
+					meta: {
+						title: 'dashboard'
+					}
+				},
+				{
+					name: `${text.module.name}-data-management`,
+					path: '/templates/data-management',
+					component: () => import('../views/data-management/index.vue'),
+					meta: {
+						title: 'dataManagement'
+					}
+				},
+				{
+					name: `${text.module.name}-settings`,
+					path: '/templates/settings',
+					component: () => import('../views/settings/index.vue'),
+					meta: {
+						title: 'settings'
+					}
+				},
+				{
+					name: `${text.module.name}-analytics`,
+					path: '/templates/analytics',
+					component: () => import('../views/analytics/index.vue'),
+					meta: {
+						title: 'analytics'
+					}
+				}
+			]
+		}
+	]
+}
+
+export default getRoutes()

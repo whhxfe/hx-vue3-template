@@ -1,14 +1,14 @@
 <template>
 	<div class="settings-page">
 		<div class="header">
-			<h2>系统设置</h2>
+			<h2>{{ text.settings.title }}</h2>
 			<el-button v-if="hasChanges" type="warning" @click="handleReset">
 				<el-icon><RefreshRight /></el-icon>
-				重置
+				{{ text.common.reset }}
 			</el-button>
 			<el-button type="primary" :disabled="!hasChanges" @click="handleSave">
 				<el-icon><Check /></el-icon>
-				保存设置
+				{{ text.settings.saveSettings }}
 			</el-button>
 		</div>
 
@@ -21,10 +21,10 @@
 						:key="group.id"
 						class="group-item"
 						:class="{ active: activeGroupId === group.id }"
-						@click="handleGroupChange(group.id)"
+						@click="setActiveGroup(group.id)"
 					>
 						<el-icon v-if="group.icon"><component :is="group.icon" /></el-icon>
-						<span class="group-name">{{ group.name }}</span>
+						<span class="group-name">{{ getGroupName(group.id) }}</span>
 					</div>
 				</div>
 			</el-aside>
@@ -33,24 +33,24 @@
 			<el-main class="settings-main">
 				<div class="current-group">
 					<div class="group-header">
-						<h3>{{ currentGroup?.name }}</h3>
-						<span v-if="currentGroup?.description" class="group-desc">{{ currentGroup.description }}</span>
+						<h3>{{ getGroupName(activeGroupId) }}</h3>
+						<span v-if="getGroupDescription(activeGroupId)" class="group-desc">{{ getGroupDescription(activeGroupId) }}</span>
 					</div>
 
 					<div class="config-list">
 						<el-form label-position="top" @submit.prevent>
 							<template v-for="item in currentGroupItems" :key="item.id">
-								<el-form-item :label="item.label">
+								<el-form-item :label="getConfigLabel(item)">
 									<template #label>
 										<div class="form-item-label">
-											<span>{{ item.label }}</span>
+											<span>{{ getConfigLabel(item) }}</span>
 											<el-tag
 												v-if="modifiedItems.has(item.key)"
 												type="warning"
 												size="small"
 												class="modified-tag"
 											>
-												已修改
+												{{ text.settings.modified }}
 											</el-tag>
 										</div>
 									</template>
@@ -68,7 +68,7 @@
 									<el-input
 										v-else-if="item.type === 'input'"
 										v-model="item.value"
-										:placeholder="item.placeholder"
+										:placeholder="getConfigPlaceholder(item)"
 										@input="handleValueChange(item.key, item.value)"
 									/>
 
@@ -88,7 +88,7 @@
 										@change="handleValueChange(item.key, item.value)"
 									>
 										<el-option
-											v-for="option in item.options"
+											v-for="option in getConfigOptions(item)"
 											:key="option.value"
 											:label="option.label"
 											:value="option.value"
@@ -101,12 +101,12 @@
 										v-model="item.value"
 										type="textarea"
 										:rows="3"
-										:placeholder="item.placeholder"
+										:placeholder="getConfigPlaceholder(item)"
 										@input="handleValueChange(item.key, item.value)"
 									/>
 
-									<div v-if="item.description" class="item-description">
-										{{ item.description }}
+									<div v-if="getConfigDescription(item)" class="item-description">
+										{{ getConfigDescription(item) }}
 									</div>
 								</el-form-item>
 							</template>
@@ -124,6 +124,9 @@ import { ElMessage } from 'element-plus'
 import { Check, RefreshRight } from '@element-plus/icons-vue'
 import { useSettingsStore } from '../../store/settings'
 import type { ConfigItem } from '../../api/settings/types'
+import { useTextAlias } from '@/modules/_templates/config'
+
+const text = useTextAlias()
 
 const {
 	groups,
@@ -142,8 +145,114 @@ const {
 
 const currentGroup = computed(() => groups.value.find(g => g.id === activeGroupId.value))
 
-const handleGroupChange = (groupId: string) => {
-	setActiveGroup(groupId)
+// 获取分组名称（翻译）
+const getGroupName = (groupId: string) => {
+	const groupMap: Record<string, string> = {
+		basic: text.settings.basicSettings,
+		notification: text.settings.notificationSettings,
+		security: text.settings.securitySettings,
+		appearance: text.settings.appearanceSettings
+	}
+	return groupMap[groupId] || groupId
+}
+
+// 获取分组描述（翻译）
+const getGroupDescription = (groupId: string) => {
+	const descMap: Record<string, string> = {
+		basic: text.settings.description.siteName,
+		notification: text.settings.description.emailNotification,
+		security: text.settings.description.passwordExpireDays,
+		appearance: text.settings.description.theme
+	}
+	return descMap[groupId] || ''
+}
+
+// 获取配置项标签（翻译）
+const getConfigLabel = (item: ConfigItem) => {
+	const labelMap: Record<string, string> = {
+		'site-name': text.settings.siteName,
+		'site-logo': text.settings.siteLogo,
+		'default-lang': text.settings.defaultLanguage,
+		'email-notify': text.settings.emailNotification,
+		'sms-notify': text.settings.smsNotification,
+		'notify-email': text.settings.notifyEmail,
+		'pwd-expire': text.settings.passwordExpireDays,
+		'login-retry': text.settings.loginRetryLimit,
+		'session-timeout': text.settings.sessionTimeout,
+		'theme': text.settings.theme,
+		'compact-mode': text.settings.compactMode,
+		'sidebar-collapsed': text.settings.sidebarCollapsed
+	}
+	return labelMap[item.id] || item.label
+}
+
+// 获取配置项 placeholder（翻译）
+const getConfigPlaceholder = (item: ConfigItem) => {
+	const placeholderMap: Record<string, string> = {
+		'site-name': text.settings.placeholder.siteName,
+		'site-logo': text.settings.placeholder.siteLogo,
+		'notify-email': text.settings.placeholder.notifyEmail
+	}
+	return placeholderMap[item.id] || ''
+}
+
+// 获取配置项描述（翻译）
+const getConfigDescription = (item: ConfigItem) => {
+	const descMap: Record<string, string> = {
+		'site-name': text.settings.description.siteName,
+		'site-logo': text.settings.description.siteLogo,
+		'default-lang': text.settings.description.defaultLanguage,
+		'email-notify': text.settings.description.emailNotification,
+		'sms-notify': text.settings.description.smsNotification,
+		'notify-email': text.settings.description.notifyEmail,
+		'pwd-expire': text.settings.description.passwordExpireDays,
+		'login-retry': text.settings.description.loginRetryLimit,
+		'session-timeout': text.settings.description.sessionTimeout,
+		'theme': text.settings.description.theme,
+		'compact-mode': text.settings.description.compactMode,
+		'sidebar-collapsed': text.settings.description.sidebarCollapsed
+	}
+	return descMap[item.id] || ''
+}
+
+// 获取配置项选项（翻译）
+const getConfigOptions = (item: ConfigItem) => {
+	if (!item.options) return []
+
+	return item.options.map(opt => {
+		// 语言选项
+		if (item.id === 'default-lang') {
+			const labelMap: Record<string, string> = {
+				'zh-CN': text.settings.languageOptions.zhCN,
+				'en-US': text.settings.languageOptions.enUS
+			}
+			return { ...opt, label: labelMap[opt.value as string] || opt.label }
+		}
+
+		// 超时选项
+		if (item.id === 'session-timeout') {
+			const labelMap: Record<string, string> = {
+				15: text.settings.timeoutOptions.minutes15,
+				30: text.settings.timeoutOptions.minutes30,
+				60: text.settings.timeoutOptions.hour1,
+				120: text.settings.timeoutOptions.hours2,
+				0: text.settings.timeoutOptions.never
+			}
+			return { ...opt, label: labelMap[opt.value as number] || opt.label }
+		}
+
+		// 主题选项
+		if (item.id === 'theme') {
+			const labelMap: Record<string, string> = {
+				light: text.settings.themeOptions.light,
+				dark: text.settings.themeOptions.dark,
+				auto: text.settings.themeOptions.auto
+			}
+			return { ...opt, label: labelMap[opt.value as string] || opt.label }
+		}
+
+		return opt
+	})
 }
 
 const handleValueChange = (key: string, value: ConfigItem['value']) => {
@@ -154,14 +263,14 @@ const handleReset = () => {
 	resetChanges()
 	// 重新初始化数据以恢复原始值
 	initMockData()
-	ElMessage.success('已重置所有修改')
+	ElMessage.success(text.settings.resetSuccess)
 }
 
 const handleSave = () => {
 	const modifiedConfigs = getModifiedConfigs()
 	console.log('保存配置:', modifiedConfigs)
 	// 实际项目中这里调用 API
-	ElMessage.success('保存成功')
+	ElMessage.success(text.settings.saveSuccess)
 	resetChanges()
 }
 
