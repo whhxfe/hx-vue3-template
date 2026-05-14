@@ -18,6 +18,10 @@ export const getMenuConfig = () => {
 		{
 			title: text.menu.analytics,
 			path: '/templates/analytics'
+		},
+		{
+			title: text.menu.screen,
+			path: '/templates/screen'
 		}
 	]
 }

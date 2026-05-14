@@ -210,6 +210,7 @@ export interface MenuText {
 	approval: string
 	settings: string
 	analytics: string
+	screen: string
 }
 
 export interface RouteText {
@@ -219,6 +220,7 @@ export interface RouteText {
 	approval: string
 	settings: string
 	analytics: string
+	screen: string
 }
 
 export interface ModuleText {

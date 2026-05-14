@@ -2,17 +2,15 @@
  * _templates 模块路由入口
  * 统一导出所有子模块路由
  * 
- * 层级路由: /wzsys/templates/...
- * prefix 由 registerModules 传入，Fastify 自动添加到所有路由
+ * prefix 已在 modules/index.ts 中指定为 /templates
+ * 此时 app.prefix 已经是 /wzsys/templates
  */
 import type { FastifyInstance, FastifyPluginAsync } from "fastify"
 import { dashboardRoutes } from "./dashboard"
+import { screenRoutes } from "./screen"
 
 export const templatesRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
-	// Fastify register 会自动添加 prefix (/wzsys)
-	// templates 子模块需要额外添加 /templates 前缀
-	// 使用 app.register 嵌套注册，实现: /wzsys/templates/...
-	await app.register(async (subApp) => {
-		await dashboardRoutes(subApp, "/templates")
-	})
+	// 在此处添加 /dashboard 和 /screen prefix
+	await app.register(dashboardRoutes, { prefix: "/dashboard" })
+	await app.register(screenRoutes, { prefix: "/screen" })
 }

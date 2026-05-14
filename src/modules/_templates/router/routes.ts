@@ -40,17 +40,25 @@ export const getRoutes = (): RouteRecordRaw[] => {
 						title: 'settings'
 					}
 				},
-				{
-					name: `${text.module.name}-analytics`,
-					path: '/templates/analytics',
-					component: () => import('../views/analytics/index.vue'),
-					meta: {
-						title: 'analytics'
-					}
+			{
+				name: `${text.module.name}-analytics`,
+				path: '/templates/analytics',
+				component: () => import('../views/analytics/index.vue'),
+				meta: {
+					title: 'analytics'
 				}
-			]
-		}
-	]
+			},
+			{
+				name: `${text.module.name}-screen`,
+				path: '/templates/screen',
+				component: () => import('../views/screen/index.vue'),
+				meta: {
+					title: 'screen'
+				}
+			}
+		]
+	}
+]
 }
 
 export default getRoutes()

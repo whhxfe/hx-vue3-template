@@ -5,7 +5,7 @@ export type { TreeNode }
 
 export const rrgk = {
 	getTreeData(type: 'yhgl' | 'gxjg') {
-		return request.get<{ state: number; message: string; data: TreeNode[] }>('/zddxgk/tree', {
+		return request.get<{ state: number; message: string; data: TreeNode[] }>('/wzsys/zddxgk/tree', {
 			params: { type }
 		})
 	}

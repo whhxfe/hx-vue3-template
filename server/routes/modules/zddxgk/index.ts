@@ -13,13 +13,12 @@ interface TreeNode {
  * 站点信息管理（zddxgk）路由实现
  * 
  * 层级路由: /wzsys/zddxgk/...
- * prefix 由 registerModules 传入，Fastify 自动添加到所有路由
+ * prefix 已在 modules/index.ts 中指定为 /zddxgk
+ * 此时 app.prefix 已经是 /wzsys/zddxgk
  */
 export const zddxgkRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
-	// Fastify register 会自动添加 prefix (/wzsys)
-	// 所以路由路径只需要定义当前层级: /zddxgk/...
-
-	app.get("/zddxgk/tree", async (request, reply) => {
+	// 获取树形结构数据
+	app.get("/tree", async (request, reply) => {
 		const query = request.query as { type?: string }
 		const { type } = query
 

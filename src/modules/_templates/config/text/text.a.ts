@@ -217,7 +217,8 @@ export default {
 		dataManagement: '数据管理',
 		approval: '审批流程',
 		settings: '系统设置',
-		analytics: '数据分析'
+		analytics: '数据分析',
+		screen: '数据大屏'
 	},
 
 	// ========== 路由 meta ==========
@@ -227,7 +228,8 @@ export default {
 		dataManagement: '数据管理',
 		approval: '审批流程',
 		settings: '系统设置',
-		analytics: '数据分析'
+		analytics: '数据分析',
+		screen: '数据大屏'
 	},
 
 	module:{

@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify"
+import type { FastifyInstance, FastifyPluginAsync } from "fastify"
 import { success } from "@utils/response"
 import type { StatItem, ChartData, PieItem, OrderItem } from "./types"
 
@@ -6,12 +6,10 @@ import type { StatItem, ChartData, PieItem, OrderItem } from "./types"
  * Dashboard 仪表盘路由
  * 
  * 层级路由: /wzsys/templates/dashboard/...
- * @param app - Fastify 实例
- * @param parentPrefix - 父级路径前缀，如 /wzsys/templates
  */
-export async function dashboardRoutes(app: FastifyInstance, parentPrefix: string) {
+export const dashboardRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 	// 获取统计数据
-	app.get(parentPrefix + "/stats", async (request, reply) => {
+	app.get("/stats", async (request, reply) => {
 		const stats: StatItem[] = [
 			{
 				title: "总销售额",
@@ -46,7 +44,7 @@ export async function dashboardRoutes(app: FastifyInstance, parentPrefix: string
 	})
 
 	// 获取月度销售数据
-	app.get<{ Querystring: { period?: string } }>(parentPrefix + "/monthly-sales", async (request, reply) => {
+	app.get<{ Querystring: { period?: string } }>("/monthly-sales", async (request, reply) => {
 		const { period = "month" } = request.query
 
 		const monthlySales: ChartData[] = [
@@ -68,7 +66,7 @@ export async function dashboardRoutes(app: FastifyInstance, parentPrefix: string
 	})
 
 	// 获取饼图数据
-	app.get<{ Querystring: { type?: string } }>(parentPrefix + "/pie-data", async (request, reply) => {
+	app.get<{ Querystring: { type?: string } }>("/pie-data", async (request, reply) => {
 		const { type = "all" } = request.query
 
 		const pieData: PieItem[] = [
@@ -82,7 +80,7 @@ export async function dashboardRoutes(app: FastifyInstance, parentPrefix: string
 	})
 
 	// 获取年度趋势数据
-	app.get<{ Querystring: { year?: string } }>(parentPrefix + "/sales-trend", async (request, reply) => {
+	app.get<{ Querystring: { year?: string } }>("/sales-trend", async (request, reply) => {
 		const { year = new Date().getFullYear().toString() } = request.query
 
 		const salesTrend: ChartData[] = [
@@ -104,7 +102,7 @@ export async function dashboardRoutes(app: FastifyInstance, parentPrefix: string
 	})
 
 	// 获取订单列表
-	app.get<{ Querystring: { page?: number; pageSize?: number } }>(parentPrefix + "/orders", async (request, reply) => {
+	app.get<{ Querystring: { page?: number; pageSize?: number } }>("/orders", async (request, reply) => {
 		const { page = 1, pageSize = 10 } = request.query
 
 		const orderList: OrderItem[] = [
