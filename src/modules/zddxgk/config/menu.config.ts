@@ -4,19 +4,19 @@ export const getMenuConfig = () => {
 	const text = useTextAlias()
 	return [
 		{
-			title: text.menu.rrgk,
+			title: text.menu.rygk,
 			children: [
 				{
-					title: text.menu.rrgk,
-					path: '/zddxgk/rrgk'
+					title: text.menu.rygk,
+					path: '/zddxgk/rygk'
 				},
 				{
-					title: text.menu.rryj,
-					path: '/zddxgk/rryj'
+					title: text.menu.ryyj,
+					path: '/zddxgk/ryyj'
 				},
 				{
-					title: text.menu.rrst,
-					path: '/zddxgk/rrst'
+					title: text.menu.ryst,
+					path: '/zddxgk/ryst'
 				}
 			]
 		},

@@ -10,34 +10,34 @@ export const getRoutes = (): RouteRecordRaw[] => {
 			name: text.module.name,
 			path: '/zddxgk',
 			component: layout,
-			redirect: '/zddxgk/rrgk',
+			redirect: '/zddxgk/rygk',
 			meta: {
 				moduleKey: 'zddxgk',
 				title: text.route.zddxgk
 			},
 			children: [
 				{
-					name: `${text.module.name}-rrgk`,
-					path: '/zddxgk/rrgk',
-					component: () => import('../views/rrgk/index.vue'),
+					name: `${text.module.name}-rygk`,
+					path: '/zddxgk/rygk',
+					component: () => import('../views/rygk/index.vue'),
 					meta: {
-						title: text.route.rrgk
+						title: text.route.rygk
 					}
 				},
 				{
-					name: `${text.module.name}-rryj`,
-					path: '/zddxgk/rryj',
-					component: () => import('../views/rryj/index.vue'),
+					name: `${text.module.name}-ryyj`,
+					path: '/zddxgk/ryyj',
+					component: () => import('../views/ryyj/index.vue'),
 					meta: {
-						title: text.route.rryj
+						title: text.route.ryyj
 					}
 				},
 				{
-					name: `${text.module.name}-rrst`,
-					path: '/zddxgk/rrst',
-					component: () => import('../views/rrst/index.vue'),
+					name: `${text.module.name}-ryst`,
+					path: '/zddxgk/ryst',
+					component: () => import('../views/ryst/index.vue'),
 					meta: {
-						title: text.route.rrst
+						title: text.route.ryst
 					}
 				},
 				{
