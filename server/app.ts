@@ -3,6 +3,7 @@
  */
 import Fastify from "fastify"
 import cors from "@fastify/cors"
+import multipart from "@fastify/multipart"
 import swagger from "@fastify/swagger"
 import swaggerUi from "@fastify/swagger-ui"
 import { swaggerConfig, swaggerUiConfig } from "./swagger"
@@ -86,8 +87,18 @@ export async function createApp() {
 
 	// 注册 CORS
 	await app.register(cors, {
-		origin: "*",
-		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+		origin: true, // 允许所有来源（配合 credentials）
+		credentials: true,
+		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+		allowedHeaders: ["Content-Type", "Authorization", "token"],
+		exposedHeaders: ["Content-Disposition"]
+	})
+
+	// 注册文件上传支持
+	await app.register(multipart, {
+		limits: {
+			fileSize: 10 * 1024 * 1024 // 10MB
+		}
 	})
 
 	// 注册 Swagger
