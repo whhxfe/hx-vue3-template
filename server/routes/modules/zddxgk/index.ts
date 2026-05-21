@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyPluginAsync } from "fastify"
 import { rygkRoutes } from "./rygk"
+import { ryyjRoutes } from "./ryyj"
 
 /**
  * 站点信息管理（zddxgk）路由入口
@@ -11,4 +12,6 @@ import { rygkRoutes } from "./rygk"
 export const zddxgkRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 	// 注册 rygk 子路由
 	await app.register(rygkRoutes, { prefix: "/rygk" })
+	// 注册 ryyj 子路由
+	await app.register(ryyjRoutes, { prefix: "/ryyj" })
 }

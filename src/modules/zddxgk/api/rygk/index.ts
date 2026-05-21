@@ -1,8 +1,10 @@
 import request from '@/api/request'
-import type { TreeNode, DictItem, ListItem, ListQuery, ApiResponse, FollowLevel } from './types'
+import type { DictItem, ListResult, ApiResponse } from '../types'
+import type { TreeNode, ListItem, ListQuery, FollowLevel } from './types'
 export { FOLLOW_LEVEL_OPTIONS } from './types'
 
-export type { TreeNode, DictItem, ListItem, ListQuery, ApiResponse, FollowLevel }
+export type { TreeNode, ListItem, ListQuery, FollowLevel }
+export type { DictItem, ListResult, ApiResponse }
 
 /**
  * 新增数据参数
@@ -142,9 +144,6 @@ export const rygk = {
 	 * 获取导入模板下载地址
 	 */
 	getImportTemplate() {
-		return request.get<ApiResponse<{
-			fileName: string
-			downloadUrl: string
-		}>>('/zddxgk/rygk/template')
+		return '/zddxgk/rygk/template'
 	}
 }

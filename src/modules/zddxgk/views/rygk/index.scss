@@ -1,20 +1,20 @@
 // ==================== CSS 变量定义 ====================
 .rygk-container {
-	// 主题颜色变量
-	--rygk-bg: #f5f7fa;
-	--rygk-card-bg: #fff;
-	--rygk-text-primary: #303133;
-	--rygk-text-regular: #606266;
-	--rygk-text-secondary: #909399;
-	--rygk-border: #ebeef5;
-	--rygk-border-light: #f0f2f5;
-	--rygk-primary: #409eff;
-	--rygk-primary-light: #ecf5ff;
-	--rygk-hover-bg: #f5f7fa;
-	--rygk-success: #67c23a;
-	--rygk-warning: #e6a23c;
-	--rygk-danger: #f56c6c;
-	--rygk-info: #909399;
+	// 主题颜色变量（基于 Element Plus CSS 变量）
+	--rygk-bg: var(--el-bg-color-page, #f5f7fa);
+	--rygk-card-bg: var(--el-bg-color, #fff);
+	--rygk-text-primary: var(--el-text-color-primary, #303133);
+	--rygk-text-regular: var(--el-text-color-regular, #606266);
+	--rygk-text-secondary: var(--el-text-color-secondary, #909399);
+	--rygk-border: var(--el-border-color, #ebeef5);
+	--rygk-border-light: var(--el-border-color-light, #f0f2f5);
+	--rygk-primary: var(--el-color-primary, #409eff);
+	--rygk-primary-light: var(--el-color-primary-light-9, #ecf5ff);
+	--rygk-hover-bg: var(--el-fill-color-light, #f5f7fa);
+	--rygk-success: var(--el-color-success, #67c23a);
+	--rygk-warning: var(--el-color-warning, #e6a23c);
+	--rygk-danger: var(--el-color-danger, #f56c6c);
+	--rygk-info: var(--el-color-info, #909399);
 
 	display: flex;
 	height: 100%;
@@ -302,102 +302,6 @@
 					}
 				}
 
-				// 旧样式保留（兼容）
-				.card-grid {
-					flex: 1;
-					display: grid;
-					grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-					gap: 16px;
-					overflow-y: auto;
-					padding-bottom: 16px;
-					align-content: start;
-
-					.data-card {
-						border: 1px solid var(--rygk-border);
-						border-radius: 8px;
-						padding: 16px;
-						transition: all 0.3s;
-
-						&:hover {
-							border-color: var(--rygk-primary);
-							box-shadow: 0 2px 12px rgba(64, 158, 255, 0.15);
-						}
-
-						.card-header {
-							display: flex;
-							align-items: center;
-							gap: 12px;
-							margin-bottom: 12px;
-
-							.card-avatar {
-								flex-shrink: 0;
-							}
-
-							.card-title-wrap {
-								flex: 1;
-								min-width: 0;
-
-								.card-title {
-									display: block;
-									font-size: 16px;
-									font-weight: 600;
-									color: var(--rygk-text-primary);
-								}
-
-								.card-info {
-									display: block;
-									font-size: 12px;
-									color: var(--rygk-text-secondary);
-									margin-top: 2px;
-								}
-							}
-						}
-
-						.card-body {
-							.card-item {
-								display: flex;
-								margin-bottom: 8px;
-								font-size: 14px;
-
-								.label {
-									color: var(--rygk-text-secondary);
-									min-width: 70px;
-								}
-
-								.value {
-									color: var(--rygk-text-regular);
-									flex: 1;
-								}
-
-								.text-ellipsis-1 {
-									overflow: hidden;
-									text-overflow: ellipsis;
-									white-space: nowrap;
-								}
-							}
-
-							.card-tags {
-								display: flex;
-								flex-wrap: wrap;
-								gap: 6px;
-								margin-top: 8px;
-
-								.card-tag {
-									margin: 0;
-								}
-							}
-						}
-
-						.card-footer {
-							display: flex;
-							gap: 12px;
-							margin-top: 12px;
-							padding-top: 12px;
-							border-top: 1px solid var(--rygk-border);
-						}
-					}
-				}
-
 				.card-pagination {
 					display: flex;
 					justify-content: flex-end;
@@ -406,25 +310,6 @@
 				}
 			}
 		}
-	}
-
-	// ==================== 暗色主题 ====================
-	&.dark,
-	:global(.dark) & {
-		--rygk-bg: #1a1a2e;
-		--rygk-card-bg: #16213e;
-		--rygk-text-primary: #e4e7ed;
-		--rygk-text-regular: #c0c4cc;
-		--rygk-text-secondary: #909399;
-		--rygk-border: #2d3748;
-		--rygk-border-light: #1a1a2e;
-		--rygk-primary: #409eff;
-		--rygk-primary-light: rgba(64, 158, 255, 0.15);
-		--rygk-hover-bg: rgba(255, 255, 255, 0.05);
-		--rygk-success: #67c23a;
-		--rygk-warning: #e6a23c;
-		--rygk-danger: #f56c6c;
-		--rygk-info: #909399;
 	}
 }
 
@@ -441,6 +326,10 @@
 		--rygk-primary: #409eff;
 		--rygk-primary-light: rgba(64, 158, 255, 0.15);
 		--rygk-hover-bg: rgba(255, 255, 255, 0.05);
+		--rygk-success: #67c23a;
+		--rygk-warning: #e6a23c;
+		--rygk-danger: #f56c6c;
+		--rygk-info: #909399;
 	}
 }
 

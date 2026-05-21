@@ -75,18 +75,18 @@
 							<HxIcon type="iconify" name="ep:plus" />
 							新增
 						</el-button>
-						<HxImporter
-							ref="importerRef"
-							:upload-action="'/zddxgk/rygk/import'"
-							:method="'post'"
-							template-file-name="人员信息导入模板.xlsx"
-							:template-url="importTemplateUrl"
-							:max-size="10"
-							button-text="导入"
-							dialog-title="导入人员信息"
-							@success="handleImportSuccess"
-							@error="handleImportError"
-						/>
+					<HxImporter
+						ref="importerRef"
+						:upload-action="'/zddxgk/rygk/import'"
+						:method="'post'"
+						template-file-name="人员信息导入模板.xlsx"
+						:template-url="rygk.getImportTemplate()"
+						:max-size="10"
+						button-text="导入"
+						dialog-title="导入人员信息"
+						@success="handleImportSuccess"
+						@error="handleImportError"
+					/>
 						<HxExporter
 							ref="exporterRef"
 							:export-action="'/zddxgk/rygk/export'"
@@ -367,12 +367,11 @@
 </template>
 
 <script setup lang="tsx">
-import { ref, reactive, computed, onMounted, watch } from "vue"
+import { ref, reactive, computed, onMounted } from "vue"
 import { ElMessage, ElMessageBox, ElTag } from "element-plus"
 import { HxForm, HxTable, HxIcon, HxImporter, HxExporter, HxCardList } from "@hx/ui"
 import type { FormField, TableColumn } from "@hx/ui"
 import { rygk, type TreeNode, type ListItem, type DictItem, FOLLOW_LEVEL_OPTIONS } from "@/modules/zddxgk/api"
-import { useTheme } from "@/hooks/useTheme"
 
 type ImporterExpose = {
 	open: () => void
@@ -424,9 +423,6 @@ const addFormRules = {
 const dataSourceOptions = ref<DictItem[]>([])
 const categoryOptions = ref<DictItem[]>([])
 const addressOptions = ref<DictItem[]>([])
-
-// ==================== 主题支持 ====================
-const { isDark } = useTheme()
 
 // ==================== 类别设置弹窗 ====================
 const categoryDialogVisible = ref(false)
@@ -1082,33 +1078,10 @@ const handleAddDialogClose = () => {
 	addFormRef.value?.resetFields()
 }
 
-// ==================== 导入模板 URL ====================
-const importTemplateUrl = ref("")
-
-/**
- * 获取导入模板下载地址
- */
-const loadImportTemplate = async () => {
-	try {
-		const res = await rygk.getImportTemplate()
-		if (res?.data?.downloadUrl) {
-			importTemplateUrl.value = res.downloadUrl
-		}
-	} catch (error) {
-		console.error("获取导入模板地址失败:", error)
-	}
-}
-
 // ==================== 生命周期 ====================
 onMounted(() => {
 	loadTreeData(activeTab.value)
 	loadTableData()
-	loadImportTemplate()
-})
-
-// 监听主题变化
-watch(isDark, () => {
-	// 主题切换时的额外处理
 })
 </script>
 

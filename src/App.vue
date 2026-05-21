@@ -1,29 +1,22 @@
-
-
 <script setup lang="ts">
 import { ref } from "vue"
 import { storeToRefs } from "pinia"
 import { ElWatermark } from "element-plus"
 import { useSysStore } from "./store"
 import { HxTokenOverdue } from "@/hx-components"
-import { HxConfigProvider,  } from "@hx/ui"
-
+import { HxConfigProvider } from "@hx/ui"
 
 const sysStore = useSysStore()
 const { userInfo, token } = storeToRefs(sysStore)
 
-
 /** 本地 glob 资源 */
-const imageIconModules = import.meta.glob<{ default: string }>(
-	"@/assets/icons/**/*",
-	{ eager: true }
-)
+const imageIconModules = import.meta.glob<{ default: string }>("@/assets/icons/**/*", { eager: true })
 
 const iconConfig = {
 	svg: {},
 	image: {
 		source: "local" as const,
-		imageIconModules: [imageIconModules],
+		imageIconModules: [imageIconModules]
 		// cdnBaseUrl: "/icons"
 	},
 	/**
@@ -49,20 +42,19 @@ const iconConfig = {
 }
 
 const requestConfig = {
-	headers:{
-		'token':token.value!
+	headers: {
+		token: token.value!
 	},
-  baseUrl: 'http://localhost:3000',
-  prefix: '/wzsys',
+	baseUrl: "http://localhost:3000",
+	prefix: "/wzsys"
 }
 
-
+const form = { cols: 4, gap: 12, minColWidth: 200, actionAlign: "right" as const }
 </script>
 
-
 <template>
-	<el-watermark class="h-full" :content="userInfo?.accountName ||'hx-v3-template'"  >
-		<HxConfigProvider :icon="iconConfig" :request="requestConfig" >
+	<el-watermark class="h-full" :content="userInfo?.accountName || 'hx-v3-template'">
+		<HxConfigProvider :icon="iconConfig" :request="requestConfig" :form="form">
 			<router-view></router-view>
 		</HxConfigProvider>
 		<HxTokenOverdue />
