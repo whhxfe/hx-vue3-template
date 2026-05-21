@@ -6,15 +6,12 @@ import { storeToRefs } from "pinia"
 import { ElWatermark } from "element-plus"
 import { useSysStore } from "./store"
 import { HxTokenOverdue } from "@/hx-components"
-import type { IconifyCollectionName } from "@hx/ui"
-import { HxConfigProvider } from "@hx/ui"
-import { useTheme } from "@/hooks/useTheme"
+import { HxConfigProvider,  } from "@hx/ui"
+
 
 const sysStore = useSysStore()
 const { userInfo, token } = storeToRefs(sysStore)
 
-// Initialize theme - useDark will automatically restore from localStorage
-const { isDark } = useTheme()
 
 /** 本地 glob 资源 */
 const imageIconModules = import.meta.glob<{ default: string }>(
@@ -42,19 +39,21 @@ const iconConfig = {
 	 */
 	iconify: {
 		// ===== Offline 模式 =====
-		source: "offline" as const,
-		collections: ['ep', 'mdi', 'logos', 'twemoji'] as IconifyCollectionName[],
+		// source: "offline" as const,
+		// collections: ['ep', 'mdi', 'logos', 'twemoji','mingcute'] as IconifyCollectionName[],
 
 		// ===== CDN 模式 =====
-		// source: "cdn" as const,
-		// cdnUrl: "https://api.iconify.design"
+		source: "cdn" as const,
+		cdnUrl: SYS_CONFIG.ICONIFY_CDN_URL
 	}
 }
 
 const requestConfig = {
 	headers:{
 		'token':token.value!
-	}
+	},
+  baseUrl: 'http://localhost:3000',
+  prefix: '/wzsys',
 }
 
 

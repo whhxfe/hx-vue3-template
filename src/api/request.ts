@@ -9,8 +9,8 @@ import router from "@/router"
 import { useSysStore } from "@/store"
 export const service: AxiosInstance = axios.create({
 	// baseURL: window.SYS_CONFIG.API_BASE_URL + window.SYS_CONFIG.API_PREFIX,
-	baseURL: SYS_CONFIG.API_BASE_URL + SYS_CONFIG.API_PREFIX,
-	// baseURL:SYS_CONFIG.API_PREFIX,
+	// baseURL: SYS_CONFIG.API_BASE_URL + SYS_CONFIG.API_PREFIX,
+	baseURL:SYS_CONFIG.API_PREFIX,
 	timeout: 60000
 })
 

@@ -15,7 +15,8 @@ interface SYS_CONFIG {
 	CHROME_DOWNLOAD_URL: string
 	MODEL_PLATFORM_URL: string
 	HOME_URL: string
-	LAYOUT_MENU_MODE: "vertical" | "horizontal"
+	ICONIFY_CDN_URL: string
+	IMAGE_CDN_URL: string
 }
 
 declare const SYS_CONFIG: SYS_CONFIG

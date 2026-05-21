@@ -2,8 +2,8 @@ import { defineConfig, loadEnv } from "vite"
 import vue from "@vitejs/plugin-vue"
 import path from "path"
 import vueDevTools from "vite-plugin-vue-devtools"
-import AutoImport from "unplugin-auto-import/vite"
-import Components from "unplugin-vue-components/vite"
+// import AutoImport from "unplugin-auto-import/vite"
+// import Components from "unplugin-vue-components/vite"
 import { ElementPlusResolver } from "unplugin-vue-components/resolvers"
 import legacy from "@vitejs/plugin-legacy" // 兼容低版本浏览器
 import { createSvgIconsPlugin } from "vite-plugin-svg-icons"
@@ -21,7 +21,7 @@ export default defineConfig(({ mode, command }) => {
 	const isProd = mode === "production"
 	// 读取当前环境的 API 目标地址
 	const env = loadEnv(mode, process.cwd())
-	const apiTarget = env.VITE_API_TARGET || "http://192.168.6.58:38011"
+	const apiTarget = env.VITE_API_TARGET || "http://localhost:3000"
 	const apiPrefix = "/wzsys"
 
 	const dateStr = new Date().toISOString().slice(0,16).replace(/[-T:]/g,'')
