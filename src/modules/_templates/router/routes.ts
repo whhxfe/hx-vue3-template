@@ -10,7 +10,7 @@ export const getRoutes = (): RouteRecordRaw[] => {
 			name: text.module.name,
 			path: '/templates',
 			component: layout,
-			redirect: '/templates/data-management',
+			redirect: '/templates/dashboard',
 			meta: {
 				moduleKey: '_templates',
 				title: 'templates'
@@ -25,40 +25,16 @@ export const getRoutes = (): RouteRecordRaw[] => {
 					}
 				},
 				{
-					name: `${text.module.name}-data-management`,
-					path: '/templates/data-management',
-					component: () => import('../views/data-management/index.vue'),
+					name: `${text.module.name}-screen`,
+					path: '/templates/screen',
+					component: () => import('../views/screen/index.vue'),
 					meta: {
-						title: 'dataManagement'
+						title: 'screen'
 					}
-				},
-				{
-					name: `${text.module.name}-settings`,
-					path: '/templates/settings',
-					component: () => import('../views/settings/index.vue'),
-					meta: {
-						title: 'settings'
-					}
-				},
-			{
-				name: `${text.module.name}-analytics`,
-				path: '/templates/analytics',
-				component: () => import('../views/analytics/index.vue'),
-				meta: {
-					title: 'analytics'
 				}
-			},
-			{
-				name: `${text.module.name}-screen`,
-				path: '/templates/screen',
-				component: () => import('../views/screen/index.vue'),
-				meta: {
-					title: 'screen'
-				}
-			}
-		]
-	}
-]
+			]
+		}
+	]
 }
 
 export default getRoutes()
