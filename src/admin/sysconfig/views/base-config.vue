@@ -77,10 +77,10 @@ const formData = reactive<Record<string, any>>({})
 
 const fetchConfigs = async () => {
 	const res = await getConfigList({ pageSize: 100 })
-	if (res.data.state === 1) {
-		configList.value = res.data.data.list
+	if (res.state === 2000) {
+		configList.value = res.data.list
 		// 初始化表单数据
-		for (const item of res.data.data.list) {
+		for (const item of res.data.list) {
 			formData[item.key] = item.value
 		}
 	}
@@ -95,11 +95,11 @@ const handleSave = async () => {
 		}))
 
 		const res = await batchUpdateConfig(configs)
-		if (res.data.state === 1) {
+		if (res.state === 2000) {
 			ElMessage.success('保存成功')
 			fetchConfigs()
 		} else {
-			ElMessage.error(res.data.message || '保存失败')
+			ElMessage.error(res.message || '保存失败')
 		}
 	} catch (err: any) {
 		ElMessage.error(err.message || '保存失败')

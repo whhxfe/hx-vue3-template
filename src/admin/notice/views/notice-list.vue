@@ -228,9 +228,9 @@ const fetchData = async () => {
 			pageSize: pagination.pageSize,
 			...queryForm
 		})
-		if (res.data.state === 1) {
-			tableData.value = res.data.data.list
-			pagination.total = res.data.data.total
+		if (res.state === 2000) {
+			tableData.value = res.data.list
+			pagination.total = res.data.total
 		}
 	} catch {
 		ElMessage.error('获取公告列表失败')
@@ -301,12 +301,12 @@ const handleSubmit = async () => {
 			res = await createNotice(data)
 		}
 
-		if (res.data.state === 1) {
+		if (res.state === 2000) {
 			ElMessage.success('保存成功')
 			dialogVisible.value = false
 			fetchData()
 		} else {
-			ElMessage.error(res.data.message || '保存失败')
+			ElMessage.error(res.message || '保存失败')
 		}
 	} catch (err: any) {
 		ElMessage.error(err.message || '保存失败')
@@ -331,12 +331,12 @@ const handleSaveDraft = async () => {
 			res = await createNotice({ ...formData, status: 0 })
 		}
 
-		if (res.data.state === 1) {
+		if (res.state === 2000) {
 			ElMessage.success('草稿保存成功')
 			dialogVisible.value = false
 			fetchData()
 		} else {
-			ElMessage.error(res.data.message || '保存失败')
+			ElMessage.error(res.message || '保存失败')
 		}
 	} catch (err: any) {
 		ElMessage.error(err.message || '保存失败')
@@ -348,11 +348,11 @@ const handleSaveDraft = async () => {
 const handlePublish = async (row: Notice) => {
 	try {
 		const res = await publishNotice(row.id)
-		if (res.data.state === 1) {
+		if (res.state === 2000) {
 			ElMessage.success('发布成功')
 			fetchData()
 		} else {
-			ElMessage.error(res.data.message || '发布失败')
+			ElMessage.error(res.message || '发布失败')
 		}
 	} catch {
 		ElMessage.error('发布失败')
@@ -362,11 +362,11 @@ const handlePublish = async (row: Notice) => {
 const handleUnpublish = async (row: Notice) => {
 	try {
 		const res = await unpublishNotice(row.id)
-		if (res.data.state === 1) {
+		if (res.state === 2000) {
 			ElMessage.success('撤回成功')
 			fetchData()
 		} else {
-			ElMessage.error(res.data.message || '撤回失败')
+			ElMessage.error(res.message || '撤回失败')
 		}
 	} catch {
 		ElMessage.error('撤回失败')
@@ -381,11 +381,11 @@ const handleDelete = (row: Notice) => {
 	).then(async () => {
 		try {
 			const res = await deleteNotice(row.id)
-			if (res.data.state === 1) {
+			if (res.state === 2000) {
 				ElMessage.success('删除成功')
 				fetchData()
 			} else {
-				ElMessage.error(res.data.message || '删除失败')
+				ElMessage.error(res.message || '删除失败')
 			}
 		} catch {
 			ElMessage.error('删除失败')

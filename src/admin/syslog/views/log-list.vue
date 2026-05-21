@@ -172,9 +172,9 @@ const fetchData = async () => {
 			start_date: dateRange.value?.[0],
 			end_date: dateRange.value?.[1]
 		})
-		if (res.data.state === 1) {
-			tableData.value = res.data.data.list
-			pagination.total = res.data.data.total
+		if (res.state === 2000) {
+			tableData.value = res.data.list
+			pagination.total = res.data.total
 		}
 	} catch (err) {
 		ElMessage.error('获取日志列表失败')
@@ -186,7 +186,7 @@ const fetchData = async () => {
 const fetchStats = async () => {
 	try {
 		const res = await getLogStats()
-		if (res.data.state === 1) {
+		if (res.state === 2000) {
 			Object.assign(stats, res.data.data)
 		}
 	} catch (err) {

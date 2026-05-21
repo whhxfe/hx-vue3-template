@@ -110,9 +110,9 @@ const fetchData = async () => {
 			page: pagination.page,
 			pageSize: pagination.pageSize
 		})
-		if (res.data.state === 1) {
-			tableData.value = res.data.data.list
-			pagination.total = res.data.data.total
+		if (res.state === 2000) {
+			tableData.value = res.data.list
+			pagination.total = res.data.total
 		}
 	} catch {
 		ElMessage.error('获取字典类型列表失败')
@@ -172,12 +172,12 @@ const handleSubmit = async () => {
 			})
 		}
 
-		if (res.data.state === 1) {
+		if (res.state === 2000) {
 			ElMessage.success('保存成功')
 			dialogVisible.value = false
 			fetchData()
 		} else {
-			ElMessage.error(res.data.message || '保存失败')
+			ElMessage.error(res.message || '保存失败')
 		}
 	} catch (err: any) {
 		ElMessage.error(err.message || '保存失败')
@@ -194,11 +194,11 @@ const handleDelete = (row: DictType) => {
 	).then(async () => {
 		try {
 			const res = await deleteDictType(row.id)
-			if (res.data.state === 1) {
+			if (res.state === 2000) {
 				ElMessage.success('删除成功')
 				fetchData()
 			} else {
-				ElMessage.error(res.data.message || '删除失败')
+				ElMessage.error(res.message || '删除失败')
 			}
 		} catch {
 			ElMessage.error('删除失败')
