@@ -1,34 +1,56 @@
 # 模块化开发模式
 
+## ⚠️ 重要路径规范
+
+**严禁将页面放在 `src/views/modules/` 下！**
+
+| 正确路径 | 错误路径 |
+|---------|---------|
+| `src/modules/<module>/views/xxx.vue` | `src/views/modules/<module>/xxx.vue` |
+| `src/modules/<module>/api/xxx.ts` | `src/views/modules/<module>/api/xxx.ts` |
+
+**判断依据**：根据路由配置 `import('../views/xxx.vue')` 中的相对路径反推：
+- 路由文件在 `src/modules/<module>/router/routes.ts`
+- `import('../views/xxx.vue')` 表示 views 目录在 `src/modules/<module>/views/`
+
+---
+
 ## 模块目录结构
 
 每个业务模块在 `src/modules/<module-name>/` 下独立组织：
 
 ```
-modules/<module-name>/
+src/modules/<module-name>/
 ├── index.ts          # 模块入口（导出 routes, api, menu）
 ├── layout.vue        # 模块级布局（可选）
 ├── menu.config.ts    # 菜单配置
 ├── api/              # 模块级 API 接口
 │   ├── index.ts      # API 统一导出
-│   ├── account.ts
-│   └── role.ts
+│   ├── types.ts      # 共享类型定义
+│   └── <sub>/        # 子模块 API（可选）
+│       ├── index.ts
+│       └── types.ts
 ├── assets/           # 模块级资源（可选）
 ├── components/       # 模块级私有组件（可选）
 ├── router/
-│   └── routes.ts     # 模块路由配置
+│   ├── index.ts      # 路由入口
+│   └── routes.ts     # 路由配置
 ├── store/            # 模块级状态（可选）
 └── views/            # 模块页面视图组件
-    ├── account-list.vue
-    └── role-list.vue
+    ├── component/
+    │   └── index.vue
+    └── <view-name>/
+        └── index.vue
 ```
+
+---
 
 ## 模块入口（index.ts）
 
 模块入口统一导出 routes、api、menu：
 
 ```typescript
-// 模块入口模式
+// src/modules/<module-name>/index.ts
 import type { RouteRecordRaw } from 'vue-router'
 
 export interface ModuleConfig {
@@ -40,16 +62,65 @@ export interface ModuleConfig {
 export default { name: '<module-name>', routes } as ModuleConfig
 ```
 
-## 路由配置
+---
 
-- 路由 `component` 使用动态 `import()` 懒加载
-- 路由命名与路径规范见 vue-conventions
+## 路由配置规范
 
-## 模块间隔离
+### 文件位置
+- 路由文件：`src/modules/<module-name>/router/routes.ts`
+- 视图文件：`src/modules/<module-name>/views/<view-name>/index.vue`
 
-- 模块间禁止互相引用
-- 共享逻辑提取到 `src/composables/`、`src/utils/` 等公共目录
-- 共享组件放在 `src/components/` 公共目录
+### 相对路径引用
+
+```typescript
+// src/modules/<module-name>/router/routes.ts
+import type { RouteRecordRaw } from 'vue-router'
+import layout from '../layout.vue'
+
+const routes: RouteRecordRaw[] = [
+  {
+    name: '<module>',
+    path: '/<module>',
+    component: layout,
+    children: [
+      {
+        name: 'ViewName',
+        path: '/<module>/<view-name>',
+        component: () => import('../views/<view-name>/index.vue'),
+        meta: { title: '<view-name>' }
+      }
+    ]
+  }
+]
+
+export default routes
+```
+
+### 路由命名与路径规范
+- 路由命名：PascalCase（如 `UserList`, `UserDetail`）
+- 路由路径：kebab-case（如 `/user-list`, `/user-detail/:id`）
+- 组件使用动态 `import()` 懒加载
+
+---
+
+## 模块间隔离原则
+
+### 允许
+- 引用公共目录：`src/composables/`、`src/utils/`、`src/components/`
+- 引用全局样式和类型
+
+### 禁止
+- 模块间互相引用（`src/modules/a` 引用 `src/modules/b`）
+- 直接引用其他模块的 views、api、components
+
+### 共享逻辑提取
+如果多个模块需要共享某些逻辑，应提取到：
+- `src/composables/` - 组合式函数
+- `src/utils/` - 工具函数
+- `src/components/` - 公共组件
+- `src/types/` - 共享类型定义
+
+---
 
 ## API 命名空间封装
 
@@ -58,13 +129,10 @@ export default { name: '<module-name>', routes } as ModuleConfig
 ### 子模块 API 文件结构
 
 ```
-api/
+src/modules/<module-name>/api/
 ├── index.ts      # API 统一导出
-├── types.ts     # 共享类型定义
-├── rrgk/        # 业务子模块 API
-│   ├── index.ts
-│   └── types.ts
-└── xtsz/        # 系统配置 API
+├── types.ts      # 共享类型定义
+└── <sub>/        # 业务子模块 API
     ├── index.ts
     └── types.ts
 ```
@@ -74,15 +142,15 @@ api/
 使用命名空间对象封装 API 方法和类型：
 
 ```typescript
-// api/rrgk/index.ts
+// src/modules/<module-name>/api/<sub>/index.ts
 import request from '@/api/request'
 import type { TreeNode } from './types'
 
 export type { TreeNode }
 
-export const rrgk = {
+export const <sub> = {
   getTreeData(type: 'yhgl' | 'gxjg') {
-    return request.get<{ state: number; message: string; data: TreeNode[] }>('/zddxgk/tree', {
+    return request.get<{ state: number; message: string; data: TreeNode[] }>('/<module>/tree', {
       params: { type }
     })
   }
@@ -92,20 +160,71 @@ export const rrgk = {
 ### 主入口统一导出
 
 ```typescript
-// api/index.ts
-export { rrgk } from './rrgk'
-export type { TreeNode } from './rrgk'
+// src/modules/<module-name>/api/index.ts
+export { <sub> } from './<sub>'
+export type { TreeNode } from './<sub>'
 ```
 
 ### 使用方式
 
 ```typescript
 // 在组件中调用
-import { rrgk, type TreeNode } from '@/modules/zddxgk/api'
+import { <sub>, type TreeNode } from '@/modules/<module-name>/api'
 
-const res = await rrgk.getTreeData('yhgl')
+const res = await <sub>.getTreeData('yhgl')
 ```
+
+---
 
 ## 模块模板
 
 `src/modules/_templates/` 提供了模块的标准模板，创建新模块时复制此模板修改。
+
+### 使用模板创建新模块
+
+```bash
+# 1. 复制模板目录
+cp -r src/modules/_templates src/modules/<new-module-name>
+
+# 2. 修改模块名称和配置
+# - src/modules/<new-module-name>/index.ts
+# - src/modules/<new-module-name>/menu.config.ts
+# - src/modules/<new-module-name>/router/routes.ts
+# - src/modules/<new-module-name>/api/index.ts
+
+# 3. 添加路由到 src/router/index.ts
+```
+
+---
+
+## 常见错误避免
+
+### 错误 1：路径混淆
+
+```typescript
+// ❌ 错误 - 路径不存在
+component: () => import('src/views/modules/zddxgk/rygk/index.vue')
+
+// ✅ 正确 - 按照模块结构
+component: () => import('../views/rygk/index.vue')
+```
+
+### 错误 2：模块间耦合
+
+```typescript
+// ❌ 错误 - 模块间耦合
+import { useUserStore } from '@/modules/ucenter/store/user'
+
+// ✅ 正确 - 使用公共目录
+import { useUserStore } from '@/stores/user'
+```
+
+### 错误 3：API 分散
+
+```typescript
+// ❌ 错误 - API 分散在各处
+import request from '@/api/account'
+import request from '@/api/role'
+
+// ✅ 正确 - 统一从模块 API 入口导出
+import { account, role } from '@/modules/ucenter/api'

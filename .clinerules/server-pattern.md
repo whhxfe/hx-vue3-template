@@ -53,4 +53,4 @@ export function success<T>(data: T, message = "操作成功"): ApiResponse<T>
 export function paginate<T>(list: T[], total: number, page: number, pageSize: number): ApiResponse
 
 // 错误响应
-export function error(message = "操作失败", code = 500): ApiResponse
+export function error(message = "操作失败", code = 6000): ApiResponse

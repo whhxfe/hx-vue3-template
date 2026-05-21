@@ -208,10 +208,10 @@ cp -r src/modules/_templates src/modules/<new-module-name>
 
 ```typescript
 // ❌ 错误 - 路径不存在
-component: () => import('src/views/modules/zddxgk/rrgk/index.vue')
+component: () => import('src/views/modules/zddxgk/rygk/index.vue')
 
 // ✅ 正确 - 按照模块结构
-component: () => import('../views/rrgk/index.vue')
+component: () => import('../views/rygk/index.vue')
 ```
 
 ### 错误 2：模块间耦合
