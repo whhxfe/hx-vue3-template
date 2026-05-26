@@ -293,6 +293,10 @@ async function seed() {
 		// 30% 概率有头像
 		const hasAvatar = faker.number.int({ min: 1, max: 10 }) <= 3
 
+		// 生成湖北省范围内的经纬度（武汉为中心点）
+		const longitude = faker.number.float({ min: 108.5, max: 119.5, fractionDigits: 6 })
+		const latitude = faker.number.float({ min: 29.0, max: 33.5, fractionDigits: 6 })
+
 		const month = String(faker.number.int({ min: 1, max: 12 })).padStart(2, "0")
 		const day = String(faker.number.int({ min: 1, max: 28 })).padStart(2, "0")
 
@@ -302,9 +306,9 @@ async function seed() {
 		const targetNode = faker.helpers.arrayElement(targetNodes)
 
 		db.run(
-			`INSERT INTO rygk_persons 
-			(name, gender, age, phone, id_card, residence_address, category, data_source, tags, follow_status, avatar, tree_id, tree_type, entry_time) 
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			`INSERT INTO rygk_persons
+			(name, gender, age, phone, id_card, residence_address, category, data_source, tags, follow_status, avatar, tree_id, tree_type, longitude, latitude, entry_time)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 			[
 				faker.helpers.arrayElement(surnames) + faker.helpers.arrayElement(givenNames),
 				gender,
@@ -319,6 +323,8 @@ async function seed() {
 				hasAvatar ? faker.image.avatar() : null,
 				targetNode.id,
 				targetNode.type,
+				longitude,
+				latitude,
 				entryTime.toISOString().replace("T", " ").slice(0, 19)
 			]
 		)

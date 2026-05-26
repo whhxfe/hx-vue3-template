@@ -17,3 +17,7 @@ export type {
 // ryyj 模块
 export { ryyj } from './ryyj'
 export type { ListItem as RyyjListItem, ListQuery as RyyjListQuery } from './ryyj'
+
+// ryst 模块
+export { ryst, FOLLOW_STATUS_OPTIONS } from './ryst'
+export type { ListItem as RystListItem, ListQuery as RystListQuery, FollowStatus } from './ryst'

@@ -23,6 +23,8 @@ export function createRygkTables(db: Database) {
 			avatar TEXT,
 			tree_id INTEGER,
 			tree_type TEXT,
+			longitude REAL,
+			latitude REAL,
 			entry_time TEXT DEFAULT (datetime('now')),
 			created_at TEXT DEFAULT (datetime('now')),
 			updated_at TEXT DEFAULT (datetime('now'))

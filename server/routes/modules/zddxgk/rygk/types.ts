@@ -35,6 +35,8 @@ export interface ListItem {
 	followStatus: "0" | "1"
 	followStatusName?: string
 	entryTime: string
+	longitude?: number
+	latitude?: number
 }
 
 export interface ListQuery {
@@ -74,6 +76,8 @@ export interface PersonRow {
 	avatar: string | null
 	tree_id: number | null
 	tree_type: string | null
+	longitude: number | null
+	latitude: number | null
 	entry_time: string
 	created_at: string
 	updated_at: string

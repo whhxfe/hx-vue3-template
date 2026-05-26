@@ -32,7 +32,7 @@ export interface DictItem {
 }
 
 export interface ListItem {
-	id: number
+	id?: number
 	avatar?: string
 	name: string
 	gender: "男" | "女"
@@ -50,6 +50,8 @@ export interface ListItem {
 	followStatus: FollowLevel
 	followStatusName?: string
 	entryTime: string
+	longitude?: number
+	latitude?: number
 }
 
 export interface ListQuery {

@@ -9,8 +9,9 @@ import { createDictTables } from "./dict"
 import { createNoticeTables } from "./notice"
 import { createRygkTables } from "./rygk"
 import { createRyyjTables } from "./ryyj"
+import { createRystTables } from "./ryst"
 
-export { createUserTables, createSystemTables, createDictTables, createNoticeTables, createRygkTables, createRyyjTables }
+export { createUserTables, createSystemTables, createDictTables, createNoticeTables, createRygkTables, createRyyjTables, createRystTables }
 
 /**
  * 创建所有表结构
@@ -22,4 +23,5 @@ export function createAllTables(db: Database) {
 	createNoticeTables(db)
 	createRygkTables(db)
 	createRyyjTables(db)
+	createRystTables(db)
 }

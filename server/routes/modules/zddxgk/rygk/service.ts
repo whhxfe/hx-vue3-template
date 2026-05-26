@@ -53,7 +53,9 @@ function rowToListItem(row: PersonRow): ListItem {
 		category: row.category || "",
 		dataSource: row.data_source || "",
 		followStatus: row.follow_status as "0" | "1",
-		entryTime: row.entry_time
+		entryTime: row.entry_time,
+		longitude: row.longitude,
+		latitude: row.latitude
 	}
 }
 
