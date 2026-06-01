@@ -6,7 +6,7 @@ const SYS_CONFIG = {
 	// API_BASE_URL: "http://192.168.7.14:8011", // 后台url
 	// API_BASE_URL: "http://192.168.6.58:38011", // 后台url
 	MAP_URL: "http://192.168.6.68:9080/normalMap",
-	ICONIFY_CDN_URL: "https://api.iconify.design",
+	ICONIFY_CDN_URL: "http://localhost:3333",
 	IMAGE_CDN_URL: "https://img.iconify.design",
 	API_PREFIX: "/wzsys",
 	HOME_URL:"/"

@@ -4,7 +4,7 @@
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "nodemon --watch \"**/*.ts\" --ext ts,json --exec \"node ./node_modules/tsx/dist/cli.mjs\" index.ts",
+		"dev": "nodemon --config nodemon.json index.ts",
 		"start": "tsx index.ts",
 		"seed": "tsx db/seed.ts"
 	},

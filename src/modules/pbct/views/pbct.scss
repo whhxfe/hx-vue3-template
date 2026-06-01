@@ -1,0 +1,84 @@
+// ==================== CSS 变量定义 ====================
+.pbct-container {
+	// 主题颜色变量（基于 Element Plus CSS 变量）
+	--pbct-bg: var(--el-bg-color-page, #f5f7fa);
+	--pbct-card-bg: var(--el-bg-color, #fff);
+	--pbct-text-primary: var(--el-text-color-primary, #303133);
+	--pbct-text-regular: var(--el-text-color-regular, #606266);
+	--pbct-text-secondary: var(--el-text-color-secondary, #909399);
+	--pbct-border: var(--el-border-color, #ebeef5);
+	--pbct-border-light: var(--el-border-color-light, #f0f2f5);
+	--pbct-primary: var(--el-color-primary, #409eff);
+	--pbct-primary-light: var(--el-color-primary-light-9, #ecf5ff);
+	--pbct-hover-bg: var(--el-fill-color-light, #f5f7fa);
+
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding: 16px;
+	background: var(--pbct-bg);
+
+	// ==================== 筛选区域 ====================
+	.filter-section {
+		background: var(--pbct-card-bg);
+		border-radius: 8px;
+		padding: 16px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		margin-bottom: 16px;
+	}
+
+	// ==================== 操作栏 ====================
+	.action-bar {
+		background: var(--pbct-card-bg);
+		border-radius: 8px;
+		padding: 12px 16px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		margin-bottom: 16px;
+
+		.action-left {
+			display: flex;
+			gap: 8px;
+		}
+
+		.action-right {
+			display: flex;
+			gap: 8px;
+		}
+	}
+
+	// ==================== 表格区域 ====================
+	.table-container {
+		flex: 1;
+		background: var(--pbct-card-bg);
+		border-radius: 8px;
+		padding: 16px;
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+		overflow: hidden;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+		:deep(.el-table) {
+			width: 100%;
+		}
+	}
+}
+
+// ==================== 全局暗色主题覆盖 ====================
+:global(.dark) {
+	.pbct-container {
+		--pbct-bg: #1a1a2e;
+		--pbct-card-bg: #16213e;
+		--pbct-text-primary: #e4e7ed;
+		--pbct-text-regular: #c0c4cc;
+		--pbct-text-secondary: #909399;
+		--pbct-border: #2d3748;
+		--pbct-border-light: #1a1a2e;
+		--pbct-primary: #409eff;
+		--pbct-primary-light: rgba(64, 158, 255, 0.15);
+		--pbct-hover-bg: rgba(255, 255, 255, 0.05);
+	}
+}

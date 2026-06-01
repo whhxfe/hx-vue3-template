@@ -44,9 +44,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
+import { ref, computed, onMounted } from "vue"
 import { storeToRefs } from "pinia"
 import { useSysStore } from "@/store"
+import { getModules } from "@/api/auth"
+import type { ModuleInfo } from "@/api/auth"
 
 interface MenuItem {
 	title: string
@@ -73,25 +75,40 @@ const adminMenu: MenuItem[] = [
 	{ title: "通知公告", path: "/admin/notice" },
 ]
 
-const moduleMap: Record<string, MenuItem> = {
-	_templates: { title: "templates", path: "/templates" },
-	zddxgk: { title: "zddxgk", path: "/zddxgk" },
+// 从接口获取的模块列表
+const availableModules = ref<ModuleInfo[]>([])
+
+// 获取可用模块列表
+const fetchModules = async () => {
+	try {
+		const res = await getModules()
+		if (res.state === 2000) {
+			availableModules.value = res.data || []
+		}
+	} catch (error) {
+		console.error("获取模块列表失败:", error)
+	}
 }
 
 const moduleMenu = computed<MenuItem[]>(() => {
 	const result: MenuItem[] = []
 	for (const key of authorizedModules.value) {
-		const item = moduleMap[key]
-		if (item) {
-			result.push(item)
+		// 优先使用接口返回的模块信息
+		const moduleInfo = availableModules.value.find(m => m.key === key)
+		if (moduleInfo) {
+			result.push({ title: moduleInfo.name, path: moduleInfo.path })
 		}
 	}
 
 	// 有 token 但没有任何模块匹配时，展示全部模块作为示例
 	if (result.length === 0 && token.value) {
-		return Object.values(moduleMap)
+		return availableModules.value.map(m => ({ title: m.name, path: m.path }))
 	}
 	return result
+})
+
+onMounted(() => {
+	fetchModules()
 })
 </script>
 

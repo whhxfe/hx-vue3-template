@@ -1,7 +1,7 @@
 /**
  * ryyj 模块数据库操作层
  */
-import { getDb, saveDatabase } from "@db/db"
+import { getDb, saveDatabase } from "@db/manager"
 import type { ListItem, ListQuery, DictItem, RyyjRow } from "./types"
 
 // ========== 查询工具函数 ==========

@@ -6,7 +6,7 @@
  * 层级路由: /wzsys/zddxgk/ryst/...
  */
 import type { FastifyInstance, FastifyPluginAsync } from "fastify"
-import { success } from "@utils/response"
+import { success, pagedList } from "@utils/response"
 import type { ListQuery } from "./types"
 import * as service from "./service"
 
@@ -31,15 +31,6 @@ export const rystRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 	app.post<{ Body: ListQuery }>("/list", async (request) => {
 		const { page = 1, pageSize = 10, ...rest } = request.body || {}
 		const result = await service.getPersons({ page, pageSize, ...rest })
-		return {
-			state: 1,
-			message: "success",
-			data: {
-				list: result.list,
-				total: result.total,
-				page,
-				pageSize
-			}
-		}
+		return pagedList(result.list, result.total, page, pageSize)
 	})
 }

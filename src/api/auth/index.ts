@@ -39,9 +39,23 @@ export function getUserInfo(params: GetUserInfoParams) {
 	return request.post<ApiResponse<UserInfo>>('/account/getUsInfoByTo', params)
 }
 
+/**
+ * 获取所有可用业务模块列表
+ */
+export function getModules() {
+	return request.get<ApiResponse<ModuleInfo[]>>('/account/modules')
+}
+
+export interface ModuleInfo {
+	key: string
+	name: string
+	path: string
+}
+
 export default {
 	login,
 	logout,
 	checkToken,
-	getUserInfo
+	getUserInfo,
+	getModules
 }

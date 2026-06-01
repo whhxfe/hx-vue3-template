@@ -13,6 +13,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./*"],
+			"@config/*": ["config/*"],
 			"@db/*": ["db/*"],
 			"@routes/*": ["routes/*"],
 			"@utils/*": ["utils/*"]

@@ -1,127 +1,87 @@
 /**
  * App 工厂：创建 Fastify 实例，注册插件/路由/hooks
  */
-import Fastify from "fastify"
+import Fastify, { type FastifyRequest, type FastifyReply } from "fastify"
 import cors from "@fastify/cors"
 import multipart from "@fastify/multipart"
 import swagger from "@fastify/swagger"
 import swaggerUi from "@fastify/swagger-ui"
-import { swaggerConfig, swaggerUiConfig } from "./swagger"
+import { serverConfig, swaggerConfig, swaggerUiConfig, corsConfig, uploadConfig, loggerConfig } from "./config/index.js"
 import { authRoutes } from "./routes/auth"
 import { registerModules } from "./routes/modules"
 import { registerAdmin } from "./routes/admin"
-import { saveDatabase } from "./db/db"
-
-/** 格式化请求参数（防止大文件/大对象） */
-function formatParams(data: any, maxLen = 300): string {
-	if (!data) return "无"
-	try {
-		const str = JSON.stringify(data)
-		return str.length > maxLen ? str.slice(0, maxLen) + "..." : str
-	} catch {
-		return String(data).slice(0, maxLen)
-	}
-}
-
-/** 记录接口访问日志 */
-function logRequest(request: any, reply: any, startTime: number) {
-	const { method, url } = request
-	const duration = Date.now() - startTime
-	const token = request.headers.token || request.headers.authorization || "-"
-	const ip =
-		request.headers["x-forwarded-for"] || request.headers["x-real-ip"] || request.ip || "-"
-	const status = reply.statusCode
-
-	// 解析 URL 路径（去除 query string）
-	const path = url.split("?")[0]
-
-	// 构建日志内容
-	const lines = [
-		"",
-		"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-		`  🕐  ${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}`,
-		`  📡 ${method}  ${path}`,
-		`  👤 Token: ${String(token).slice(0, 35)}${String(token).length > 35 ? "..." : ""}`,
-		`  🌐 IP:    ${ip}`,
-		`  ⏱️  ${duration}ms  |  📊 ${status}`,
-		""
-	]
-
-	const query = request.query
-	const params = request.params
-	const body = request.body
-
-	if (query && Object.keys(query).length > 0) {
-		lines.push(`  📋 Query:  ${formatParams(query)}`)
-	}
-	if (params && Object.keys(params).length > 0) {
-		lines.push(`  📋 Params: ${formatParams(params)}`)
-	}
-	if (body && Object.keys(body).length > 0) {
-		lines.push(`  📋 Body:   ${formatParams(body)}`)
-	}
-
-	lines.push("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-	lines.push("")
-
-	console.log(lines.join("\n"))
-}
+import { registerCommon } from "./routes/common"
+import { logRequest } from "./utils/logger"
+import { registerLifecycleHooks } from "./lifecycle"
+import { baseAuthHook } from "./utils/base-controller"
+import { fail } from "./utils/response"
+import { cleanExpiredTokens } from "./routes/auth/token-store"
 
 export async function createApp() {
-	// 基础日志配置（用于框架内部日志）
-	const app = Fastify({
-		logger: {
-			level: "warn" // 降低框架日志级别，减少干扰
-		}
-	})
+  // 基础日志配置（用于框架内部日志）
+  const app = Fastify({
+    logger: {
+      level: loggerConfig.level
+    }
+  })
 
-	// 请求开始时记录时间
-	app.addHook("onRequest", async (request: any) => {
-		request.startTime = Date.now()
-	})
+  // 请求开始时记录时间
+  app.addHook("onRequest", async (request: FastifyRequest & { startTime?: number }) => {
+    request.startTime = Date.now()
+  })
 
-	// 请求完成时记录完整日志
-	app.addHook("onResponse", async (request: any, reply: any) => {
-		logRequest(request, reply, request.startTime)
-	})
+  // 请求完成时记录完整日志
+  app.addHook("onResponse", async (request: FastifyRequest & { startTime?: number }, reply: FastifyReply) => {
+    logRequest(request, reply, request.startTime!)
+  })
 
-	// 注册 CORS
-	await app.register(cors, {
-		origin: true, // 允许所有来源（配合 credentials）
-		credentials: true,
-		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-		allowedHeaders: ["Content-Type", "Authorization", "token"],
-		exposedHeaders: ["Content-Disposition"]
-	})
+  // 注册 CORS
+  await app.register(cors, corsConfig)
 
-	// 注册文件上传支持
-	await app.register(multipart, {
-		limits: {
-			fileSize: 10 * 1024 * 1024 // 10MB
-		}
-	})
+  // 注册文件上传支持
+  await app.register(multipart, {
+    limits: {
+      fileSize: uploadConfig.fileSize
+    }
+  })
 
-	// 注册 Swagger
-	await app.register(swagger, swaggerConfig)
-	await app.register(swaggerUi, swaggerUiConfig)
+  // 注册 Swagger
+  await app.register(swagger, swaggerConfig)
+  await app.register(swaggerUi, swaggerUiConfig)
 
-	// 注册业务路由
-	await app.register(authRoutes, { prefix: "/wzsys" })
-	await registerModules(app, "/wzsys")
-	await registerAdmin(app, "/wzsys")
+  // 注册业务路由
+  await app.register(authRoutes, { prefix: "/wzsys/account" })
+  await registerModules(app, "/wzsys")
+  await registerAdmin(app, "/wzsys")
+  await registerCommon(app, "/wzsys")
 
-	// 健康检查
-	app.get("/", async () => ({
-		status: "ok",
-		message: "Mock 服务运行中",
-		docs: `http://localhost:${3000}/docs`
-	}))
+  // 注册统一 token 校验
+  // await baseAuthHook.register(app, { prefix: "/wzsys" })
 
-	// 优雅关闭：保存数据库
-	app.addHook("onClose", () => {
-		saveDatabase()
-		console.log("💾 数据库已保存")
-	})
+  // 健康检查
+  app.get("/", async () => ({
+    status: "ok",
+    message: "Mock 服务运行中",
+    docs: `http://localhost:${serverConfig.port}/docs`
+  }))
 
-	return app
+  // 全局错误处理：统一捕获未处理的错误
+  app.setErrorHandler((error: Error, request, reply) => {
+    console.error(`❌ ${request.method} ${request.url}:`, error)
+    reply.code(200)
+    reply.send(fail(error.message || "服务器内部错误"))
+  })
+
+  // 注册生命周期 Hook（保存数据库等）
+  registerLifecycleHooks(app)
+
+  // 定时清理过期 token（每 10 分钟），防止内存泄漏
+  setInterval(() => {
+    const count = cleanExpiredTokens()
+    if (count > 0) {
+      console.log(`🧹 清理了 ${count} 个过期 token`)
+    }
+  }, 10 * 60 * 1000)
+
+  return app
 }

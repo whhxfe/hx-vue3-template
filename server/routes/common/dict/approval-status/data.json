@@ -1,0 +1,5 @@
+[
+  { "label": "待审批", "value": "pending" },
+  { "label": "已通过", "value": "approved" },
+  { "label": "已拒绝", "value": "rejected" }
+]

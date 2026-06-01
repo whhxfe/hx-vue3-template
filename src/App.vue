@@ -45,9 +45,10 @@ const requestConfig = {
 	headers: {
 		token: token.value!
 	},
-	baseUrl: "http://localhost:3000",
-	prefix: "/wzsys"
+	baseUrl: SYS_CONFIG.API_BASE_URL,
+	prefix: SYS_CONFIG.API_PREFIX
 }
+
 
 const form = { cols: 4, gap: 12, minColWidth: 200, actionAlign: "right" as const }
 </script>

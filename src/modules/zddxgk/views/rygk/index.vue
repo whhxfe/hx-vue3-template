@@ -75,18 +75,18 @@
 							<HxIcon type="iconify" name="ep:plus" />
 							新增
 						</el-button>
-					<HxImporter
-						ref="importerRef"
-						:upload-action="'/zddxgk/rygk/import'"
-						:method="'post'"
-						template-file-name="人员信息导入模板.xlsx"
-						:template-url="rygk.getImportTemplate()"
-						:max-size="10"
-						button-text="导入"
-						dialog-title="导入人员信息"
-						@success="handleImportSuccess"
-						@error="handleImportError"
-					/>
+				<HxImporter
+					ref="importerRef"
+					:upload-action="'/zddxgk/rygk/import'"
+					:method="'post'"
+					template-file-name="人员信息导入模板.xlsx"
+					:template-url="'/zddxgk/rygk/template'"
+					:max-size="10"
+					button-text="导入"
+					dialog-title="导入人员信息"
+					@success="handleImportSuccess"
+					@error="handleImportError"
+				/>
 						<HxExporter
 							ref="exporterRef"
 							:export-action="'/zddxgk/rygk/export'"

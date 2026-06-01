@@ -1,41 +1,9 @@
 /**
  * rygk 模块数据库操作层
  */
-import { getDb, saveDatabase } from "@db/db"
+import { getDb, saveDatabase } from "@db/manager"
 import type { ListItem, ListQuery, TreeNode, DictItem, PersonRow } from "./types"
-
-// ========== 查询工具函数 ==========
-
-function queryAll(sql: string, params: any[] = []): Record<string, any>[] {
-	const db = getDb()
-	const stmt = db.prepare(sql)
-	stmt.bind(params)
-	const rows: Record<string, any>[] = []
-	while (stmt.step()) {
-		rows.push(stmt.getAsObject())
-	}
-	stmt.free()
-	return rows
-}
-
-function queryScalar(sql: string, params: any[] = []): any {
-	const db = getDb()
-	const stmt = db.prepare(sql)
-	stmt.bind(params)
-	let result: any = undefined
-	if (stmt.step()) {
-		const row = stmt.getAsObject()
-		result = Object.values(row)[0]
-	}
-	stmt.free()
-	return result
-}
-
-function runAndSave(sql: string, params: any[] = []) {
-	const db = getDb()
-	db.run(sql, params)
-	saveDatabase()
-}
+import { queryAll, queryScalar, runAndSave } from "@utils/db-helper"
 
 // ========== 行数据转 ListItem ==========
 

@@ -184,67 +184,64 @@ export const rygkRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
 	// ========== 模板下载 ==========
 
-	// 获取导入模板下载地址
-	app.get("/template", async () => {
-		return success({
-			fileName: "人员信息导入模板.xlsx",
-			downloadUrl: "/wzsys/zddxgk/rygk/template/download"
-		}, "获取模板成功")
-	})
+	// 下载导入模板（返回 Excel 文件）
+	app.get("/template", async (_req, reply) => {
+		try {
+			const XLSX = await import("xlsx")
 
-	// 动态生成并下载导入模板
-	app.get("/template/download", async (request, reply) => {
-		const XLSX = await import("xlsx")
+			// 人员信息表头配置
+			const headers = [
+				"姓名",
+				"性别",
+				"年龄",
+				"手机号",
+				"身份证号",
+				"居住地址",
+				"类别",
+				"数据来源",
+				"标签"
+			]
 
-		// 人员信息表头配置
-		const headers = [
-			"姓名",
-			"性别",
-			"年龄",
-			"手机号",
-			"身份证号",
-			"居住地址",
-			"类别",
-			"数据来源",
-			"标签"
-		]
+			// 示例数据
+			const sampleData = [
+				["张三", "男", 28, "13800138000", "420100199001011234", "武汉市", "重点关注", "社区采集", "党员,志愿者"],
+				["李四", "女", 32, "13900139000", "420200199002021234", "黄石市", "一般人员", "医院录入", "独居老人"],
+				["王五", "男", 45, "13700137000", "420300198001031234", "十堰市", "困难群体", "公安推送", "低保户,残疾人"]
+			]
 
-		// 示例数据
-		const sampleData = [
-			["张三", "男", 28, "13800138000", "420100199001011234", "武汉市", "重点关注", "社区采集", "党员,志愿者"],
-			["李四", "女", 32, "13900139000", "420200199002021234", "黄石市", "一般人员", "医院录入", "独居老人"],
-			["王五", "男", 45, "13700137000", "420300198001031234", "十堰市", "困难群体", "公安推送", "低保户,残疾人"]
-		]
+			// 合并表头和示例数据
+			const data = [headers, ...sampleData]
 
-		// 合并表头和示例数据
-		const data = [headers, ...sampleData]
+			// 创建工作簿和工作表
+			const worksheet = XLSX.utils.aoa_to_sheet(data)
+			const workbook = XLSX.utils.book_new()
+			XLSX.utils.book_append_sheet(workbook, worksheet, "人员信息")
 
-		// 创建工作簿和工作表
-		const worksheet = XLSX.utils.aoa_to_sheet(data)
-		const workbook = XLSX.utils.book_new()
-		XLSX.utils.book_append_sheet(workbook, worksheet, "人员信息")
+			// 设置列宽
+			worksheet["!cols"] = [
+				{ wch: 10 }, // 姓名
+				{ wch: 6 },  // 性别
+				{ wch: 6 },  // 年龄
+				{ wch: 15 }, // 手机号
+				{ wch: 20 }, // 身份证号
+				{ wch: 15 }, // 居住地址
+				{ wch: 12 }, // 类别
+				{ wch: 12 }, // 数据来源
+				{ wch: 20 }  // 标签
+			]
 
-		// 设置列宽
-		worksheet["!cols"] = [
-			{ wch: 10 }, // 姓名
-			{ wch: 6 },  // 性别
-			{ wch: 6 },  // 年龄
-			{ wch: 15 }, // 手机号
-			{ wch: 20 }, // 身份证号
-			{ wch: 15 }, // 居住地址
-			{ wch: 12 }, // 类别
-			{ wch: 12 }, // 数据来源
-			{ wch: 20 }  // 标签
-		]
+			// 生成 Excel buffer
+			const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" })
 
-		// 生成 Excel buffer
-		const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" })
+			// 设置响应头
+			reply.header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+			reply.header("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent("人员信息导入模板.xlsx")}`)
 
-		// 设置响应头
-		reply.header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-		reply.header("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent("人员信息导入模板.xlsx")}`)
-
-		return reply.send(buffer)
+			return reply.send(buffer)
+		} catch (error) {
+			console.error("下载导入模板失败:", error)
+			return reply.send(fail("下载导入模板失败"))
+		}
 	})
 
 	// ========== 导入导出 ==========

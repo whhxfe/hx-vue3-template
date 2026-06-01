@@ -5,47 +5,17 @@
  */
 import type { FastifyInstance, FastifyRequest } from "fastify"
 import type { MockUserInfo } from "./types"
-import { getDb } from "@db/db"
-import { success, fail, tokenExpired } from "@utils/response"
-
-/** Token 有效期（秒）- 24小时 */
-const TOKEN_EXPIRES_IN = 24 * 60 * 60
-
-/** token 内存存储：token -> { user: 用户信息, expiresAt: 过期时间戳 } */
-const tokenStore = new Map<string, { user: MockUserInfo; expiresAt: number }>()
-
-/**
- * 后台系统模块列表
- * 这些模块归类为 adminModules，用于前端动态注册后台管理路由
- */
-const ADMIN_MODULE_KEYS = ['ucenter', 'sysconfig', 'syslog', 'dict', 'notice']
-
-function generateToken(): string {
-	return "mock_token_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8)
-}
-
-/**
- * 检查 token 是否存在且未过期
- */
-function checkToken(token: string): { valid: boolean; user?: MockUserInfo; expiresIn?: number } {
-	const entry = tokenStore.get(token)
-	if (!entry) {
-		return { valid: false }
-	}
-	if (Date.now() > entry.expiresAt) {
-		tokenStore.delete(token)
-		return { valid: false }
-	}
-	const expiresIn = Math.floor((entry.expiresAt - Date.now()) / 1000)
-	return { valid: true, user: entry.user, expiresIn }
-}
+import { getDb } from "@db/manager"
+import { success, fail, tokenExpired } from "../../utils/response.js"
+import { authConfig, adminModuleKeys, businessModules } from "../../config/index.js"
+import { generateToken, checkToken, setToken, deleteToken } from "./token-store"
 
 export async function authRoutes(app: FastifyInstance) {
 	/**
 	 * GET /account/login
 	 * 登录接口
 	 */
-	app.get("/account/login", {
+	app.get("/login", {
 		schema: {
 			summary: "用户登录",
 			tags: ["认证接口"],
@@ -111,7 +81,7 @@ export async function authRoutes(app: FastifyInstance) {
 			const row = menuStmt.getAsObject()
 			const moduleKey = row.module_key as string
 			// 后台系统模块归类为 adminModules
-			if (ADMIN_MODULE_KEYS.includes(moduleKey)) {
+			if ((adminModuleKeys as readonly string[]).includes(moduleKey)) {
 				adminModules.push(moduleKey)
 			} else {
 				modules.push(moduleKey)
@@ -133,17 +103,25 @@ export async function authRoutes(app: FastifyInstance) {
 		}
 
 		const token = generateToken()
-		const expiresAt = Date.now() + TOKEN_EXPIRES_IN * 1000
-		tokenStore.set(token, { user: userInfo, expiresAt })
+		const expiresAt = Date.now() + authConfig.tokenExpiresIn * 1000
+		setToken(token, userInfo, expiresAt)
 
-		return success({ info: token, level: roleLevel, modules, adminModules, expiresIn: TOKEN_EXPIRES_IN }, "登录成功")
+		return success({ info: token, level: roleLevel, modules, adminModules, expiresIn: authConfig.tokenExpiresIn }, "登录成功")
+	})
+
+	/**
+	 * GET /account/modules
+	 * 获取所有可用业务模块列表
+	 */
+	app.get("/modules", async () => {
+		return success(businessModules, "获取成功")
 	})
 
 	/**
 	 * GET /account/loginOut
 	 * 登出接口
 	 */
-	app.get("/account/loginOut", {
+	app.get("/loginOut", {
 		schema: {
 			summary: "用户登出",
 			tags: ["认证接口"],
@@ -157,7 +135,7 @@ export async function authRoutes(app: FastifyInstance) {
 	}, async (request: FastifyRequest) => {
 		const token = request.headers.token as string | undefined
 		if (token) {
-			tokenStore.delete(token)
+			deleteToken(token)
 		}
 		return success({ success: true }, "登出成功")
 	})
@@ -166,7 +144,7 @@ export async function authRoutes(app: FastifyInstance) {
 	 * GET /account/getAccState
 	 * 校验 token 状态
 	 */
-	app.get("/account/getAccState", {
+	app.get("/getAccState", {
 		schema: {
 			summary: "校验 token 状态",
 			tags: ["认证接口"],
@@ -199,7 +177,7 @@ export async function authRoutes(app: FastifyInstance) {
 	 * POST /account/getUsInfoByTo
 	 * 通过 token 获取用户信息
 	 */
-	app.post("/account/getUsInfoByTo", {
+	app.post("/getUsInfoByTo", {
 		schema: {
 			summary: "获取用户信息",
 			tags: ["认证接口"],

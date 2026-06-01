@@ -136,14 +136,5 @@ export const rygk = {
 	 */
 	assignCategory(params: { personIds: number[]; categoryCode: string }) {
 		return request.post('/zddxgk/rygk/category/assign', params) as Promise<ApiResponse<{ assignedCount: number }>>
-	},
-
-	// ==================== 导入导出 ====================
-
-	/**
-	 * 获取导入模板下载地址
-	 */
-	getImportTemplate() {
-		return '/zddxgk/rygk/template'
 	}
 }
