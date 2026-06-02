@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
  * 获取文件类型
  */
 export function getFileType(extension: string) {
-	let _extension = typeof extension == 'string' ? extension.toLowerCase() : ''
+	const _extension = typeof extension == 'string' ? extension.toLowerCase() : ''
 	if (!extension) return
 
 	const fileTypes = [
@@ -83,7 +83,7 @@ export function highlightTextNumbers(
 
 	const reg = includeDecimal ? /\d+(\.\d+)?/g : /\d+/g
 
-	let result = text
+	const result = text
 	return result.replace(reg, match => {
 		return `<span class="${className}" >${match}</span>`
 	})

@@ -1,7 +1,7 @@
 import dayjs from "dayjs"
 
 function generateShortcuts() {
-	let list = [
+	const list = [
 		{
 			text: "近一天",
 			days: 1

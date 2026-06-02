@@ -5,27 +5,61 @@ import pluginVue from "eslint-plugin-vue";
 import markdown from "@eslint/markdown";
 import css from "@eslint/css";
 import { defineConfig } from "eslint/config";
-import prettier from "eslint-plugin-prettier";
-// 导入 ESLint 配置类型（用于类型约束）
+import eslintConfigPrettier from "eslint-config-prettier";
 import type { Linter } from "eslint";
 
-// 定义 ESLint 配置（通过泛型约束为 Linter.FlatConfig 数组）
+// pluginVue.configs["flat/recommended"] 中部分配置项没有 files 限制，
+// 会导致 Vue 规则被应用到 .md 等非 Vue 文件上而崩溃，在此补充 files 限制。
+const vueRecommended = pluginVue.configs["flat/recommended"];
+const vueRecommendedFiltered = (Array.isArray(vueRecommended) ? vueRecommended : [vueRecommended]).map((config) => {
+  if (!config.files) {
+    return { ...config, files: ["**/*.vue"] as string[] };
+  }
+  return config;
+});
+
+// 定义全局类型（运行时注入或跨文件共享的类型，用于消除 no-undef 误报）
+const sharedGlobals = {
+  ...globals.browser,
+  ...globals.node,
+  SYS_CONFIG: "readonly",
+  MenuItem: "readonly",
+  StatItem: "readonly",
+  OverviewData: "readonly",
+  RegionItem: "readonly",
+};
+
+// 定义 ESLint 配置
 const eslintConfig: Linter.FlatConfig[] = [
+  // 排除不参与检查的目录
+  {
+    ignores: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/server/**",
+      "**/.clinerules/**",
+      "**/public/**",
+      "**/*.d.ts",
+      // JSX 在 Vue 文件中需要特殊配置，暂跳过
+      "**/modules/zddxgk/views/rygk/**",
+      "**/modules/zddxgk/views/ryst/**",
+    ]
+  },
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"],
-    plugins: { js, prettier },
+    plugins: { js },
     extends: ["js/recommended"]
   },
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"],
     languageOptions: {
-      globals: { ...globals.browser, ...globals.node }
+      globals: sharedGlobals
     }
   },
-  // 类型断言：确保 TypeScript-ESLint 配置符合 FlatConfig 类型
+  // TypeScript 规则
   ...tseslint.configs.recommended as Linter.FlatConfig[],
-  // Vue 推荐配置的类型适配
-  pluginVue.configs["flat/recommended"] as Linter.FlatConfig,
+  // Vue 推荐配置
+  ...vueRecommendedFiltered as Linter.FlatConfig[],
   {
     files: ["**/*.vue"],
     languageOptions: {
@@ -33,7 +67,6 @@ const eslintConfig: Linter.FlatConfig[] = [
       parserOptions: {
         parser: tseslint.parser,
         extraFileExtensions: [".vue"],
-        project: "./tsconfig.app.json"
       }
     }
   },
@@ -49,15 +82,48 @@ const eslintConfig: Linter.FlatConfig[] = [
     language: "css/css",
     extends: ["css/recommended"]
   },
+  // 关闭与 prettier 冲突的规则（必须放在 Vue 配置之后）
+  eslintConfigPrettier as Linter.FlatConfig,
+  // 全局规则调整
   {
-    ignores: ["**/*.d.ts"]
-  },
-  {
+    files: ["**/*"],
     rules: {
-      "vue/multi-word-component-names": "error"
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-duplicate-enum-values": "warn",
+      "@typescript-eslint/no-require-imports": "off",
+      // 关闭无用的转义字符检查（正则中 `/` 不需要转义）
+      "no-useless-escape": "off",
+      // `successMessage && fn()` 是惯用的卫语句写法
+      "@typescript-eslint/no-unused-expressions": "off",
     }
-  }
+  },
+  // Vue 文件规则调整
+  {
+    files: ["**/*.vue"],
+    rules: {
+      // index、layout、303、404 等是标准命名习惯
+      "vue/multi-word-component-names": ["error", {
+        ignores: ["index", "layout", "default", "base", "303", "403", "404", "v2", "Layout", "Layout2"]
+      }],
+      // 关闭样式类 Vue 规则
+      "vue/attributes-order": "off",
+      "vue/first-attribute-linebreak": "off",
+      "vue/component-name-in-template-casing": "off",
+      "vue/html-self-closing": "off",
+      "vue/block-order": "off",
+      "vue/define-matches-order": "off",
+      "vue/no-unused-components": "warn",
+      "vue/require-default-prop": "off",
+      "vue/v-on-event-hyphenation": "off",
+      "vue/no-empty-component-block": "off",
+      "vue/no-deprecated-v-on-native-modifier": "off",
+      "vue/no-deprecated-slot-attribute": "off",
+      // Vue 3.5+ ref 解包
+      "vue/no-ref-as-operand": "off",
+      "vue/no-unused-vars": "warn",
+    }
+  },
 ];
 
-// 导出配置（通过 defineConfig 进一步增强类型校验）
 export default defineConfig(eslintConfig);

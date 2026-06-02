@@ -24,7 +24,7 @@
 		<i class="i-mdi:youtube text-#f00" />
 
 		<ul class="h-100 overflow-auto p-5">
-			<li v-for="item in 10" class="p-5 h-12 shadow mb-5 last:mb-0">{{ item }}</li>
+			<li v-for="item in 10" :key="item" class="p-5 h-12 shadow mb-5 last:mb-0">{{ item }}</li>
 		</ul>
 	</div>
 </template>
