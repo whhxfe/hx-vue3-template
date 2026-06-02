@@ -42,8 +42,15 @@
 		</div>
 
 		<!-- 新增表单弹窗 -->
-		<el-dialog v-model="dialogVisible" title="新增数据" width="1000px"  :close-on-click-modal="false">
-			<HxForm ref="addFormRef" v-model="addFormData" :fields="formFields" label-width="100px" :cols="2" :show-action="false" />
+		<el-dialog v-model="dialogVisible" title="新增数据" width="1000px" :close-on-click-modal="false">
+			<HxForm
+				ref="addFormRef"
+				v-model="addFormData"
+				:fields="formFields"
+				label-width="100px"
+				:cols="2"
+				:show-action="false"
+			/>
 			<template #footer>
 				<el-button @click="dialogVisible = false">取消</el-button>
 				<el-button type="primary" :loading="dialogLoading" @click="handleSubmit">确认</el-button>
@@ -137,11 +144,11 @@ const formFields = computed<FormField[]>(() => [
 		type: "input",
 		placeholder: "请输入身份证号",
 		maxlength: 18,
-		colSpan: 1,
-		rules: [
-			{ required: true, message: "请输入身份证号", trigger: "blur" },
-			{ pattern: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/, message: "身份证号格式不正确", trigger: "blur" }
-		]
+		colSpan: 1
+		// rules: [
+		// 	{ required: true, message: "请输入身份证号", trigger: "blur" },
+		// 	{ pattern: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/, message: "身份证号格式不正确", trigger: "blur" }
+		// ]
 	},
 	{
 		prop: "phone",
@@ -198,13 +205,26 @@ const formFields = computed<FormField[]>(() => [
 	{
 		prop: "district",
 		label: "所属区县",
-		type: "select",
+		type: "cascader",
 		placeholder: "请选择所属区县",
 		remote: {
-			url: "/public/dict/district",
-			labelKey: "label",
-			valueKey: "value"
+			// /public/dict/china-region?
+			url: "/public/dict/china-region",
+			params: {
+				// parentCode: 5404,
+				depth: 3,
+				format: "tree"
+			},
+			labelKey: "name",
+			valueKey: "name",
+			childrenKey: "children"
 		},
+		cascaderProps: {
+			showAllLevels: true,
+			checkStrictly: true,
+			emitPath: false
+		},
+		// componentProps: {},
 		colSpan: 1
 	},
 	{
@@ -246,7 +266,7 @@ const tableColumns = computed<TableColumn[]>(() => [
 		prop: "handleTime",
 		label: "处理时间",
 		width: 120,
-		sortable:true,
+		sortable: true
 	},
 	{
 		prop: "name",
@@ -312,10 +332,10 @@ const tableColumns = computed<TableColumn[]>(() => [
 	},
 	{
 		label: "操作",
-		slot:"action",
-		fixed:'right',
+		slot: "action",
+		fixed: "right",
 		width: 160
-	},
+	}
 ])
 
 // ==================== 方法 ====================
