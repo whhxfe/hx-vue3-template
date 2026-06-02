@@ -134,7 +134,8 @@ export const ucenterRoutes: FastifyPluginAsync = async (app: FastifyInstance) =>
 		const availableModules = [
 			{ key: "_templates", name: "模板示例", description: "功能模板示例" },
 			{ key: "zddxgk", name: "站点管理", description: "站点信息管理" },
-			{ key: "pbct", name: "数据导入管理", description: "数据导入管理" }
+			{ key: "pbct", name: "数据导入管理", description: "数据导入管理" },
+			{ key: "amc", name: "审计中心", description: "审计日志管理" }
 		]
 		return success(availableModules)
 	})

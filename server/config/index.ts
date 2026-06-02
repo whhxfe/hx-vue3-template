@@ -62,7 +62,8 @@ export type AdminModuleKey = (typeof adminModuleKeys)[number]
 export const businessModules = [
   { key: "_templates", name: "模板示例", path: "/templates" },
   { key: "zddxgk", name: "站点管理", path: "/zddxgk" },
-  { key: "pbct", name: "数据管理", path: "/pbct" }
+  { key: "pbct", name: "数据管理", path: "/pbct" },
+  { key: "amc", name: "审计中心", path: "/amc" }
 ] as const
 
 /** 业务模块 key 联合类型 */
