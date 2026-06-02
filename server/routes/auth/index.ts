@@ -56,7 +56,7 @@ export async function authRoutes(app: FastifyInstance) {
 		// 从 SQLite accounts 表查询用户
 		const db = getDb()
 		const stmt = db.prepare(`
-			SELECT a.*, r.code as role_code, r.sort_order as role_level
+			SELECT a.*, r.code as role_code, r.role_level as role_level
 			FROM accounts a
 			LEFT JOIN roles r ON a.role_id = r.id
 			WHERE a.username = ?
@@ -89,7 +89,7 @@ export async function authRoutes(app: FastifyInstance) {
 		}
 		menuStmt.free()
 
-		const roleLevel = String(account.role_level ?? 99)
+		const roleLevel = String(account.role_level ?? -1)
 		const userInfo: MockUserInfo = {
 			accountId: String(account.id),
 			accountName: (account.display_name as string) || (account.username as string),

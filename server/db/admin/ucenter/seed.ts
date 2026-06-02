@@ -8,16 +8,27 @@ import type { Database } from "sql.js"
 import { faker } from "@faker-js/faker/locale/zh_CN"
 
 /** 表为空时插入默认数据（服务启动时调用） */
-export function seedUcenterDefaults(_db: Database) {
-  // 用户中心没有需要服务启动时初始化的默认数据
+export function seedUcenterDefaults(db: Database) {
+  // 迁移：旧数据库中 roles 表可能没有 role_level 字段，需要补充
+  try {
+    const pragmaResult = db.exec("PRAGMA table_info(roles)")
+    const columns = pragmaResult[0]?.values.map((row: any) => row[1] as string) ?? []
+    if (!columns.includes("role_level")) {
+      db.run("ALTER TABLE roles ADD COLUMN role_level INTEGER DEFAULT 99")
+    }
+    // 将 sort_order 的值回填到 role_level（仅针对 role_level 为默认值的记录）
+    db.run("UPDATE roles SET role_level = sort_order WHERE role_level = -1")
+  } catch {
+    // 忽略迁移错误
+  }
 }
 
 /** 生成 Faker 大数据（npm run seed 时调用） */
 export function seedUcenterFakeData(db: Database) {
   console.log("🌱 正在生成角色数据...")
-  db.run("INSERT INTO roles (name, code, description, sort_order) VALUES ('超级管理员', 'super', '拥有所有模块权限', 0)")
-  db.run("INSERT INTO roles (name, code, description, sort_order) VALUES ('管理员', 'admin', '系统管理权限', 1)")
-  db.run("INSERT INTO roles (name, code, description, sort_order) VALUES ('普通用户', 'user', '基本访问权限', 2)")
+  db.run("INSERT INTO roles (name, code, description, sort_order, role_level) VALUES ('超级管理员', 'super', '拥有所有模块权限', 0, 0)")
+  db.run("INSERT INTO roles (name, code, description, sort_order, role_level) VALUES ('管理员', 'admin', '系统管理权限', 1, 1)")
+  db.run("INSERT INTO roles (name, code, description, sort_order, role_level) VALUES ('普通用户', 'user', '基本访问权限', 2, 2)")
   console.log("  ✅ 已生成 3 条角色数据")
 
   // 分配角色模块权限

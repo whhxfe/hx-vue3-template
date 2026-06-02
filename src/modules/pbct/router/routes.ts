@@ -7,7 +7,7 @@ export const getRoutes = (): RouteRecordRaw[] => {
 			name: 'pbct',
 			path: '/pbct',
 			component: layout,
-			redirect: '/pbct/import',
+			redirect: '/pbct/query',
 			meta: {
 				moduleKey: 'pbct',
 				title: 'pbct'
@@ -18,7 +18,9 @@ export const getRoutes = (): RouteRecordRaw[] => {
 					path: '/pbct/import',
 					component: () => import('../views/import/index.vue'),
 					meta: {
-						title: 'import'
+						title: 'import',
+						/** 仅 super(0) 和 admin(1) 可访问，user(2) 不可见 */
+						minRoleLevel: 1
 					}
 				},
 				{
@@ -26,7 +28,9 @@ export const getRoutes = (): RouteRecordRaw[] => {
 					path: '/pbct/query',
 					component: () => import('../views/query/index.vue'),
 					meta: {
-						title: 'query'
+						title: 'query',
+						/** 所有角色均可访问 */
+						minRoleLevel: -1
 					}
 				}
 			]

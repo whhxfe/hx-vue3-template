@@ -8,9 +8,11 @@
 import type { FastifyInstance, FastifyPluginAsync } from "fastify"
 import { dashboardRoutes } from "./dashboard"
 import { screenRoutes } from "./screen"
+import { listRoutes } from "./list"
 
 export const templatesRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 	// 在此处添加 /dashboard 和 /screen prefix
 	await app.register(dashboardRoutes, { prefix: "/dashboard" })
 	await app.register(screenRoutes, { prefix: "/screen" })
+	await app.register(listRoutes, { prefix: "/list" })
 }

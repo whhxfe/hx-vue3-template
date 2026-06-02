@@ -1,29 +1,29 @@
 /**
  * Faker 数据生成统一入口
- * 按模块调用各模块的 seed 函数
+ * 参考 init.ts 模块化组织，通过 allModules 遍历调用各模块的 seedFakeData
  * 运行方式：cd server && npm run seed
  */
-import { initDatabase } from "./init.js"
-import { getDb, saveDatabase } from "./manager.js"
+import { createDatabase, getDb, saveDatabase } from "./manager.js"
+import type { DbModule } from "./types.js"
+import { baseModules } from "./base/index.js"
+import { adminModules } from "./admin/index.js"
+import { commonModules } from "./common/index.js"
+import { businessModules } from "./modules/index.js"
 
-// 各模块 Faker 种子
-import { seedBaseFakeData } from "./base/seed.js"
-import { seedUcenterFakeData } from "./admin/ucenter/seed.js"
-import { seedSysconfigFakeData } from "./admin/sysconfig/seed.js"
-import { seedDictFakeData } from "./common/dict/seed.js"
-import { seedNoticeFakeData } from "./common/notice/seed.js"
-import { seedSyslogFakeData } from "./common/syslog/seed.js"
-import { seedZddxgkFakeData } from "./modules/zddxgk/seed.js"
-import { seedRyyjFakeData } from "./modules/ryyj/seed.js"
-import { seedRystFakeData } from "./modules/ryst/seed.js"
-import { seedPbctFakeData } from "./modules/pbct/seed.js"
+const allModules: DbModule[] = [...baseModules, ...adminModules, ...commonModules, ...businessModules]
 
 async function seed() {
-  // 先初始化数据库（建表 + 默认数据）
-  await initDatabase()
+  // 先创建数据库实例
+  await createDatabase()
   const db = getDb()
 
-  // ========== 清空旧数据 ==========
+  // ========== 建表 + 默认数据 ==========
+  for (const mod of allModules) {
+    mod.createTables(db)
+    mod.seedDefaults(db)
+  }
+
+  // ========== 清空旧 Faker 数据 ==========
   const tablesToClear = [
     "users", "logs", "settings",
     "accounts", "roles", "role_menus",
@@ -34,17 +34,10 @@ async function seed() {
     db.run(`DELETE FROM ${table}`)
   }
 
-  // ========== 按模块生成 Faker 数据 ==========
-  seedBaseFakeData(db)
-  seedUcenterFakeData(db)
-  seedSysconfigFakeData(db)
-  seedDictFakeData(db)
-  seedNoticeFakeData(db)
-  seedSyslogFakeData(db)
-  seedZddxgkFakeData(db)
-  seedRyyjFakeData(db)
-  seedRystFakeData(db)
-  seedPbctFakeData(db)
+  // ========== 按模块顺序生成 Faker 数据 ==========
+  for (const mod of allModules) {
+    mod.seedFakeData?.(db)
+  }
 
   // ========== 持久化到文件 ==========
   saveDatabase()

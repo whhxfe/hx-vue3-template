@@ -1,15 +1,16 @@
-import { useTextAlias } from './text.config'
-
 export const getMenuConfig = () => {
-	const text = useTextAlias()
 	return [
 		{
-			title: text.menu.dashboard,
+			title: '仪表盘',
 			path: '/templates/dashboard'
 		},
 		{
-			title: text.menu.screen,
+			title: '数据大屏',
 			path: '/templates/screen'
+		},
+		{
+			title: '列表管理',
+			path: '/templates/list'
 		}
 	]
 }

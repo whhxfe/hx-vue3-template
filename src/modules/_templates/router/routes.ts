@@ -1,35 +1,40 @@
 import type { RouteRecordRaw } from 'vue-router'
 import layout from '../layout.vue'
-import { useTextAlias } from '../config'
 
 export const getRoutes = (): RouteRecordRaw[] => {
-	const text = useTextAlias()
-
 	return [
 		{
-			name: text.module.name,
+			name: 'template',
 			path: '/templates',
 			component: layout,
 			redirect: '/templates/dashboard',
 			meta: {
 				moduleKey: '_templates',
-				title: 'templates'
+				title: '模板中心'
 			},
 			children: [
 				{
-					name: `${text.module.name}-dashboard`,
+					name: 'template-dashboard',
 					path: '/templates/dashboard',
 					component: () => import('../views/dashboard/index.vue'),
 					meta: {
-						title: 'dashboard'
+						title: '仪表盘'
 					}
 				},
 				{
-					name: `${text.module.name}-screen`,
+					name: 'template-screen',
 					path: '/templates/screen',
 					component: () => import('../views/screen/index.vue'),
 					meta: {
-						title: 'screen'
+						title: '数据大屏'
+					}
+				},
+				{
+					name: 'template-list',
+					path: '/templates/list',
+					component: () => import('../views/list/index.vue'),
+					meta: {
+						title: '列表管理'
 					}
 				}
 			]

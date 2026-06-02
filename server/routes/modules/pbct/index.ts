@@ -5,6 +5,55 @@ import type { FastifyInstance } from "fastify"
 import { pbctService } from "./service"
 import type { ListQuery, ImportData } from "./types"
 
+/**
+ * 兼容多种日期格式，统一转换为 YYYY-MM-DD
+ * 支持: Date对象, 2024/3/12, 2024-03-12, 2024-3-12, 2024年3月12日, 2024年03月12日, Excel序列号(45362)
+ */
+function formatDate(value: any): string {
+	if (!value && value !== 0) return ""
+	// XLSX 解析的 Date 对象（带时间戳）
+	if (value instanceof Date) {
+		const y = value.getFullYear()
+		const m = String(value.getMonth() + 1).padStart(2, "0")
+		const d = String(value.getDate()).padStart(2, "0")
+		return `${y}-${m}-${d}`
+	}
+	// Excel 序列号（1900年起，1900-01-01为1，但Excel有1900-02-29的bug）
+	// day >= 60 需要减1修正
+	if (typeof value === "number" && value > 0) {
+		const serial = value
+		if (serial >= 60) {
+			// Excel 1900 leap year bug: day 60 = 1900-02-29 (nonexistent)
+			const d = new Date(Date.UTC(1899, 11, 30 + serial))
+			const y = d.getUTCFullYear()
+			const m = String(d.getUTCMonth() + 1).padStart(2, "0")
+			const day = String(d.getUTCDate()).padStart(2, "0")
+			return `${y}-${m}-${day}`
+		}
+	}
+	const str = String(value).trim()
+	// yyyy/M/d 或 yyyy/MM/dd
+	const slashMatch = str.match(/^(\d{1,4})\/(\d{1,2})\/(\d{1,2})$/)
+	if (slashMatch) {
+		const [, y, m, d] = slashMatch
+		return `${y.padStart(4, "0")}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`
+	}
+	// yyyy-M-d 或 yyyy-MM-dd
+	const dashMatch = str.match(/^(\d{1,4})-(\d{1,2})-(\d{1,2})$/)
+	if (dashMatch) {
+		const [, y, m, d] = dashMatch
+		return `${y.padStart(4, "0")}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`
+	}
+	// yyyy年M月d日 或 yyyy年MM月DD日
+	const cnMatch = str.match(/^(\d{1,4})年(\d{1,2})月(\d{1,2})日?$/)
+	if (cnMatch) {
+		const [, y, m, d] = cnMatch
+		return `${y.padStart(4, "0")}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`
+	}
+	// 已经是标准格式或无法解析，原样返回
+	return str
+}
+
 interface ListParams {
 	page?: string
 	pageSize?: string
@@ -15,6 +64,7 @@ interface ListParams {
 	gender?: string
 	ethnicity?: string
 	sortOrder?: string
+	source?: string
 }
 
 interface DeleteBody {
@@ -38,7 +88,7 @@ interface AddBody {
 
 const pbctRoutes = async (app: FastifyInstance) => {
 	/**
-	 * 获取列表数据
+	 * 获取列表数据（从记录表查询）
 	 */
 	app.get<{ Querystring: ListParams }>("/list", async (req, reply) => {
 		try {
@@ -51,7 +101,8 @@ const pbctRoutes = async (app: FastifyInstance) => {
 				district: req.query.district,
 				gender: req.query.gender,
 				ethnicity: req.query.ethnicity,
-				sortOrder: req.query.sortOrder
+				sortOrder: req.query.sortOrder,
+				source: req.query.source
 			}
 
 			const result = await pbctService.getList(query)
@@ -76,7 +127,6 @@ const pbctRoutes = async (app: FastifyInstance) => {
 	 */
 	app.post("/import", async (req, reply) => {
 		try {
-			// 获取上传的文件
 			const data = await (req as any).file()
 
 			if (!data) {
@@ -87,11 +137,9 @@ const pbctRoutes = async (app: FastifyInstance) => {
 				})
 			}
 
-			// 读取文件内容
 			const buffer = await data.toBuffer()
 			const XLSX = await import("xlsx")
 
-			// 解析 Excel
 			const workbook = XLSX.read(buffer, { type: "buffer" })
 			const sheetName = workbook.SheetNames[0]
 			const worksheet = workbook.Sheets[sheetName]
@@ -105,10 +153,8 @@ const pbctRoutes = async (app: FastifyInstance) => {
 				})
 			}
 
-			// 获取表头（第一行）
 			const headers = jsonData[0].map((h) => String(h).trim())
 
-			// 表头映射
 			const headerMap: Record<string, string> = {
 				"处理时间": "handleTime",
 				"姓名": "name",
@@ -128,10 +174,7 @@ const pbctRoutes = async (app: FastifyInstance) => {
 				"所属区县": "district"
 			}
 
-			// 解析数据行
 			const dataList: ImportData[] = []
-			const idCardSet = new Set<string>()
-			const duplicateIdCards: string[] = []
 			const missingHandleTimeRows: number[] = []
 
 			for (let i = 1; i < jsonData.length; i++) {
@@ -141,40 +184,34 @@ const pbctRoutes = async (app: FastifyInstance) => {
 				headers.forEach((header, index) => {
 					const field = headerMap[header]
 					if (field) {
-						rowData[field] = row[index] !== undefined ? String(row[index]).trim() : ""
+						if (field === "handleTime") {
+							// 日期字段直接保留原始值（可能是Date对象或Excel序列号）
+							rowData[field] = row[index]
+						} else {
+							rowData[field] = row[index] !== undefined ? String(row[index]).trim() : ""
+						}
 					}
 				})
 
-				// 跳过空行
 				if (!rowData.name && !rowData.phone && !rowData.idCard) {
 					continue
 				}
 
-				// 验证必填字段：处理时间
-				if (!rowData.handleTime) {
+				// 格式化日期后再存入
+				const formattedHandleTime = formatDate(rowData.handleTime || "")
+				if (!formattedHandleTime) {
 					missingHandleTimeRows.push(i + 1)
 					continue
 				}
 
-				// 验证必填字段：姓名
 				if (!rowData.name) {
 					throw new Error(`第 ${i + 1} 行：姓名为必填项`)
 				}
 
 				const idCard = rowData.idCard || ""
 
-				// 检查 Excel 内部是否有重复的身份证号
-				if (idCard && idCardSet.has(idCard)) {
-					duplicateIdCards.push(idCard)
-					continue
-				}
-
-				if (idCard) {
-					idCardSet.add(idCard)
-				}
-
 				dataList.push({
-					handleTime: rowData.handleTime || "",
+					handleTime: formattedHandleTime,
 					name: rowData.name || "",
 					idCard: idCard,
 					phone: rowData.phone || "",
@@ -189,7 +226,6 @@ const pbctRoutes = async (app: FastifyInstance) => {
 				})
 			}
 
-			// 检查处理时间是否为空
 			if (missingHandleTimeRows.length > 0) {
 				return reply.send({
 					state: 4000,
@@ -199,13 +235,6 @@ const pbctRoutes = async (app: FastifyInstance) => {
 			}
 
 			if (dataList.length === 0) {
-				if (duplicateIdCards.length > 0) {
-					return reply.send({
-						state: 4000,
-						message: `Excel 文件中存在重复的身份证号：${[...new Set(duplicateIdCards)].join("、")}`,
-						data: null
-					})
-				}
 				return reply.send({
 					state: 4000,
 					message: "没有有效数据可导入",
@@ -213,16 +242,15 @@ const pbctRoutes = async (app: FastifyInstance) => {
 				})
 			}
 
-			// 调用服务层保存数据（包含去重逻辑）
-			const result = await pbctService.importData(dataList)
+			// 调用服务层（source = import）
+			const result = await pbctService.importData(dataList, "import")
 
-			// 拼接错误信息
 			let message = `导入完成，成功 ${result.successCount} 条`
+			if (result.skipCount > 0) {
+				message += `，跳过 ${result.skipCount} 条（记录已存在）`
+			}
 			if (result.failCount > 0) {
 				message += `，失败 ${result.failCount} 条`
-			}
-			if (result.duplicateIdCards && result.duplicateIdCards.length > 0) {
-				message += `\n以下身份证号已存在：${result.duplicateIdCards.join("、")}`
 			}
 
 			return reply.send({
@@ -241,11 +269,13 @@ const pbctRoutes = async (app: FastifyInstance) => {
 	})
 
 	/**
-	 * 新增数据
+	 * 新增数据（与导入逻辑相同）
 	 */
 	app.post<{ Body: AddBody }>("/add", async (req, reply) => {
 		try {
-			const { handleTime, name, idCard, phone, gender, ethnicity, virtualAccount, handleReason, handleResult, householdAddress, residenceAddress, district } = req.body
+			const { handleTime: rawHandleTime, name, idCard, phone, gender, ethnicity, virtualAccount, handleReason, handleResult, householdAddress, residenceAddress, district } = req.body
+
+			const handleTime = formatDate(rawHandleTime || "")
 
 			if (!handleTime) {
 				return reply.send({
@@ -271,7 +301,28 @@ const pbctRoutes = async (app: FastifyInstance) => {
 				})
 			}
 
-			await pbctService.add({ handleTime, name, idCard, phone: phone || "", gender: gender || "男", ethnicity: ethnicity || "", virtualAccount: virtualAccount || "", handleReason: handleReason || "", handleResult: handleResult || "", householdAddress: householdAddress || "", residenceAddress: residenceAddress || "", district: district || "" })
+			const result = await pbctService.add({
+				handleTime,
+				name,
+				idCard,
+				phone: phone || "",
+				gender: gender || "男",
+				ethnicity: ethnicity || "",
+				virtualAccount: virtualAccount || "",
+				handleReason: handleReason || "",
+				handleResult: handleResult || "",
+				householdAddress: householdAddress || "",
+				residenceAddress: residenceAddress || "",
+				district: district || ""
+			})
+
+			if (result.skipCount > 0) {
+				return reply.send({
+					state: 4000,
+					message: "该记录已存在（整行数据完全相同）",
+					data: null
+				})
+			}
 
 			return reply.send({
 				state: 2000,
@@ -289,7 +340,7 @@ const pbctRoutes = async (app: FastifyInstance) => {
 	})
 
 	/**
-	 * 删除数据
+	 * 删除记录
 	 */
 	app.post<{ Body: DeleteBody }>("/delete", async (req, reply) => {
 		try {
@@ -327,7 +378,6 @@ const pbctRoutes = async (app: FastifyInstance) => {
 		try {
 			const XLSX = await import("xlsx")
 
-			// 数据导入表头配置
 			const headers = [
 				"处理时间",
 				"姓名",
@@ -343,41 +393,35 @@ const pbctRoutes = async (app: FastifyInstance) => {
 				"所属区县"
 			]
 
-			// 示例数据
 			const sampleData = [
 				["2024-01-15", "张三", "420100199001011234", "13800138000", "男", "汉族", "VA001", "政策补贴申请", "已审批通过", "湖北省武汉市", "湖北省武汉市武昌区", "武汉市"],
 				["2024-02-20", "李四", "420200199002021234", "13900139000", "女", "汉族", "VA002", "困难认定", "待审核", "湖北省黄石市", "湖北省黄石市黄石港区", "黄石市"],
 				["2024-03-10", "王五", "420300198001031234", "13700137000", "男", "土家族", "VA003", "残贴申请", "已发放", "湖北省十堰市", "湖北省十堰市茅箭区", "十堰市"]
 			]
 
-			// 合并表头和示例数据
 			const data = [headers, ...sampleData]
 
-			// 创建工作簿和工作表
 			const worksheet = XLSX.utils.aoa_to_sheet(data)
 			const workbook = XLSX.utils.book_new()
 			XLSX.utils.book_append_sheet(workbook, worksheet, "数据导出")
 
-			// 设置列宽
 			worksheet["!cols"] = [
-				{ wch: 12 },  // 处理时间
-				{ wch: 10 },  // 姓名
-				{ wch: 20 },  // 身份证
-				{ wch: 15 },  // 联系电话
-				{ wch: 6 },   // 性别
-				{ wch: 10 },  // 民族
-				{ wch: 12 },  // 虚拟账号
-				{ wch: 15 },  // 处理原因
-				{ wch: 15 },  // 处理结果
-				{ wch: 30 },  // 户籍地址
-				{ wch: 30 },  // 现居地址
-				{ wch: 15 }   // 所属区县
+				{ wch: 12 },
+				{ wch: 10 },
+				{ wch: 20 },
+				{ wch: 15 },
+				{ wch: 6 },
+				{ wch: 10 },
+				{ wch: 12 },
+				{ wch: 15 },
+				{ wch: 15 },
+				{ wch: 30 },
+				{ wch: 30 },
+				{ wch: 15 }
 			]
 
-			// 生成 Excel buffer
 			const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" })
 
-			// 设置响应头
 			reply.header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 			reply.header("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent("导入模板.xlsx")}`)
 

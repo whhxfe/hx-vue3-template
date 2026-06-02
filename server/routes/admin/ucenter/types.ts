@@ -104,9 +104,9 @@ export const assignRoleMenusSchema: RouteShorthandOptions = {
 		},
 		body: {
 			type: "object",
-			required: ["module_keys"],
+			required: ["moduleKeys"],
 			properties: {
-				module_keys: {
+				moduleKeys: {
 					type: "array",
 					items: { type: "string" },
 					description: "模块 key 列表"

@@ -28,12 +28,12 @@
 					<el-form-item label="联系电话">
 						<el-input v-model="formData.phone" placeholder="请输入联系电话" clearable />
 					</el-form-item>
-					<el-form-item label="处理时间排序">
+					<!-- <el-form-item label="处理时间排序">
 						<el-select v-model="formData.sortOrder" placeholder="默认不排序" clearable style="width: 100%">
 							<el-option label="从早到晚" value="asc" />
 							<el-option label="从晚到早" value="desc" />
 						</el-select>
-					</el-form-item>
+					</el-form-item> -->
 				</template>
 
 				<template #action-buttons>
@@ -196,7 +196,9 @@ const tableColumns = computed<TableColumn[]>(() => [
 	{
 		prop: "handleTime",
 		label: "处理时间",
-		width: 120
+		width: 120,
+		sortable:true,
+
 	},
 	{
 		prop: "name",

@@ -29,8 +29,6 @@ import "uno.css"
 import "./styles/index.scss"
 import "normalize.css"
 
-// 注册自定义指令
-
 const app = createApp(App)
 const pinia = createPinia()
 

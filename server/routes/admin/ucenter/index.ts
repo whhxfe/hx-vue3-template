@@ -115,11 +115,10 @@ export const ucenterRoutes: FastifyPluginAsync = async (app: FastifyInstance) =>
 
 	app.put("/roles/:id/menus", assignRoleMenusSchema, async (request: FastifyRequest) => {
 		const { id } = request.params as { id: number }
-		const { module_keys } = request.body as { module_keys: string[] }
-		// 先清除旧权限，再插入新权限（批量执行，仅一次 saveDatabase）
+		const { moduleKeys } = request.body as { moduleKeys: string[] }
 		runBatch([
 			{ sql: "DELETE FROM role_menus WHERE role_id = ?", params: [id] },
-			...module_keys.map(key => ({
+			...moduleKeys.map(key => ({
 				sql: "INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)",
 				params: [id, key]
 			}))

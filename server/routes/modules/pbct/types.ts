@@ -2,18 +2,25 @@
  * pbct 模块类型定义
  */
 
-/** 数据导入列表项 */
-export interface ListItem {
+/** 记录列表项（从 pbct_records 查询，含人员关联信息） */
+export interface RecordItem {
 	id: number
+	personId: number
+	handleTime: string
 	name: string
-	gender: string
-	age: number
-	phone: string
 	idCard: string
-	occupation: string
+	phone: string
+	gender: string
+	ethnicity: string
+	virtualAccount: string
+	handleReason: string
+	handleResult: string
+	householdAddress: string
 	residenceAddress: string
-	entryTime: string
-	updateTime: string
+	district: string
+	source: string
+	importTime: string
+	createdAt: string
 }
 
 /** 列表查询参数 */
@@ -27,11 +34,12 @@ export interface ListQuery {
 	gender?: string
 	ethnicity?: string
 	sortOrder?: string
+	source?: string
 }
 
 /** 列表响应结果 */
 export interface ListResult {
-	list: ListItem[]
+	list: RecordItem[]
 	total: number
 }
 

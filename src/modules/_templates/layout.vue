@@ -1,15 +1,12 @@
 <template>
-	<HxLayout :title="title" :menu="menuConfig">
+	<HxLayout title="模板中心" :menu="menuConfig">
 		<router-view />
 	</HxLayout>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
 import { HxLayout } from "@/hx-components"
-import { menuConfig, useTextAlias } from "./config"
-const text = useTextAlias()
-const title = ref(text.module.title)
+import { menuConfig } from "./config"
 </script>
 
 <style lang="scss" scoped></style>

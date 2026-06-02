@@ -77,12 +77,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from "vue"
+import { ref, reactive, computed, onMounted, onBeforeMount } from "vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { Refresh, Plus } from "@element-plus/icons-vue"
 import { HxForm, HxTable, HxImporter, HxExporter } from "@hx/ui"
 import type { FormField, TableColumn } from "@hx/ui"
 import { pbct, type ListItem } from "@/modules/pbct/api"
+import { useSysStore } from "@/store"
+import router from "@/router"
 
 // ==================== Refs ====================
 const tableRef = ref()
@@ -243,7 +245,8 @@ const tableColumns = computed<TableColumn[]>(() => [
 	{
 		prop: "handleTime",
 		label: "处理时间",
-		width: 120
+		width: 120,
+		sortable:true,
 	},
 	{
 		prop: "name",
@@ -306,7 +309,13 @@ const tableColumns = computed<TableColumn[]>(() => [
 		prop: "district",
 		label: "所属区县",
 		width: 100
-	}
+	},
+	{
+		label: "操作",
+		slot:"action",
+		fixed:'right',
+		width: 160
+	},
 ])
 
 // ==================== 方法 ====================
@@ -467,6 +476,17 @@ const handleExportSuccess = () => {
 const handleExportError = (error: any) => {
 	ElMessage.error(error.message || "导出失败")
 }
+
+// ==================== 权限检查 ====================
+
+/** 仅 super(0) 和 admin(1) 可访问此页面，普通用户自动跳转 */
+onBeforeMount(() => {
+	const sysStore = useSysStore()
+	const roleLevel = Number(sysStore.userInfo?.roleLevel ?? -1)
+	if (roleLevel > 1) {
+		router.replace("/pbct/query")
+	}
+})
 
 // ==================== 生命周期 ====================
 onMounted(() => {

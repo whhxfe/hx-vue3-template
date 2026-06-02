@@ -15,6 +15,7 @@ export function createUcenterTables(db: Database) {
       description TEXT,
       status INTEGER DEFAULT 1,
       sort_order INTEGER DEFAULT 0,
+      role_level INTEGER DEFAULT -1,
       created_at TEXT DEFAULT (datetime('now'))
     )
   `)
