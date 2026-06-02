@@ -1,22 +1,28 @@
 <template>
-	<div class="overview-cards">
-		<div v-for="card in cards" :key="card.key" class="card-item" :style="{ '--accent-color': card.color }">
-			<div class="card-icon">
+	<div class="grid grid-cols-4 gap-4">
+		<div v-for="card in cards" :key="card.key" class="relative flex items-center gap-4 p-5 bg-bg-elevated rounded-2xl border border-border-base shadow-base overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary" :style="{ '--accent-color': card.color }">
+			<!-- 图标 -->
+			<div class="flex items-center justify-center w-15 h-15 rounded-2xl flex-shrink-0 shadow-md" :style="{ background: `linear-gradient(135deg, ${card.color} 0%, ${card.color}dd 100%)` }">
 				<el-icon :size="32" color="#fff">
 					<component :is="card.icon" />
 				</el-icon>
 			</div>
-			<div class="card-content">
-				<div class="card-value">{{ card.value }}</div>
-				<div class="card-label">{{ card.label }}</div>
-				<div class="card-trend" :class="card.trend >= 0 ? 'up' : 'down'">
+			<!-- 内容 -->
+			<div class="flex-1 min-w-0 relative z-1">
+				<div class="text-2xl font-bold leading-tight truncate bg-gradient-to-r from-text-primary to-text-regular bg-clip-text text-transparent">{{ card.value }}</div>
+				<div class="text-sm text-text-secondary font-medium mt-1 truncate">{{ card.label }}</div>
+				<div
+					class="flex items-center gap-1 mt-2 text-xs font-semibold"
+					:class="card.trend >= 0 ? 'text-success' : 'text-danger'"
+				>
 					<el-icon v-if="card.trend >= 0"><ArrowUp /></el-icon>
 					<el-icon v-else><ArrowDown /></el-icon>
 					<span>{{ Math.abs(card.trend) }}%</span>
-					<span class="trend-label">环比</span>
+					<span class="text-text-placeholder font-normal">环比</span>
 				</div>
 			</div>
-			<div class="card-decoration"></div>
+			<!-- 装饰圆 -->
+			<div class="absolute -right-5 -bottom-5 w-25 h-25 rounded-full opacity-10 bg-gradient-to-br from-[var(--accent-color)] to-transparent"></div>
 		</div>
 	</div>
 </template>
@@ -87,101 +93,3 @@ const formatNumber = (value: number): string => {
 	return value.toLocaleString()
 }
 </script>
-
-<style lang="scss" scoped>
-.overview-cards {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 16px;
-
-	.card-item {
-		position: relative;
-		display: flex;
-		align-items: center;
-		gap: 16px;
-		padding: 20px;
-		background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-		border-radius: 16px;
-		border: 1px solid rgba(0, 0, 0, 0.06);
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-		overflow: hidden;
-		transition: all 0.3s ease;
-
-		&:hover {
-			transform: translateY(-4px);
-			box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-		}
-
-		.card-icon {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			width: 60px;
-			height: 60px;
-			border-radius: 16px;
-			background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color)dd 100%);
-			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-			flex-shrink: 0;
-		}
-
-		.card-content {
-			flex: 1;
-			min-width: 0;
-			position: relative;
-			z-index: 1;
-
-			.card-value {
-				font-size: 28px;
-				font-weight: 700;
-				color: #1a1a2e;
-				line-height: 1.2;
-				background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
-				background-clip: text;
-			}
-
-			.card-label {
-				font-size: 14px;
-				color: #6b7280;
-				margin-top: 4px;
-				font-weight: 500;
-			}
-
-			.card-trend {
-				display: flex;
-				align-items: center;
-				gap: 4px;
-				margin-top: 8px;
-				font-size: 13px;
-				font-weight: 600;
-
-				&.up {
-					color: #10b981;
-				}
-
-				&.down {
-					color: #ef4444;
-				}
-
-				.trend-label {
-					color: #9ca3af;
-					font-weight: 400;
-					margin-left: 4px;
-				}
-			}
-		}
-
-		.card-decoration {
-			position: absolute;
-			right: -20px;
-			bottom: -20px;
-			width: 100px;
-			height: 100px;
-			border-radius: 50%;
-			background: linear-gradient(135deg, var(--accent-color) 0%, transparent 70%);
-			opacity: 0.1;
-		}
-	}
-}
-</style>

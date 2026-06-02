@@ -1,18 +1,24 @@
 <template>
-	<div class="category-chart">
-		<div class="chart-header">
-			<span class="chart-title">销售分类</span>
+	<div class="relative bg-bg-elevated rounded-2xl p-5 border border-border-base shadow-base h-full flex flex-col">
+		<div class="mb-4 pb-3 border-b border-dashed border-border-base">
+			<span class="text-base font-semibold text-text-primary relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-4 before:bg-gradient-to-b before:from-success before:to-success/50 before:rounded-sm">
+				销售分类
+			</span>
 		</div>
-		<div class="chart-body">
-			<div class="pie-wrapper">
+		<div class="flex-1 flex flex-col gap-4 overflow-hidden">
+			<div class="h-50">
 				<v-chart :option="pieOption" autoresize />
 			</div>
-			<div class="legend-list">
-				<div v-for="(item, index) in data" :key="item.name" class="legend-item">
-					<span class="legend-dot" :style="{ background: colors[index % colors.length] }"></span>
-					<span class="legend-name">{{ item.name }}</span>
-					<span class="legend-value">{{ formatMoney(item.value) }}</span>
-					<span class="legend-percent">{{ item.percentage.toFixed(1) }}%</span>
+			<div class="grid grid-cols-2 gap-2 overflow-y-auto">
+				<div
+					v-for="(item, index) in data"
+					:key="item.name"
+					class="flex items-center gap-2 p-2 rounded-lg bg-bg-hover transition-colors cursor-pointer hover:bg-bg-active"
+				>
+					<span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{ background: colors[index % colors.length] }"></span>
+					<span class="flex-1 text-sm text-text-regular truncate">{{ item.name }}</span>
+					<span class="text-sm font-semibold text-text-primary">{{ formatMoney(item.value) }}</span>
+					<span class="text-xs text-text-placeholder min-w-10 text-right">{{ item.percentage.toFixed(1) }}%</span>
 				</div>
 			</div>
 		</div>
@@ -21,6 +27,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { usePreferredDark } from '@vueuse/core'
 import type { CategoryItem } from '@/modules/_templates/api/screen/types'
 
 interface Props {
@@ -28,18 +35,24 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
+const prefersDark = usePreferredDark()
 const colors = ['#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399', '#c71585']
+
+const chartColors = computed(() => ({
+	bgOverlay: prefersDark.value ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+	border: prefersDark.value ? '#3a3a3c' : '#e4e7ed',
+	textPrimary: prefersDark.value ? '#b4b4b4' : '#606266',
+}))
 
 const pieOption = computed(() => ({
 	tooltip: {
 		trigger: 'item',
 		formatter: '{b}: {c} ({d}%)',
-		backgroundColor: 'rgba(255, 255, 255, 0.95)',
-		borderColor: '#e4e7ed',
+		backgroundColor: chartColors.value.bgOverlay,
+		borderColor: chartColors.value.border,
 		borderWidth: 1,
 		textStyle: {
-			color: '#606266'
+			color: chartColors.value.textPrimary
 		}
 	},
 	series: [
@@ -51,7 +64,7 @@ const pieOption = computed(() => ({
 			avoidLabelOverlap: false,
 			itemStyle: {
 				borderRadius: 8,
-				borderColor: '#fff',
+				borderColor: prefersDark.value ? '#1d1d1d' : '#fff',
 				borderWidth: 3
 			},
 			label: {
@@ -63,7 +76,7 @@ const pieOption = computed(() => ({
 					show: true,
 					fontSize: 14,
 					fontWeight: 'bold',
-					color: '#303133'
+					color: prefersDark.value ? '#e8e8e8' : '#303133'
 				}
 			},
 			labelLine: {
@@ -90,99 +103,3 @@ const formatMoney = (value: number): string => {
 	return value.toFixed(0)
 }
 </script>
-
-<style lang="scss" scoped>
-.category-chart {
-	background: #fff;
-	border-radius: 16px;
-	padding: 20px;
-	border: 1px solid rgba(0, 0, 0, 0.06);
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-	height: 100%;
-
-	.chart-header {
-		margin-bottom: 16px;
-		padding-bottom: 12px;
-		border-bottom: 1px dashed #e5e7eb;
-
-		.chart-title {
-			font-size: 16px;
-			font-weight: 600;
-			color: #1f2937;
-			position: relative;
-			padding-left: 12px;
-
-			&::before {
-				content: '';
-				position: absolute;
-				left: 0;
-				top: 50%;
-				transform: translateY(-50%);
-				width: 4px;
-				height: 16px;
-				background: linear-gradient(180deg, #67c23a 0%, #95d475 100%);
-				border-radius: 2px;
-			}
-		}
-	}
-
-	.chart-body {
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
-
-		.pie-wrapper {
-			height: 200px;
-		}
-
-		.legend-list {
-			display: grid;
-			grid-template-columns: repeat(2, 1fr);
-			gap: 8px;
-
-			.legend-item {
-				display: flex;
-				align-items: center;
-				gap: 8px;
-				padding: 8px 12px;
-				background: #f8fafc;
-				border-radius: 8px;
-				transition: all 0.2s;
-
-				&:hover {
-					background: #f0f2f5;
-				}
-
-				.legend-dot {
-					width: 10px;
-					height: 10px;
-					border-radius: 50%;
-					flex-shrink: 0;
-				}
-
-				.legend-name {
-					flex: 1;
-					font-size: 13px;
-					color: #606266;
-					white-space: nowrap;
-					overflow: hidden;
-					text-overflow: ellipsis;
-				}
-
-				.legend-value {
-					font-size: 13px;
-					font-weight: 600;
-					color: #303133;
-				}
-
-				.legend-percent {
-					font-size: 12px;
-					color: #909399;
-					min-width: 45px;
-					text-align: right;
-				}
-			}
-		}
-	}
-}
-</style>

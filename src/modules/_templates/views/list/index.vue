@@ -1,7 +1,7 @@
 <template>
-	<div class="list-page-container">
+	<div class="flex flex-col h-full p-4 bg-bg-base gap-4">
 		<!-- 筛选表单区域 -->
-		<div class="filter-section">
+		<div class="bg-bg-elevated rounded-md p-4">
 			<HxForm
 				v-model="filterData"
 				:fields="filterFields"
@@ -13,8 +13,8 @@
 		</div>
 
 		<!-- 表格区域 -->
-		<div ref="tableContainerRef" class="table-container">
-			<div class="table-header">
+		<div ref="tableContainerRef" class="flex-1 bg-bg-elevated rounded-md p-4 flex flex-col min-h-0 overflow-hidden">
+			<div class="flex gap-2 mb-3">
 				<el-button type="primary" :disabled="addLoading" @click="handleAdd">
 					<el-icon><Plus /></el-icon>
 					新增
@@ -560,40 +560,3 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped>
-.list-page-container {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	padding: 16px;
-	background: var(--el-bg-color-page);
-	gap: 16px;
-
-	.filter-section {
-		background: var(--el-bg-color);
-		border-radius: 8px;
-		padding: 16px;
-	}
-
-	.table-container {
-		flex: 1;
-		background: var(--el-bg-color);
-		border-radius: 8px;
-		padding: 16px;
-		display: flex;
-		flex-direction: column;
-		min-height: 0;
-		overflow: hidden;
-
-		.table-header {
-			display: flex;
-			gap: 8px;
-			margin-bottom: 12px;
-		}
-
-		:deep(.el-table) {
-			width: 100%;
-		}
-	}
-}
-</style>

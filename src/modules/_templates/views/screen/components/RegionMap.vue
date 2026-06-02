@@ -1,9 +1,11 @@
 <template>
-	<div class="region-map">
-		<div class="chart-header">
-			<span class="chart-title">区域分布</span>
+	<div class="relative bg-bg-elevated rounded-2xl p-5 border border-border-base shadow-base h-full flex flex-col">
+		<div class="mb-5 pb-3 border-b border-dashed border-border-base">
+			<span class="text-base font-semibold text-text-primary relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-4 before:bg-gradient-to-b before:from-warning before:to-warning/50 before:rounded-sm">
+				区域分布
+			</span>
 		</div>
-		<div class="chart-body">
+		<div class="flex-1">
 			<v-chart :option="chartOption" autoresize />
 		</div>
 	</div>
@@ -11,6 +13,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { usePreferredDark } from '@vueuse/core'
 import type { RegionItem } from '@/modules/_templates/api/screen/types'
 
 interface Props {
@@ -18,6 +21,16 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const prefersDark = usePreferredDark()
+
+const chartColors = ['#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399', '#c71585', '#8e44ad']
+
+const theme = computed(() => ({
+	bgOverlay: prefersDark.value ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+	border: prefersDark.value ? '#3a3a3c' : '#e4e7ed',
+	textPrimary: prefersDark.value ? '#b4b4b4' : '#606266',
+	splitLine: prefersDark.value ? '#2d2d2d' : '#f0f0f0',
+}))
 
 const chartOption = computed(() => ({
 	tooltip: {
@@ -25,11 +38,11 @@ const chartOption = computed(() => ({
 		axisPointer: {
 			type: 'shadow'
 		},
-		backgroundColor: 'rgba(255, 255, 255, 0.95)',
-		borderColor: '#e4e7ed',
+		backgroundColor: theme.value.bgOverlay,
+		borderColor: theme.value.border,
 		borderWidth: 1,
 		textStyle: {
-			color: '#606266'
+			color: theme.value.textPrimary
 		},
 		formatter: (params: any) => {
 			const item = params[0]
@@ -56,7 +69,7 @@ const chartOption = computed(() => ({
 			show: false
 		},
 		axisLabel: {
-			color: '#606266',
+			color: theme.value.textPrimary,
 			formatter: (value: number) => {
 				if (value >= 1000000) {
 					return (value / 1000000).toFixed(1) + 'M'
@@ -69,7 +82,7 @@ const chartOption = computed(() => ({
 		},
 		splitLine: {
 			lineStyle: {
-				color: '#f0f0f0'
+				color: theme.value.splitLine
 			}
 		}
 	},
@@ -78,11 +91,11 @@ const chartOption = computed(() => ({
 		data: props.data.map((item) => item.region),
 		axisLine: {
 			lineStyle: {
-				color: '#e4e7ed'
+				color: theme.value.border
 			}
 		},
 		axisLabel: {
-			color: '#606266'
+			color: theme.value.textPrimary
 		},
 		axisTick: {
 			show: false
@@ -95,8 +108,7 @@ const chartOption = computed(() => ({
 			data: props.data.map((item) => item.value),
 			itemStyle: {
 				color: (params: any) => {
-					const colors = ['#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399', '#c71585', '#8e44ad']
-					return colors[params.dataIndex % colors.length]
+					return chartColors[params.dataIndex % chartColors.length]
 				},
 				borderRadius: [0, 6, 6, 0]
 			},
@@ -108,7 +120,7 @@ const chartOption = computed(() => ({
 					const regionData = props.data[params.dataIndex]
 					return regionData.percentage.toFixed(1) + '%'
 				},
-				color: '#909399',
+				color: theme.value.textPrimary,
 				fontSize: 12
 			}
 		}
@@ -125,44 +137,3 @@ const formatMoney = (value: number): string => {
 	return value.toFixed(0)
 }
 </script>
-
-<style lang="scss" scoped>
-.region-map {
-	background: #fff;
-	border-radius: 16px;
-	padding: 20px;
-	border: 1px solid rgba(0, 0, 0, 0.06);
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-	height: 100%;
-
-	.chart-header {
-		margin-bottom: 20px;
-		padding-bottom: 12px;
-		border-bottom: 1px dashed #e5e7eb;
-
-		.chart-title {
-			font-size: 16px;
-			font-weight: 600;
-			color: #1f2937;
-			position: relative;
-			padding-left: 12px;
-
-			&::before {
-				content: '';
-				position: absolute;
-				left: 0;
-				top: 50%;
-				transform: translateY(-50%);
-				width: 4px;
-				height: 16px;
-				background: linear-gradient(180deg, #e6a23c 0%, #f0b774 100%);
-				border-radius: 2px;
-			}
-		}
-	}
-
-	.chart-body {
-		height: 320px;
-	}
-}
-</style>

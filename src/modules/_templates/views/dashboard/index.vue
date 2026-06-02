@@ -1,47 +1,70 @@
 <template>
-	<div class="dashboard-container">
+	<div class="flex flex-col h-full p-4 bg-bg-base gap-4 overflow-y-auto">
 		<!-- 统计卡片区域 -->
-		<div class="stats-cards" v-loading="statsLoading">
-			<div v-for="stat in statsData" :key="stat.title" class="stat-card">
-				<div class="stat-icon" :style="{ background: `linear-gradient(135deg, ${stat.color} 0%, ${stat.color}dd 100%)` }">
+		<div class="grid grid-cols-4 gap-4" v-loading="statsLoading">
+			<div
+				v-for="stat in statsData"
+				:key="stat.title"
+				class="relative flex items-center gap-4 p-5 bg-bg-elevated rounded-md border border-border-base shadow-base overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-primary"
+			>
+				<!-- 顶部渐变条 -->
+				<div
+					class="absolute top-0 left-0 right-0 h-1 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+					:class="`bg-gradient-to-r from-primary to-primary/20`"
+				/>
+				<!-- 图标 -->
+				<div
+					class="flex items-center justify-center w-14 h-14 rounded-xl flex-shrink-0 shadow-md"
+					:style="{ background: `linear-gradient(135deg, ${stat.color} 0%, ${stat.color}dd 100%)` }"
+				>
 					<el-icon :size="28" color="#ffffff">
 						<component :is="stat.icon" />
 					</el-icon>
 				</div>
-				<div class="stat-content">
-					<div class="stat-value">{{ stat.value }}</div>
-					<div class="stat-title">{{ stat.title }}</div>
-					<div class="stat-trend" :class="stat.trend > 0 ? 'up' : 'down'">
+				<!-- 内容 -->
+				<div class="flex-1 min-w-0 relative">
+					<div class="text-2xl font-bold text-text-primary leading-tight truncate">
+						{{ stat.value }}
+					</div>
+					<div class="text-sm text-text-secondary mt-1 font-medium truncate">{{ stat.title }}</div>
+					<div
+						class="flex items-center gap-1 mt-2 text-xs font-medium"
+						:class="stat.trend > 0 ? 'text-success' : 'text-danger'"
+					>
 						<el-icon v-if="stat.trend > 0"><ArrowUp /></el-icon>
 						<el-icon v-else><ArrowDown /></el-icon>
 						<span>{{ Math.abs(stat.trend) }}%</span>
-						<span class="trend-text">较上周</span>
+						<span class="text-text-placeholder">较上周</span>
 					</div>
 				</div>
 			</div>
 		</div>
 
 		<!-- 图表区域 -->
-		<div class="charts-section">
+		<div class="grid grid-cols-5 gap-4">
 			<!-- 左侧柱状图 -->
-			<div class="chart-card bar-chart" v-loading="chartLoading">
-				<div class="chart-header">
-					<span class="chart-title">月度销售额统计</span>
+			<div class="col-span-3 relative bg-bg-elevated rounded-md p-5 border border-border-base shadow-base" v-loading="chartLoading">
+				<div class="flex justify-between items-center mb-5 pb-3 border-b border-dashed border-border-base">
+					<span class="text-base font-semibold text-text-primary relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-4 before:bg-gradient-to-b before:from-primary before:to-primary/50 before:rounded-sm">
+						月度销售额统计
+					</span>
 					<el-radio-group v-model="barPeriod" size="small" @change="handleBarPeriodChange">
 						<el-radio-button value="week">本周</el-radio-button>
 						<el-radio-button value="month">本月</el-radio-button>
 						<el-radio-button value="year">本年</el-radio-button>
 					</el-radio-group>
 				</div>
-				<div class="chart-body">
+				<div class="h-80">
 					<v-chart :option="barOption" autoresize />
 				</div>
 			</div>
 
 			<!-- 右侧饼图 -->
-			<div class="chart-card pie-chart" v-loading="chartLoading">
-				<div class="chart-header">
-					<span class="chart-title">销售分类占比</span>
+			<div class="col-span-2 relative bg-bg-elevated rounded-md p-5 border border-border-base shadow-base" v-loading="chartLoading">
+				<div class="flex justify-between items-center mb-5 pb-3 border-b border-dashed border-border-base">
+					<span class="text-base font-semibold text-text-primary relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-4 before:bg-gradient-to-b before:from-primary before:to-primary/50 before:rounded-sm">
+						销售分类占比
+					</span>
 					<el-select v-model="pieType" size="small" placeholder="选择分类" @change="handlePieTypeChange">
 						<el-option label="全部" value="all" />
 						<el-option label="电子产品" value="electronic" />
@@ -49,17 +72,19 @@
 						<el-option label="生活用品" value="daily" />
 					</el-select>
 				</div>
-				<div class="chart-body">
+				<div class="h-80">
 					<v-chart :option="pieOption" autoresize />
 				</div>
 			</div>
 		</div>
 
 		<!-- 底部折线图 -->
-		<div class="chart-card line-chart" v-loading="chartLoading">
-			<div class="chart-header">
-				<span class="chart-title">年度销售趋势</span>
-				<div class="chart-actions">
+		<div class="relative bg-bg-elevated rounded-md p-5 border border-border-base shadow-base" v-loading="chartLoading">
+			<div class="flex justify-between items-center mb-5 pb-3 border-b border-dashed border-border-base">
+				<span class="text-base font-semibold text-text-primary relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-4 before:bg-gradient-to-b before:from-primary before:to-primary/50 before:rounded-sm">
+					年度销售趋势
+				</span>
+				<div class="flex gap-2">
 					<el-date-picker
 						v-model="lineYear"
 						type="year"
@@ -72,23 +97,25 @@
 					<el-button size="small" @click="handleExportData">导出数据</el-button>
 				</div>
 			</div>
-			<div class="chart-body">
+			<div class="h-72">
 				<v-chart :option="lineOption" autoresize />
 			</div>
 		</div>
 
-		<!-- 底部数据列表 -->
-		<div class="data-list-section">
-			<div class="section-header">
-				<span class="section-title">最新订单</span>
+		<!-- 最新订单列表 -->
+		<div class="relative bg-bg-elevated rounded-md p-5 border border-border-base shadow-base" v-loading="orderLoading">
+			<div class="flex justify-between items-center mb-4 pb-3 border-b border-dashed border-border-base">
+				<span class="text-base font-semibold text-text-primary relative pl-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-4 before:bg-gradient-to-b before:from-primary before:to-primary/50 before:rounded-sm">
+					最新订单
+				</span>
 				<el-button type="primary" link @click="handleViewAllOrders">查看全部</el-button>
 			</div>
-			<el-table v-loading="orderLoading" :data="orderList" stripe>
+			<el-table :data="orderList" stripe>
 				<el-table-column prop="orderNo" label="订单编号" width="180" />
 				<el-table-column prop="product" label="商品名称" min-width="200" />
 				<el-table-column prop="amount" label="订单金额" width="120" align="right">
 					<template #default="{ row }">
-						<span class="amount">¥{{ row.amount.toFixed(2) }}</span>
+						<span class="text-danger font-semibold">¥{{ row.amount.toFixed(2) }}</span>
 					</template>
 				</el-table-column>
 				<el-table-column prop="status" label="订单状态" width="100" align="center">
@@ -114,44 +141,36 @@
 import { ref, computed, onMounted } from "vue"
 import { ElMessage } from "element-plus"
 import { ArrowUp, ArrowDown } from "@element-plus/icons-vue"
-import { dashboard, type StatItem, type ChartData, type PieItem, type OrderItem } from '@/modules/_templates/api'
-
-const statsData = ref<StatItem[]>([])
-const monthlySalesData = ref<ChartData[]>([])
-const pieChartData = ref<PieItem[]>([])
-const salesTrendData = ref<ChartData[]>([])
-const orderList = ref<OrderItem[]>([])
-const statsLoading = ref(false)
-const chartLoading = ref(false)
-const orderLoading = ref(false)
+import { useAsyncState } from "@vueuse/core"
+import { dashboard, type StatItem, type ChartData, type PieItem, type OrderItem } from "@/modules/_templates/api"
 
 const barPeriod = ref("month")
 const pieType = ref("all")
 const lineYear = ref(new Date().getFullYear().toString())
 
-const loadStats = async () => {
-	statsLoading.value = true
-	try {
-		const res = await dashboard.getStats()
-		if (res.data) {
-			statsData.value = res.data
-		}
-	} catch (error) {
-		console.error('加载统计数据失败:', error)
-	} finally {
-		statsLoading.value = false
-	}
-}
+// ==================== 统计数据 ====================
+const {
+	state: statsData,
+	isLoading: statsLoading,
+	execute: loadStats
+} = useAsyncState(async () => {
+	const res = await dashboard.getStats()
+	return (res.state === 2000 || res.state === 200) && res.data ? res.data : []
+}, [], { immediate: false })
+
+// ==================== 图表数据（共享 loading） ====================
+const chartLoading = ref(false)
+const monthlySalesData = ref<ChartData[]>([])
+const pieChartData = ref<PieItem[]>([])
+const salesTrendData = ref<ChartData[]>([])
 
 const loadMonthlySales = async (period: string) => {
 	chartLoading.value = true
 	try {
-		const res = await dashboard.getMonthlySales(period as 'week' | 'month' | 'year')
-		if (res.data) {
-			monthlySalesData.value = res.data
+		const res = await dashboard.getMonthlySales(period as "week" | "month" | "year")
+		if (res.state === 2000 || res.state === 200) {
+			monthlySalesData.value = res.data || []
 		}
-	} catch (error) {
-		console.error('加载月度销售数据失败:', error)
 	} finally {
 		chartLoading.value = false
 	}
@@ -161,11 +180,9 @@ const loadPieData = async (type: string) => {
 	chartLoading.value = true
 	try {
 		const res = await dashboard.getPieData(type)
-		if (res.data) {
-			pieChartData.value = res.data
+		if (res.state === 2000 || res.state === 200) {
+			pieChartData.value = res.data || []
 		}
-	} catch (error) {
-		console.error('加载饼图数据失败:', error)
 	} finally {
 		chartLoading.value = false
 	}
@@ -175,40 +192,31 @@ const loadSalesTrend = async (year: string) => {
 	chartLoading.value = true
 	try {
 		const res = await dashboard.getSalesTrend(year)
-		if (res.data) {
-			salesTrendData.value = res.data
+		if (res.state === 2000 || res.state === 200) {
+			salesTrendData.value = res.data || []
 		}
-	} catch (error) {
-		console.error('加载年度趋势数据失败:', error)
 	} finally {
 		chartLoading.value = false
 	}
 }
 
+// ==================== 订单列表 ====================
+const orderLoading = ref(false)
+const orderList = ref<OrderItem[]>([])
+
 const loadOrders = async (page: number = 1, pageSize: number = 10) => {
 	orderLoading.value = true
 	try {
 		const res = await dashboard.getOrders(page, pageSize)
-		if (res.data) {
+		if ((res.state === 2000 || res.state === 200) && res.data) {
 			orderList.value = res.data.list || []
 		}
-	} catch (error) {
-		console.error('加载订单列表失败:', error)
 	} finally {
 		orderLoading.value = false
 	}
 }
 
-const loadAllData = async () => {
-	await Promise.all([
-		loadStats(),
-		loadMonthlySales(barPeriod.value),
-		loadPieData(pieType.value),
-		loadSalesTrend(lineYear.value),
-		loadOrders()
-	])
-}
-
+// ==================== 柱状图配置 ====================
 const barOption = computed(() => ({
 	tooltip: {
 		trigger: "axis",
@@ -273,6 +281,7 @@ const barOption = computed(() => ({
 	]
 }))
 
+// ==================== 饼图配置 ====================
 const pieOption = computed(() => ({
 	tooltip: {
 		trigger: "item",
@@ -321,6 +330,7 @@ const pieOption = computed(() => ({
 	]
 }))
 
+// ==================== 折线图配置 ====================
 const lineOption = computed(() => ({
 	tooltip: {
 		trigger: "axis"
@@ -413,6 +423,7 @@ const lineOption = computed(() => ({
 	]
 }))
 
+// ==================== 状态映射 ====================
 const getStatusType = (status: OrderItem["status"]) => {
 	const map: Record<OrderItem["status"], string> = {
 		pending: "warning",
@@ -433,6 +444,7 @@ const getStatusText = (status: OrderItem["status"]) => {
 	return map[status]
 }
 
+// ==================== 事件处理 ====================
 const handleBarPeriodChange = (period: string) => {
 	loadMonthlySales(period)
 }
@@ -461,259 +473,14 @@ const handleExportOrder = (row: OrderItem) => {
 	ElMessage.success(`导出 ${row.orderNo}`)
 }
 
-onMounted(() => {
-	loadAllData()
+// ==================== 初始化加载 ====================
+onMounted(async () => {
+	await Promise.all([
+		loadStats(),
+		loadMonthlySales(barPeriod.value),
+		loadPieData(pieType.value),
+		loadSalesTrend(lineYear.value),
+		loadOrders()
+	])
 })
 </script>
-
-<style lang="scss" scoped>
-.dashboard-container {
-	padding: 16px;
-	height: 100%;
-	overflow-y: auto;
-	background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
-
-	.stats-cards {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 16px;
-		margin-bottom: 16px;
-
-		.stat-card {
-			position: relative;
-			display: flex;
-			align-items: center;
-			gap: 16px;
-			padding: 20px;
-			background: #fff;
-			border-radius: 12px;
-			border: 1px solid rgba(0, 0, 0, 0.06);
-			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-			transition: all 0.3s ease;
-			overflow: hidden;
-
-			&::before {
-				content: '';
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				height: 3px;
-				background: linear-gradient(90deg, var(--el-color-primary) 0%, transparent 100%);
-				opacity: 0;
-				transition: opacity 0.3s;
-			}
-
-			&:hover {
-				transform: translateY(-2px);
-				box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-				border-color: rgba(64, 158, 255, 0.2);
-
-				&::before {
-					opacity: 1;
-				}
-			}
-
-			.stat-icon {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				width: 56px;
-				height: 56px;
-				border-radius: 14px;
-				flex-shrink: 0;
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-			}
-
-			.stat-content {
-				flex: 1;
-				min-width: 0;
-				position: relative;
-
-				.stat-value {
-					font-size: 26px;
-					font-weight: 700;
-					color: #1a1a2e;
-					line-height: 1.2;
-					background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
-					-webkit-background-clip: text;
-					-webkit-text-fill-color: transparent;
-					background-clip: text;
-				}
-
-				.stat-title {
-					font-size: 14px;
-					color: #6b7280;
-					margin-top: 4px;
-					font-weight: 500;
-				}
-
-				.stat-trend {
-					display: flex;
-					align-items: center;
-					gap: 4px;
-					margin-top: 8px;
-					font-size: 12px;
-					font-weight: 500;
-
-					&.up {
-						color: #10b981;
-					}
-
-					&.down {
-						color: #ef4444;
-					}
-
-					.trend-text {
-						color: #9ca3af;
-						margin-left: 4px;
-					}
-				}
-			}
-		}
-	}
-
-	.charts-section {
-		display: grid;
-		grid-template-columns: 1.5fr 1fr;
-		gap: 16px;
-		margin-bottom: 16px;
-	}
-
-	.chart-card {
-		position: relative;
-		background: #fff;
-		border-radius: 12px;
-		padding: 20px;
-		border: 1px solid rgba(0, 0, 0, 0.06);
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-
-		&::before {
-			content: '';
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			height: 1px;
-			background: linear-gradient(90deg, transparent 0%, rgba(64, 158, 255, 0.3) 50%, transparent 100%);
-		}
-
-		.chart-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 20px;
-			padding-bottom: 12px;
-			border-bottom: 1px dashed #e5e7eb;
-
-			.chart-title {
-				font-size: 16px;
-				font-weight: 600;
-				color: #1f2937;
-				position: relative;
-				padding-left: 12px;
-
-				&::before {
-					content: '';
-					position: absolute;
-					left: 0;
-					top: 50%;
-					transform: translateY(-50%);
-					width: 4px;
-					height: 16px;
-					background: linear-gradient(180deg, #409eff 0%, #79bbff 100%);
-					border-radius: 2px;
-				}
-			}
-
-			.chart-actions {
-				display: flex;
-				gap: 8px;
-			}
-		}
-
-		.chart-body {
-			height: 300px;
-		}
-
-		&.bar-chart {
-			.chart-body {
-				height: 320px;
-			}
-		}
-
-		&.line-chart {
-			.chart-body {
-				height: 280px;
-			}
-		}
-	}
-
-	.data-list-section {
-		position: relative;
-		background: #fff;
-		border-radius: 12px;
-		padding: 20px;
-		border: 1px solid rgba(0, 0, 0, 0.06);
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-
-		&::before {
-			content: '';
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			height: 1px;
-			background: linear-gradient(90deg, transparent 0%, rgba(64, 158, 255, 0.3) 50%, transparent 100%);
-		}
-
-		.section-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 16px;
-			padding-bottom: 12px;
-			border-bottom: 1px dashed #e5e7eb;
-
-			.section-title {
-				font-size: 16px;
-				font-weight: 600;
-				color: #1f2937;
-				position: relative;
-				padding-left: 12px;
-
-				&::before {
-					content: '';
-					position: absolute;
-					left: 0;
-					top: 50%;
-					transform: translateY(-50%);
-					width: 4px;
-					height: 16px;
-					background: linear-gradient(180deg, #409eff 0%, #79bbff 100%);
-					border-radius: 2px;
-				}
-			}
-		}
-
-		.amount {
-			color: #ef4444;
-			font-weight: 600;
-		}
-
-		:deep(.el-table) {
-			--el-table-border-color: #f0f0f0;
-			--el-table-header-bg-color: #fafafa;
-
-			th.el-table__cell {
-				font-weight: 600;
-				color: #374151;
-			}
-
-			tr:hover > td.el-table__cell {
-				background-color: #f5f7fa !important;
-			}
-		}
-	}
-}
-</style>
