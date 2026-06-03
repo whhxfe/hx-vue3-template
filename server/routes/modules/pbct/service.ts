@@ -1,7 +1,7 @@
 /**
  * pbct 模块服务层
  */
-import type { ListQuery, RecordItem, ImportData, AddData } from "./types"
+import type { ListQuery, RecordItem, ImportData, AddData, BatchQueryResult } from "./types"
 import { getDb, saveDatabase } from "@db/manager"
 
 /** 记录来源类型 */
@@ -96,6 +96,51 @@ export const pbctService = {
 		}
 
 		return { list, total }
+	},
+
+	/**
+	 * 批量查询身份证号
+	 */
+	async batchQuery(idCards: string[]): Promise<BatchQueryResult> {
+		const db = getDb()
+
+		if (!idCards || idCards.length === 0) {
+			return { list: [], total: 0, unmatchedIdCards: [] }
+		}
+
+		// 去重
+		const uniqueIdCards = [...new Set(idCards)]
+
+		const placeholders = uniqueIdCards.map(() => "?").join(",")
+		const sql = `
+			SELECT r.id, r.person_id, r.handle_time, r.name, r.id_card, r.phone, r.gender, r.ethnicity,
+			       r.virtual_account, r.handle_reason, r.handle_result,
+			       r.household_address, r.residence_address, r.district,
+			       r.source, r.import_time, r.created_at
+			FROM pbct_records r
+			WHERE r.id_card IN (${placeholders})
+			ORDER BY r.handle_time DESC
+		`
+		const result = db.exec(sql, uniqueIdCards)
+
+		const list: RecordItem[] = []
+		if (result.length > 0) {
+			const columns = result[0].columns
+			for (const row of result[0].values) {
+				const item: any = {}
+				columns.forEach((col, idx) => {
+					const camelCol = col.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+					item[camelCol] = row[idx]
+				})
+				list.push(item as RecordItem)
+			}
+		}
+
+		// 计算未匹配的身份证号
+		const matchedIdCards = list.map((item) => item.idCard)
+		const unmatchedIdCards = uniqueIdCards.filter((idCard) => !matchedIdCards.includes(idCard))
+
+		return { list, total: list.length, unmatchedIdCards }
 	},
 
 	/**

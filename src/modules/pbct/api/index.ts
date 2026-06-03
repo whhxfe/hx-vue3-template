@@ -8,9 +8,9 @@ export interface DictItem {
  * pbct 模块 API 接口
  */
 import request from '@/api/request'
-import type { ListQuery, ListResult, ListItem, ImportData, AddForm } from './types'
+import type { ListQuery, ListResult, ListItem, ImportData, AddForm, BatchQueryResult } from './types'
 
-export type { ListItem, ListQuery, ListResult, ImportData, AddForm }
+export type { ListItem, ListQuery, ListResult, ImportData, AddForm, BatchQueryResult }
 
 export const pbct = {
 /**
@@ -42,6 +42,13 @@ getDistrictOptions() {
 			ethnicity: params.ethnicity || undefined,
 			sortOrder: params.sortOrder || undefined
 		})
+	},
+
+	/**
+	 * 批量查询身份证号
+	 */
+	batchQuery(idCards: string[]) {
+		return request.post<{ state: number; message: string; data: BatchQueryResult }>('/pbct/batch-list', { idCards })
 	},
 
 	/**

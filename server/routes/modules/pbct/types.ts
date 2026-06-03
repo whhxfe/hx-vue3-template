@@ -43,6 +43,13 @@ export interface ListResult {
 	total: number
 }
 
+/** 批量查询响应结果 */
+export interface BatchQueryResult {
+	list: RecordItem[]
+	total: number
+	unmatchedIdCards: string[]
+}
+
 /** 导入数据项 */
 export interface ImportData {
 	handleTime: string

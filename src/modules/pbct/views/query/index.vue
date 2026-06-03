@@ -6,52 +6,35 @@
 				ref="formRef"
 				v-model="formData"
 				:fields="[]"
-				:cols="4"
+				:cols="5"
 				:show-action="true"
 				@search="handleSearch"
 				@reset="handleReset"
 			>
 				<!-- 自定义表单渲染插槽 -->
 				<template #search>
-					<el-form-item label="身份证" required>
+					<el-form-item label="身份证" style="--col-span: 2" required>
 						<el-input
-							v-model="formData.idCard"
-							placeholder="请输入身份证号"
-							@input="handleIdCardInput"
-							@blur="handleIdCardInput(formData.idCard)"
+							v-model="formData.idCardsText"
+							type="textarea"
+							:rows="4"
+							placeholder="请输入身份证号，每行一个"
+							@input="handleIdCardsInput"
 						/>
 						<div v-if="idCardError" class="id-card-error">{{ idCardError }}</div>
+						<div class="id-card-hint">支持每行一个或多个身份证号，回车换行分隔</div>
 					</el-form-item>
-					<el-form-item label="姓名">
+					<el-form-item label="姓名" cols="1">
 						<el-input v-model="formData.name" placeholder="请输入姓名" clearable />
 					</el-form-item>
-					<el-form-item label="联系电话">
+					<el-form-item label="联系电话" cols="1">
 						<el-input v-model="formData.phone" placeholder="请输入联系电话" clearable />
 					</el-form-item>
-					<!-- <el-form-item label="处理时间排序">
-						<el-select v-model="formData.sortOrder" placeholder="默认不排序" clearable style="width: 100%">
-							<el-option label="从早到晚" value="asc" />
-							<el-option label="从晚到早" value="desc" />
-						</el-select>
-					</el-form-item> -->
 				</template>
 
 				<template #action-buttons>
-					<el-button type="primary" :disabled="!!idCardError || !formData.idCard" @click="handleSearch">查询</el-button>
+					<el-button type="primary" @click="handleSearch">查询</el-button>
 					<el-button @click="handleReset">重置</el-button>
-					<!-- <HxExporter
-					:export-action="'/pbct/export'"
-					:method="'post'"
-					:current-page="pagination.currentPage"
-					:page-size="pagination.pageSize"
-					:total-count="pagination.total"
-					:max-export-count="10000"
-					button-text="导出"
-					dialog-title="导出数据"
-					:get-search-params="getSearchParams"
-					@success="handleExportSuccess"
-					@error="handleExportError"
-				/> -->
 				</template>
 			</HxForm>
 		</div>
@@ -75,16 +58,25 @@
 			</div>
 		</div> -->
 
+		<!-- 未匹配身份证号提示区域 -->
+		<div v-if="hasSearched && unmatchedIdCards.length > 0" class="unmatched-section">
+			<div class="unmatched-title">
+				<el-icon><Warning /></el-icon>
+				<span>以下 {{ unmatchedIdCards.length }} 个身份证号无记录：</span>
+			</div>
+			<div class="unmatched-list">{{ unmatchedIdCards.join("、") }}</div>
+		</div>
+
 		<!-- 表格区域 -->
 		<div class="table-container">
 			<HxTable
 				ref="tableRef"
 				border
-				height="calc(100vh - 350px)"
+				height="calc(100vh - 400px)"
 				:columns="tableColumns"
 				:data="tableData"
-				:loading="tableLoading"
-				:show-pagination="true"
+				:loading="tableLoading || batchQueryLoading"
+				:show-pagination="!hasBatchSearched"
 				:current-page="pagination.currentPage"
 				:page-size="pagination.pageSize"
 				:total="pagination.total"
@@ -98,8 +90,8 @@
 					<div v-if="!hasSearched" class="empty-init">
 						<div class="empty-icon">
 							<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<circle cx="32" cy="32" r="30" stroke="#DCDFE6" stroke-width="2" stroke-dasharray="4 4"/>
-								<path d="M32 20v16M32 42v2" stroke="#909399" stroke-width="2.5" stroke-linecap="round"/>
+								<circle cx="32" cy="32" r="30" stroke="#DCDFE6" stroke-width="2" stroke-dasharray="4 4" />
+								<path d="M32 20v16M32 42v2" stroke="#909399" stroke-width="2.5" stroke-linecap="round" />
 							</svg>
 						</div>
 						<div class="empty-title">请输入身份证号进行查询</div>
@@ -108,8 +100,14 @@
 					<div v-else class="empty-no-data">
 						<div class="empty-icon">
 							<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<circle cx="32" cy="32" r="30" stroke="#DCDFE6" stroke-width="2"/>
-								<path d="M22 32h20M32 22v20" stroke="#909399" stroke-width="2" stroke-linecap="round" transform="rotate(45 32 32)"/>
+								<circle cx="32" cy="32" r="30" stroke="#DCDFE6" stroke-width="2" />
+								<path
+									d="M22 32h20M32 22v20"
+									stroke="#909399"
+									stroke-width="2"
+									stroke-linecap="round"
+									transform="rotate(45 32 32)"
+								/>
 							</svg>
 						</div>
 						<div class="empty-title">暂无匹配数据</div>
@@ -127,7 +125,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue"
 import { ElMessage } from "element-plus"
-import { HxForm, HxTable, HxExporter } from "@hx/ui"
+import { Warning } from "@element-plus/icons-vue"
+import { HxForm, HxTable } from "@hx/ui"
 import type { TableColumn } from "@hx/ui"
 import { pbct, type ListItem } from "@/modules/pbct/api"
 
@@ -136,9 +135,19 @@ import { pbct, type ListItem } from "@/modules/pbct/api"
  */
 const validateIdCard = (idCard: string): boolean => {
 	if (!idCard) return false
-	// 15位或18位身份证号正则
 	const reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
 	return reg.test(idCard)
+}
+
+/**
+ * 解析多行身份证号文本，返回有效身份证号数组
+ */
+const parseIdCards = (text: string): string[] => {
+	const lines = text
+		.split(/[\n,，;；\s]+/)
+		.map(s => s.trim())
+		.filter(Boolean)
+	return [...new Set(lines)].filter(validateIdCard)
 }
 
 // ==================== Refs ====================
@@ -150,13 +159,23 @@ const hasSearched = ref(false)
 // ==================== 表单数据 ====================
 const formData = ref({
 	name: "",
-	idCard: "",
+	idCardsText: "",
 	phone: "",
 	district: "",
 	gender: "",
 	ethnicity: "",
-	sortOrder: "" // 排序：不排序/asc/desc
+	sortOrder: ""
 })
+
+// ==================== 批量查询结果 ====================
+const unmatchedIdCards = ref<string[]>([])
+const batchQueryLoading = ref(false)
+const isBatchMode = ref(false)
+
+/**
+ * 是否为批量查询模式
+ */
+const hasBatchSearched = computed(() => isBatchMode.value)
 
 // ==================== 身份证号错误提示 ====================
 const idCardError = ref("")
@@ -164,9 +183,10 @@ const idCardError = ref("")
 /**
  * 身份证号输入校验
  */
-const handleIdCardInput = (value: string) => {
-	if (value && !validateIdCard(value)) {
-		idCardError.value = "请输入正确的身份证号"
+const handleIdCardsInput = (value: string) => {
+	const parsed = parseIdCards(value)
+	if (value && parsed.length === 0) {
+		idCardError.value = "请输入有效的身份证号，每行一个"
 	} else {
 		idCardError.value = ""
 	}
@@ -197,8 +217,7 @@ const tableColumns = computed<TableColumn[]>(() => [
 		prop: "handleTime",
 		label: "处理时间",
 		width: 120,
-		sortable:true,
-
+		sortable: true
 	},
 	{
 		prop: "name",
@@ -274,7 +293,7 @@ const buildListQuery = () => {
 		page: pagination.currentPage,
 		pageSize: pagination.pageSize,
 		name: formData.value.name || undefined,
-		idCard: formData.value.idCard || undefined,
+		idCard: formData.value.idCardsText || undefined,
 		phone: formData.value.phone || undefined,
 		district: formData.value.district || undefined,
 		gender: formData.value.gender || undefined,
@@ -284,14 +303,7 @@ const buildListQuery = () => {
 }
 
 /**
- * 获取查询参数（用于导出）
- */
-const getSearchParams = () => {
-	return buildListQuery()
-}
-
-/**
- * 加载表格数据
+ * 加载表格数据（单条查询）
  */
 const loadTableData = async () => {
 	tableLoading.value = true
@@ -310,19 +322,52 @@ const loadTableData = async () => {
 }
 
 /**
+ * 批量查询身份证号
+ */
+const loadBatchData = async () => {
+	batchQueryLoading.value = true
+	try {
+		const idCards = parseIdCards(formData.value.idCardsText)
+		if (idCards.length === 0) {
+			ElMessage.warning("请输入有效的身份证号")
+			return
+		}
+		const res = await pbct.batchQuery(idCards)
+		tableData.value = res.data.list || []
+		unmatchedIdCards.value = res.data.unmatchedIdCards || []
+		isBatchMode.value = true
+		pagination.total = res.data.total || 0
+		ElMessage.success(res.message)
+	} catch (error) {
+		console.error("批量查询失败:", error)
+		tableData.value = []
+		unmatchedIdCards.value = []
+		isBatchMode.value = false
+	} finally {
+		batchQueryLoading.value = false
+	}
+}
+
+/**
  * 搜索
  */
 const handleSearch = () => {
-	// 校验身份证号格式
-	if (!formData.value.idCard) {
-		ElMessage.warning("请输入身份证号")
-		return
-	}
-	if (!validateIdCard(formData.value.idCard)) {
-		idCardError.value = "请输入正确的身份证号"
-		return
-	}
 	idCardError.value = ""
+	const idCards = parseIdCards(formData.value.idCardsText)
+
+	// 如果有输入身份证号，执行批量查询
+	if (idCards.length > 0) {
+		unmatchedIdCards.value = []
+		loadBatchData()
+		hasSearched.value = true
+		return
+	}
+
+	// 没有身份证号时，使用原有单条查询逻辑
+	if (!formData.value.name && !formData.value.phone) {
+		ElMessage.warning("请输入查询条件")
+		return
+	}
 	pagination.currentPage = 1
 	loadTableData()
 	hasSearched.value = true
@@ -334,7 +379,7 @@ const handleSearch = () => {
 const handleReset = () => {
 	formData.value = {
 		name: "",
-		idCard: "",
+		idCardsText: "",
 		phone: "",
 		district: "",
 		gender: "",
@@ -342,6 +387,8 @@ const handleReset = () => {
 		sortOrder: ""
 	}
 	idCardError.value = ""
+	unmatchedIdCards.value = []
+	isBatchMode.value = false
 	pagination.currentPage = 1
 	hasSearched.value = false
 }
@@ -370,20 +417,6 @@ const handleView = (row: ListItem) => {
 	ElMessage.info(`查看 ${row.name} 的详情`)
 }
 
-/**
- * 导出成功回调
- */
-const handleExportSuccess = () => {
-	ElMessage.success("导出成功")
-}
-
-/**
- * 导出失败回调
- */
-const handleExportError = (error: any) => {
-	ElMessage.error(error.message || "导出失败")
-}
-
 // ==================== 生命周期 ====================
 // 默认不查询，等待用户输入正确的身份证号后手动查询
 </script>
@@ -391,11 +424,51 @@ const handleExportError = (error: any) => {
 <style lang="scss" scoped>
 @use "../pbct.scss" as *;
 
+:deep(.el-form-item .el-form-item__content) {
+	align-items: baseline;
+}
+
 .id-card-error {
 	font-size: 12px;
 	color: var(--el-color-danger);
 	line-height: 1.4;
 	margin-top: 4px;
+}
+
+.id-card-hint {
+	font-size: 12px;
+	color: #909399;
+	line-height: 1.4;
+	margin-top: 4px;
+}
+
+.unmatched-section {
+	background: #fef0f0;
+	border: 1px solid #fde2e2;
+	border-radius: 4px;
+	padding: 12px 16px;
+	margin-bottom: 16px;
+
+	.unmatched-title {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 14px;
+		color: #f56c6c;
+		font-weight: 500;
+		margin-bottom: 8px;
+
+		.el-icon {
+			font-size: 16px;
+		}
+	}
+
+	.unmatched-list {
+		font-size: 13px;
+		color: #666;
+		line-height: 1.6;
+		word-break: break-all;
+	}
 }
 
 .empty-init,
