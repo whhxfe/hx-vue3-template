@@ -13,4 +13,5 @@ export const amcRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 	await app.register(lspRoutes, { prefix: "/lsp" })
 	await app.register(lmcRoutes, { prefix: "/lmc" })
 	// await app.register(lvsRoutes, { prefix: "/lvs" })
+	await app.register(lvsRoutes, { prefix: "/lvs" })
 }

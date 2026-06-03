@@ -10,12 +10,7 @@ import type {
 	LmcItem,
 	LmcQuery,
 	LmcResult,
-	LmcForm,
-	LvsOverview,
-	LvsMonthTrend,
-	LvsMonthShare,
-	LvsHealthStatus,
-	LvsAlertItem
+	LmcForm
 } from './types'
 
 export type {
@@ -26,12 +21,7 @@ export type {
 	LmcItem,
 	LmcQuery,
 	LmcResult,
-	LmcForm,
-	LvsOverview,
-	LvsMonthTrend,
-	LvsMonthShare,
-	LvsHealthStatus,
-	LvsAlertItem
+	LmcForm
 }
 
 /** 日志标准化处理 API */
@@ -100,23 +90,43 @@ export const lmc = {
 
 /** 日志统计大屏 API */
 export const lvs = {
-	getOverview() {
-		return request.get<{ state: number; message: string; data: LvsOverview }>('/amc/lvs/overview')
+	/** 板块1：日志总量统计 - 横向柱状图 */
+	getLogTotalStats() {
+		return request.get<{ state: number; message: string; data: Array<{ name: string; value: number }> }>('/amc/lvs/log-total-stats')
 	},
 
-	getMonthTrend() {
-		return request.get<{ state: number; message: string; data: LvsMonthTrend[] }>('/amc/lvs/month-trend')
+	/** 板块2：应用日志总量排行 - 横向柱状图 */
+	getAppLogRanking() {
+		return request.get<{ state: number; message: string; data: Array<{ name: string; value: number }> }>('/amc/lvs/app-log-ranking')
 	},
 
-	getMonthShare() {
-		return request.get<{ state: number; message: string; data: LvsMonthShare[] }>('/amc/lvs/month-share')
+	/** 板块3：日志总量统计饼图 - 环形饼图 */
+	getLogSharePie() {
+		return request.get<{ state: number; message: string; data: Array<{ name: string; value: number; itemStyle?: { color: string } }> }>('/amc/lvs/log-share-pie')
 	},
 
-	getHealthStatus() {
-		return request.get<{ state: number; message: string; data: LvsHealthStatus[] }>('/amc/lvs/health-status')
+	/** 板块4：用户统计 - 柱状图 */
+	getUserStatsBar() {
+		return request.get<{ state: number; message: string; data: Array<{ label: string; val: number }> }>('/amc/lvs/user-stats-bar')
 	},
 
-	getAlerts() {
-		return request.get<{ state: number; message: string; data: LvsAlertItem[] }>('/amc/lvs/alerts')
+	/** 板块5：应用统计 - 折线图 */
+	getAppStatsLine() {
+		return request.get<{ state: number; message: string; data: { xAxis: string[]; series: number[] } }>('/amc/lvs/app-stats-line')
+	},
+
+	/** 板块6：终端统计 - 列表数据 */
+	getTerminalStatsList() {
+		return request.get<{ state: number; message: string; data: Array<{ ip: string; num: number }> }>('/amc/lvs/terminal-stats-list')
+	},
+
+	/** 板块7：日志数量趋势统计 - 多折线图 */
+	getTrendStatsLine() {
+		return request.get<{ state: number; message: string; data: { x: string[]; data1: number[]; data2: number[]; data3: number[] } }>('/amc/lvs/trend-stats-line')
+	},
+
+	/** 板块8：用户访问数量统计 - 面积折线图 */
+	getUserVisitStats() {
+		return request.get<{ state: number; message: string; data: Array<{ name: string; val: number }> }>('/amc/lvs/user-visit-stats')
 	}
 }
