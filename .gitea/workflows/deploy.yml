@@ -12,51 +12,68 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     container:
+      # 当前试点阶段：先用 Docker Hub 镜像
+      # ★ 迁移到纯内网时改为：registry:5000/node:20-alpine
+      #   并配置 Docker daemon.json:
+      #   { "insecure-registries": ["registry:5000"] }
       image: node:20-alpine
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # ==========================================
+      # 内网方案：通过 Gitea API 克隆代码
+      # 不依赖 actions/checkout@v4
+      # ==========================================
+      - name: Checkout code via Gitea
+        run: |
+          apk add --no-cache git
+          git clone http://gitea:3000/${{ gitea.repository }}.git .
+          git checkout ${{ gitea.sha }}
 
       # ==========================================
       # @hx 私有包 registry 配置
-      # 注意：工作流容器内无法访问 localhost:4873
-      # 需改为宿主机 IP 或 host.docker.internal
+      # 内网通过容器名访问 verdaccio（同属 gitea-net 网络）
       # ==========================================
-      - name: Setup npm registry for private packages
+      - name: Setup npm registry
         run: |
-          # host.docker.internal 指向宿主机（Windows）
-          echo "@hx:registry=http://host.docker.internal:4873/" > .npmrc
-          echo "//registry.npmjs.org/:_authToken=" >> .npmrc
+          # @hx 私有包从 verdaccio 获取
+          echo "@hx:registry=http://verdaccio:4873/" > .npmrc
+          # 公共包从内网 npm 镜像获取（如果有的话）
+          # echo "registry=http://npm-mirror:8081/repository/npm-public/" >> .npmrc
 
       # ==========================================
-      # 缓存 node_modules，避免每次重新下载
+      # 内网缓存：将 node_modules 打包到共享目录
+      # 不依赖 actions/cache@v4
       # ==========================================
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          key: node-modules-${{ hashFiles('package-lock.json') }}
-          path: node_modules
-          restore-keys: |
-            node-modules-
+      - name: Restore node_modules cache
+        run: |
+          if [ -f /var/www/html/.cache/node_modules.tar.gz ]; then
+            echo "Found cached node_modules, restoring..."
+            tar -xzf /var/www/html/.cache/node_modules.tar.gz -C /workspace/${{ gitea.repository }}/
+          else
+            echo "No cache found, will install fresh dependencies"
+          fi
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Cache node_modules
+        run: |
+          mkdir -p /var/www/html/.cache
+          tar -czf /var/www/html/.cache/node_modules.tar.gz node_modules
+          echo "node_modules cached successfully"
 
       - name: Build project
         run: npm run build
 
       # ==========================================
-      # 将 dist 复制到共享部署目录
-      # 该目录挂载了宿主机的路径，Nginx 容器也挂载同一路径
+      # 部署到共享目录（Nginx 读取此目录）
       # ==========================================
       - name: Copy dist to deploy directory
         run: |
-          # 先清空原有文件
-          rm -rf /var/www/html/*
+          # 清空原有文件（保留 .cache 目录）
+          find /var/www/html/ -maxdepth 1 ! -name '.cache' ! -name '/var/www/html/' -exec rm -rf {} +
           # 复制新构建产物
           cp -r dist/* /var/www/html/
-          # 保留 nginx.conf 供 nginx 容器使用（可选）
           echo "Deploy completed at $(date)" > /var/www/html/deploy-info.txt
 
       - name: List deployed files
