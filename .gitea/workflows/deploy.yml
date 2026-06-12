@@ -18,12 +18,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup npm registry
+      # ==========================================
+      # @hx 私有包 registry 配置
+      # 注意：工作流容器内无法访问 localhost:4873
+      # 需改为宿主机 IP 或 host.docker.internal
+      # ==========================================
+      - name: Setup npm registry for private packages
         run: |
-          # 如果 @hx 私有 registry 在宿主机上，容器内需要通过 host.docker.internal 访问
-          # 如需调整，请修改下面的 registry 地址
-          echo "@hx:registry=https://registry.npmjs.org" > .npmrc
+          # host.docker.internal 指向宿主机（Windows）
+          echo "@hx:registry=http://host.docker.internal:4873/" > .npmrc
           echo "//registry.npmjs.org/:_authToken=" >> .npmrc
+
+      # ==========================================
+      # 缓存 node_modules，避免每次重新下载
+      # ==========================================
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+          restore-keys: |
+            node-modules-
 
       - name: Install dependencies
         run: npm ci
@@ -31,39 +46,18 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: List dist files
-        run: ls -la dist/
-
-      # 打包构建产物为 artifact
-      - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-
-      # 构建 Docker 镜像并推送
-      - name: Login to Docker registry (if needed)
-        if: false  # 暂时禁用，后续启用
-        run: echo "docker login ..."
-
-      - name: Build Docker image
+      # ==========================================
+      # 将 dist 复制到共享部署目录
+      # 该目录挂载了宿主机的路径，Nginx 容器也挂载同一路径
+      # ==========================================
+      - name: Copy dist to deploy directory
         run: |
-          docker build -t hx-vue3-template:latest .
-          docker tag hx-vue3-template:latest hx-vue3-template:${{ gitea.sha }}
+          # 先清空原有文件
+          rm -rf /var/www/html/*
+          # 复制新构建产物
+          cp -r dist/* /var/www/html/
+          # 保留 nginx.conf 供 nginx 容器使用（可选）
+          echo "Deploy completed at $(date)" > /var/www/html/deploy-info.txt
 
-      # 部署到远程服务器（通过 SSH）
-      - name: Deploy to remote server
-        if: false  # 暂时禁用，后续根据实际部署环境启用
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-        run: |
-          # 示例：通过 SSH 部署到远程服务器
-          # ssh -i key $DEPLOY_USER@$DEPLOY_HOST "
-          #   docker pull hx-vue3-template:latest && 
-          #   docker stop hx-nginx || true && 
-          #   docker rm hx-nginx || true && 
-          #   docker run -d --name hx-nginx -p 8080:80 hx-vue3-template:latest
-          # "
-          echo "Deploy step - configure later"
+      - name: List deployed files
+        run: ls -la /var/www/html/
