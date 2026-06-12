@@ -26,8 +26,11 @@ jobs:
       - name: Checkout code via Gitea
         run: |
           apk add --no-cache git
-          git clone http://gitea:3000/${{ gitea.repository }}.git .
+          # 使用 Gitea Actions 自动注入的临时 token 进行认证
+          git clone http://oauth2:${{ gitea.token }}@gitea:3000/${{ gitea.repository }}.git .
           git checkout ${{ gitea.sha }}
+          # 查看已签出的提交信息（调试用）
+          git log --oneline -1
 
       # ==========================================
       # @hx 私有包 registry 配置
