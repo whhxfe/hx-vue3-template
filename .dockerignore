@@ -1,0 +1,12 @@
+node_modules
+.git
+.gitignore
+*.md
+.env
+.env.*
+dist
+dist-zip
+server/node_modules
+server/db/mock.db
+.vscode
+.idea
