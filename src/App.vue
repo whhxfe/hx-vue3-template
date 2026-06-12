@@ -50,7 +50,7 @@ const requestConfig = {
 }
 
 
-const form = { cols: 4, gap: 12, minColWidth: 200, actionAlign: "right" as const }
+const form = { cols: 5, gap: 12, minColWidth: 200, actionAlign: "right" as const }
 </script>
 
 <template>
