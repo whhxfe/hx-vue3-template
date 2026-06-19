@@ -1,12 +1,12 @@
 <template>
-	<HxLayout title="数据录入管理" :menu="visibleMenu">
+	<AppLayout title="数据录入管理" :menu="visibleMenu">
 		<router-view />
-	</HxLayout>
+	</AppLayout>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { HxLayout } from "@/hx-components"
+import { AppLayout } from "@/components"
 import { useSysStore } from '@/store'
 
 const sysStore = useSysStore()

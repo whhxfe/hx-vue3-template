@@ -1,11 +1,11 @@
 <template>
-	<HxLayout title="模板中心" :menu="menuConfig">
+	<AppLayout title="模板中心" :menu="menuConfig">
 		<router-view />
-	</HxLayout>
+	</AppLayout>
 </template>
 
 <script setup lang="ts">
-import { HxLayout } from "@/hx-components"
+import { AppLayout } from "@/components"
 import { menuConfig } from "./config"
 </script>
 

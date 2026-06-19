@@ -29,7 +29,7 @@
 				ref="tableRef"
 				border
 				:height="tableHeight"
-				:columns="tableColumns"
+				:columns="(tableColumns as any)"
 				:data="tableData"
 				:loading="tableLoading"
 				:show-pagination="true"
@@ -78,8 +78,8 @@ import { ElMessage, ElMessageBox } from "element-plus"
 import { ElTag as elTag } from "element-plus"
 import { Plus, Refresh } from "@element-plus/icons-vue"
 import { useDebounceFn, useThrottleFn, useElementSize, useAsyncState } from "@vueuse/core"
-import { HxForm, HxTable } from "@hx/ui"
-import type { FormField, TableColumn } from "@hx/ui"
+import { HxForm, HxTable } from "@whhx/ui"
+import type { FormField, TableColumn } from "@whhx/ui"
 import { lsp, type LspItem, type LspForm } from "@/modules/amc/api"
 
 // ==================== Refs ====================

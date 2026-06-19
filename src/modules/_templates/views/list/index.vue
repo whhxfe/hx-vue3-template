@@ -105,8 +105,8 @@ import { ElMessage, ElMessageBox } from "element-plus"
 import { ElTag as elTag } from "element-plus"
 import { Plus, Refresh } from "@element-plus/icons-vue"
 import { useDebounceFn, useThrottleFn, useElementSize, useAsyncState } from "@vueuse/core"
-import { HxForm, HxTable, HxImporter, HxExporter } from "@hx/ui"
-import type { FormField, TableColumn } from "@hx/ui"
+import { HxForm, HxTable, HxImporter, HxExporter } from "@whhx/ui"
+import type { FormField, TableColumn } from "@whhx/ui"
 import { demo, type ListItem, type ListForm } from "@/modules/_templates/api/list"
 
 // ==================== Refs ====================

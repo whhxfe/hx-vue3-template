@@ -122,8 +122,8 @@
 import { ref, reactive, computed, onMounted } from "vue"
 import { ElMessage } from "element-plus"
 import { fromLonLat } from "ol/proj"
-import { HxForm, HxIcon, HxCardList, HxMap, HxMapCluster, HxMapMarkers, HxMapPopup } from "@hx/ui"
-import type { FormField, MapMarkerItem, ClusterContentInfo } from "@hx/ui"
+import { HxForm, HxIcon, HxCardList, HxMap, HxMapCluster, HxMapMarkers, HxMapPopup } from "@whhx/ui"
+import type { FormField, MapMarkerItem, ClusterContentInfo } from "@whhx/ui"
 import { ryst, type ListItem as RystListItem } from "@/modules/zddxgk/api"
 
 // ==================== 地图相关 ====================

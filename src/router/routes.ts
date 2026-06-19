@@ -17,7 +17,7 @@ const routes: RouteRecordRaw[] = [
 	// ---- 需 Layout 包裹的页面（已登录用户均需要侧边栏导航） ----
 	{
 		path: "/",
-component: () => import("@/hx-components/layout/route-layout.vue"),
+component: () => import("@/components/layout/route-layout.vue"),
 		children: [
 			{
 				path: "devhome",

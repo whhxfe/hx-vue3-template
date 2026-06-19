@@ -126,8 +126,8 @@
 import { ref, reactive, computed } from "vue"
 import { ElMessage } from "element-plus"
 import { Warning } from "@element-plus/icons-vue"
-import { HxForm, HxTable } from "@hx/ui"
-import type { TableColumn } from "@hx/ui"
+import { HxForm, HxTable } from "@whhx/ui"
+import type { TableColumn } from "@whhx/ui"
 import { pbct, type ListItem } from "@/modules/pbct/api"
 
 /**

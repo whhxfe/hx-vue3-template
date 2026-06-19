@@ -312,8 +312,8 @@
 import { ref, reactive, computed, onMounted } from "vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { Plus, Sort, SortUp, SortDown, MoreFilled, Edit, Delete } from "@element-plus/icons-vue"
-import { HxForm, HxImporter, HxExporter, HxLabelText } from "@hx/ui"
-import type { FormField } from "@hx/ui"
+import { HxForm, HxImporter, HxExporter, HxLabelText } from "@whhx/ui"
+import type { FormField } from "@whhx/ui"
 import { ryyj } from "@/modules/zddxgk/api"
 import type { ListItem } from "@/modules/zddxgk/api/ryyj/types"
 

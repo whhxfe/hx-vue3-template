@@ -369,8 +369,8 @@
 <script setup lang="tsx">
 import { ref, reactive, computed, onMounted } from "vue"
 import { ElMessage, ElMessageBox, ElTag } from "element-plus"
-import { HxForm, HxTable, HxIcon, HxImporter, HxExporter, HxCardList } from "@hx/ui"
-import type { FormField, TableColumn } from "@hx/ui"
+import { HxForm, HxTable, HxIcon, HxImporter, HxExporter, HxCardList } from "@whhx/ui"
+import type { FormField, TableColumn } from "@whhx/ui"
 import { rygk, type TreeNode, type ListItem, type DictItem, FOLLOW_LEVEL_OPTIONS } from "@/modules/zddxgk/api"
 
 type ImporterExpose = {

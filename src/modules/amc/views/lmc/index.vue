@@ -77,8 +77,8 @@ import { ElMessage, ElMessageBox } from "element-plus"
 import { ElTag as elTag } from "element-plus"
 import { Plus, Refresh } from "@element-plus/icons-vue"
 import { useDebounceFn, useThrottleFn, useElementSize, useAsyncState } from "@vueuse/core"
-import { HxForm, HxTable } from "@hx/ui"
-import type { FormField } from "@hx/ui"
+import { HxForm, HxTable } from "@whhx/ui"
+import type { FormField } from "@whhx/ui"
 import { lmc, type LmcItem, type LmcForm } from "@/modules/amc/api"
 
 // ==================== Refs ====================

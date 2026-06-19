@@ -3,8 +3,8 @@ import { ref } from "vue"
 import { storeToRefs } from "pinia"
 import { ElWatermark } from "element-plus"
 import { useSysStore } from "./store"
-import { HxTokenOverdue } from "@/hx-components"
-import { HxConfigProvider } from "@hx/ui"
+import { TokenOverdue } from "@/components"
+import { HxConfigProvider } from "@whhx/ui"
 
 const sysStore = useSysStore()
 const { userInfo, token } = storeToRefs(sysStore)
@@ -54,11 +54,11 @@ const form = { cols: 5, gap: 12, minColWidth: 200, actionAlign: "right" as const
 </script>
 
 <template>
-	<el-watermark class="h-full" :content="userInfo?.accountName || 'hx-v3-template'">
+	<el-watermark class="h-full" :content="userInfo?.accountName || 'vue3-template'">
 		<HxConfigProvider :icon="iconConfig" :request="requestConfig" :form="form">
 			<router-view></router-view>
 		</HxConfigProvider>
-		<HxTokenOverdue />
+		<TokenOverdue />
 	</el-watermark>
 </template>
 
