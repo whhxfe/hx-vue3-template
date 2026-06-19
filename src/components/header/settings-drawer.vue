@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import { ElMessage } from "element-plus"
-import { HxIcon } from "@hx/ui"
+import { HxIcon } from "@whhx/ui"
 import { useSettingsStore } from "@/store"
 import { useTheme } from "@/hooks/useTheme"
 import { storeToRefs } from "pinia"

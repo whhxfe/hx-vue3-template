@@ -1,5 +1,5 @@
 <template>
-	<header class="h-15 flex items-center px-5 hx-header">
+	<header class="h-15 flex items-center px-5 app-header">
 		<div class="flex shrink-0 items-center gap-4 mr-10">
 			<div class="flex items-center gap-4 cursor-pointer" @click="backToHome">
 				<img class="w-8 h-8" src="/logo.png" alt="logo" />
@@ -58,7 +58,7 @@ import { useRouter } from "vue-router"
 import { useSysStore } from "@/store"
 import { storeToRefs } from "pinia"
 import * as authApi from "@/api/auth"
-import { ThemeSwitch } from "@/hx-components"
+import { ThemeSwitch } from "@/components"
 
 interface Props {
 	title?: string
@@ -101,8 +101,8 @@ const handleLogout = async () => {
 </script>
 
 <style lang="scss" scoped>
-.hx-header {
-	background: var(--hx-header-bg, linear-gradient(90deg, #1a3c61, #141a39));
+.app-header {
+	background: var(--bg-header, linear-gradient(90deg, #1a3c61, #141a39));
 }
 
 .user-panel {

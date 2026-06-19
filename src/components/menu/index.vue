@@ -1,10 +1,10 @@
 <template>
 	<el-menu
 		v-if="menu.length !== 0"
-		:class="[mode === 'horizontal' ? 'hx-menu--horizontal w-180' : 'hx-menu--vertical']"
+		:class="[mode === 'horizontal' ? 'app-menu--horizontal w-180' : 'app-menu--vertical']"
 		router
 		:mode="mode"
-		popper-class="hx-menu-popper"
+		popper-class="app-menu-popper"
 		:default-active="activePath"
 		:ellipsis="true"
 	>
@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import { useRoute } from "vue-router"
-import { HxIcon } from '@hx/ui'
+import { HxIcon } from '@whhx/ui'
 
 interface Props {
 	menu?: MenuItem[]
