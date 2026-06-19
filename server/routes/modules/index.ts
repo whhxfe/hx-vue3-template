@@ -1,20 +1,25 @@
 /**
  * 服务模块（modules）统一注册入口
- * 所有 modules 下的路由模块在此集中注册
- * 采用层级路由：module → submodule → route
+ * 自动扫描 modules 目录下的子目录，发现并注册路由模块
+ * 
+ * 约定：
+ * - 每个子目录的 index.ts 导出 FastifyPluginAsync 作为 default export
+ * - 目录名即为路由前缀（如 zddxgk → /wzsys/zddxgk）
+ * - 以 _ 开头的目录会被跳过
  */
 import type { FastifyInstance } from "fastify"
-import { zddxgkRoutes } from "./zddxgk"
-import { templatesRoutes } from "./_templates"
-import { pbctRoutes } from "./pbct"
-import { amcRoutes } from "./amc"
+import path from "path"
+import { fileURLToPath } from "url"
+import { scanRouteModules } from "../../utils/module-scanner.js"
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export async function registerModules(app: FastifyInstance, prefix: string) {
-	// 第一层：注册各模块（module）
-	// prefix 来自 app.ts 传入的 "/wzsys"
-	// 最终路径: prefix + "/模块名"
-	await app.register(zddxgkRoutes, { prefix: prefix + "/zddxgk" })       // /wzsys/zddxgk/...
-	await app.register(templatesRoutes, { prefix: prefix + "/templates" })  // /wzsys/templates/...
-	await app.register(pbctRoutes, { prefix: prefix + "/pbct" })           // /wzsys/pbct/...
-	await app.register(amcRoutes, { prefix: prefix + "/amc" })             // /wzsys/amc/...
+	const modulesDir = path.join(__dirname)
+	const modules = await scanRouteModules(modulesDir)
+
+	for (const [name, route] of modules) {
+		await app.register(route, { prefix: `${prefix}/${name}` })
+		console.log(`[Routes] 已注册模块: ${prefix}/${name}`)
+	}
 }

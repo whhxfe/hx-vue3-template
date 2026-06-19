@@ -7,8 +7,10 @@ import type { DbModule } from "../../types.js"
 import { createPbctTables } from "./schema.js"
 import { seedPbctDefaults, seedPbctFakeData } from "./seed.js"
 
-export const pbctModule: DbModule = {
+const pbctModule: DbModule = {
   createTables: (db: Database) => createPbctTables(db),
   seedDefaults: (db: Database) => seedPbctDefaults(db),
   seedFakeData: (db: Database) => seedPbctFakeData(db)
 }
+
+export default pbctModule

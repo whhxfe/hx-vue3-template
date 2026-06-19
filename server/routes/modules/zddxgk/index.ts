@@ -10,7 +10,7 @@ import { rystRoutes } from "./ryst"
  * prefix 已在 modules/index.ts 中指定为 /zddxgk
  * 此时 app.prefix 已经是 /wzsys/zddxgk
  */
-export const zddxgkRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
+const zddxgkRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 	// 注册 rygk 子路由
 	await app.register(rygkRoutes, { prefix: "/rygk" })
 	// 注册 ryyj 子路由
@@ -18,3 +18,5 @@ export const zddxgkRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
 	// 注册 ryst 子路由
 	await app.register(rystRoutes, { prefix: "/ryst" })
 }
+
+export default zddxgkRoutes

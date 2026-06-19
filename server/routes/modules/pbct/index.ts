@@ -593,4 +593,4 @@ const pbctRoutes = async (app: FastifyInstance) => {
 	})
 }
 
-export { pbctRoutes }
+export default pbctRoutes

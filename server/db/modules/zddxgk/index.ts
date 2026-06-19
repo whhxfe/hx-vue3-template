@@ -10,7 +10,7 @@ import { seedZddxgkDefaults, seedZddxgkFakeData } from "./seed.js"
 import { ryyjModule } from "./ryyj/index.js"
 import { rystModule } from "./ryst/index.js"
 
-export const zddxgkModule: DbModule = {
+const zddxgkModule: DbModule = {
   createTables: (db: Database) => {
     createZddxgkTables(db)
     ryyjModule.createTables(db)
@@ -27,3 +27,5 @@ export const zddxgkModule: DbModule = {
     rystModule.seedFakeData?.(db)
   }
 }
+
+export default zddxgkModule

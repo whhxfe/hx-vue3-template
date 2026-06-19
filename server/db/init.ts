@@ -4,8 +4,9 @@
  * 按模块组织，每个模块独立管理自己的 schema 和 seed
  *
  * 新增模块时只需：
- * 1. 在模块目录创建 index.ts 导出 DbModule 接口
- * 2. 在对应分类的 index.ts 中添加 import 并注册到数组
+ * 1. 在 db/modules/ 下创建子目录
+ * 2. 在子目录创建 index.ts 导出 DbModule 作为 default export
+ * 3. 自动扫描器会自动发现并注册（以 _ 开头的目录会被跳过）
  */
 import { createDatabase, saveDatabase } from "./manager.js"
 import type { DbModule } from "./types.js"
