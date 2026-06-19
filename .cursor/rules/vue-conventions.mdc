@@ -11,7 +11,7 @@ globs: "src/**/*.vue"
 | 类别 | 规范 | 示例 |
 |------|------|------|
 | Vue 组件文件 | 多词 kebab-case | `account-list.vue`, `role-list.vue` |
-| hx-components 目录 | 多词 kebab-case 目录 + `index.vue` | `theme-switch/index.vue`, `header/index.vue` |
+| components 目录 | 多词 kebab-case 目录 + `index.vue` | `theme-switch/index.vue`, `header/index.vue` |
 | 模块目录 | kebab-case | `ucenter/`, `zddxgk/` |
 | SCSS 样式文件 | `_` 前缀 + kebab-case | `_variables.scss`, `_mixins.scss` |
 
@@ -19,7 +19,7 @@ globs: "src/**/*.vue"
 
 | 类别 | 注册名规范 | 示例 |
 |------|-----------|------|
-| 平台布局组件 (hx-components) | `Hx` 前缀 + PascalCase | `HxLayout`, `HxHeader`, `HxMenu` |
+| 平台布局组件 (components/) | `App` 前缀 + PascalCase | `AppLayout`, `AppHeader`, `AppMenu` |
 | 页面级视图组件 | 多词 PascalCase (路由 name) | `AccountList`, `RoleList` |
 | 全局公共组件 (components/) | PascalCase | `SideMenu`, `DataTable` |
 

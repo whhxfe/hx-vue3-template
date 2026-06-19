@@ -37,17 +37,16 @@ npm run lint:fix     # ESLint 自动修复
 ## 顶层目录
 
 ```
-hx-vue3-template/
+vue3-template/
 ├── public/           # 静态资源（不会被构建处理）
 ├── server/           # Fastify + sql.js Mock 服务
 ├── src/              # 前端源码
 │   ├── api/          # 全局 API 接口
 │   ├── assets/       # 静态资源（会被构建处理）
-│   ├── components/   # 全局公共组件
+│   ├── components/   # 全局公共组件 + 平台核心布局组件
 │   ├── composables/  # 组合式函数
 │   ├── directives/   # 自定义指令
 │   ├── hooks/        # 自定义 Hooks
-│   ├── hx-components/ # 平台核心布局组件
 │   ├── modules/      # 业务模块（模块化架构）
 │   ├── router/       # 根路由配置
 │   ├── store/        # Pinia 全局 Store
