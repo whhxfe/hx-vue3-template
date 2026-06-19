@@ -124,7 +124,7 @@ export default defineConfig({
 		},
 	},
 	shortcuts: {
-		"hx-border-light": ["border-1", "border-gray-200", "border-solid", "rounded-md"],
+		"border-light": ["border-1", "border-gray-200", "border-solid", "rounded-md"],
 		// 更新为新的 CSS 变量名
 		page: ["w-full", "h-full", "p-5", "bg-bg-base"],
 		layout: ["w-full", "h-full", "overflow-y-hidden"],
