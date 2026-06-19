@@ -1,5 +1,5 @@
 {
-	"name": "hx-mock-server",
+	"name": "vue3-mock-server",
 	"private": true,
 	"version": "1.0.0",
 	"type": "module",

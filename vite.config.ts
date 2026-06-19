@@ -24,14 +24,14 @@ export default defineConfig(({ mode, command }) => {
 	const apiTarget = env.VITE_API_TARGET || "http://localhost:3000"
 	const apiPrefix = "/wzsys"
 
-	const dateStr = new Date().toISOString().slice(0,16).replace(/[-T:]/g,'')
+	const dateStr = new Date().toISOString().slice(0, 16).replace(/[-T:]/g, '')
 	return {
 		// base: "./",
 		css: {
 			devSourcemap: !isProd, // 开发开启，生产关闭
 			preprocessorOptions: {
 				scss: {
-					
+
 				}
 			}
 		},
@@ -48,12 +48,6 @@ export default defineConfig(({ mode, command }) => {
 			port: 8000,
 			host: "0.0.0.0",
 			strictPort: false,
-		proxy: {
-				[apiPrefix]: {
-					target: apiTarget,
-					changeOrigin: true
-				}
-			}
 		},
 		plugins: [
 			vue(),
@@ -68,13 +62,13 @@ export default defineConfig(({ mode, command }) => {
 				inject: "body-last",
 				customDomId: "__svg__icons__dom__"
 			}),
-      zipPack({
-        inDir: 'dist',
-        outFileName: `project-${mode}-${dateStr}.zip`,
-        // 过滤：排除 .map / .log 等文件
-        filter: (name) => !/\.(map|log)$/.test(name)
-      }),
-		  !isProd &&	vueDevTools(),
+			zipPack({
+				inDir: 'dist',
+				outFileName: `project-${mode}-${dateStr}.zip`,
+				// 过滤：排除 .map / .log 等文件
+				filter: (name) => !/\.(map|log)$/.test(name)
+			}),
+			!isProd && vueDevTools(),
 			// AutoImport：自动导入 API / Hooks（vue, vue-router, pinia）
 			// AutoImport({
 			// 	resolvers: [ElementPlusResolver()],
@@ -106,12 +100,12 @@ export default defineConfig(({ mode, command }) => {
 
 			// visualizer：生产环境打包体积分析
 			isProd &&
-				visualizer({
-					filename: "dist/stats.html",
-					gzipSize: true,
-					brotliSize: true,
-					open: true
-				})
+			visualizer({
+				filename: "dist/stats.html",
+				gzipSize: true,
+				brotliSize: true,
+				open: true
+			})
 		].filter(Boolean),
 
 		build: {
@@ -121,8 +115,8 @@ export default defineConfig(({ mode, command }) => {
 			assetsInlineLimit: ASSETS_INLINE_LIMIT,
 			sourcemap: !isProd, // 生产关闭 sourcemap
 			minify: "esbuild",
-			esbuild:{
-				drop:[]
+			esbuild: {
+				drop: []
 				// drop: isProd ? ["console", "debugger"]:[]
 			},
 			// terserOptions: {
