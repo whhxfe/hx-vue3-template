@@ -28,10 +28,10 @@
 			<HxTable
 				ref="tableRef"
 				border
+				v-loading="tableLoading"
 				:height="tableHeight"
 				:columns="(tableColumns as any)"
 				:data="tableData"
-				:loading="tableLoading"
 				:show-pagination="true"
 				:current-page="pagination.currentPage"
 				:page-size="pagination.pageSize"
