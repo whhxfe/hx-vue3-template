@@ -15,6 +15,12 @@ export const getRoutes = (): RouteRecordRaw[] => {
 			children: [
 				// ======== 目标人员监测 tpm ========
 				{
+					name: 'Ktc-Tpm',
+					path: '/ktc/tpm',
+					redirect: '/ktc/tpm/pc',
+					meta: { title: '目标人员监测' }
+				},
+				{
 					name: 'Ktc-PersonControl',
 					path: '/ktc/tpm/pc',
 					component: () => import('../views/tpm/pc/index.vue'),
@@ -33,6 +39,12 @@ export const getRoutes = (): RouteRecordRaw[] => {
 					meta: { title: '人员上图' }
 				},
 				// ======== 目标群体监测 tgm ========
+				{
+					name: 'Ktc-Tgm',
+					path: '/ktc/tgm',
+					redirect: '/ktc/tgm/gc',
+					meta: { title: '目标群体监测' }
+				},
 				{
 					name: 'Ktc-GroupControl',
 					path: '/ktc/tgm/gc',
@@ -70,6 +82,12 @@ export const getRoutes = (): RouteRecordRaw[] => {
 					meta: { title: '群体预警' }
 				},
 				// ======== 目标单元监测 tum ========
+				{
+					name: 'Ktc-Tum',
+					path: '/ktc/tum',
+					redirect: '/ktc/tum/uc',
+					meta: { title: '目标单元监测' }
+				},
 				{
 					name: 'Ktc-UnitControl',
 					path: '/ktc/tum/uc',

@@ -3,6 +3,7 @@ export const getMenuConfig = () => {
 	return [
 		{
 			title: '目标人员监测',
+			path: '/ktc/tpm',
 			children: [
 				{ title: '人员管控', path: '/ktc/tpm/pc' },
 				{ title: '人员预警', path: '/ktc/tpm/pw' },
@@ -11,6 +12,7 @@ export const getMenuConfig = () => {
 		},
 		{
 			title: '目标群体监测',
+			path: '/ktc/tgm',
 			children: [
 				{
 					title: '群体管控',
@@ -27,6 +29,7 @@ export const getMenuConfig = () => {
 		},
 		{
 			title: '目标单元监测',
+			path: '/ktc/tum',
 			children: [
 				{
 					title: '单元管控',

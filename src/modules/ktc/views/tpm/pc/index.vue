@@ -508,7 +508,7 @@ const formColumns = computed<FormField[]>(() => [
 		label: "录入时间",
 		type: "daterange",
 		placeholder: "请选择时间范围",
-		colSpan: 1,
+		colSpan: 2,
 		valueFormat: "YYYY-MM-DD",
 		componentProps: {
 			rangeSeparator: "至",
