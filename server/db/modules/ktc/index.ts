@@ -30,6 +30,7 @@ const ktcModule: DbModule = {
     pcModule.seedFakeData?.(db)
     pwModule.seedFakeData?.(db)
     pmModule.seedFakeData?.(db)
+    tgmModule.seedFakeData?.(db)
   }
 }
 

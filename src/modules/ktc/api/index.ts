@@ -21,3 +21,7 @@ export type { ListItem as PwListItem, ListQuery as PwListQuery } from './tpm/pw'
 // tpm/pm 模块（人员上图）
 export { pm, FOLLOW_STATUS_OPTIONS } from './tpm/pm'
 export type { ListItem as PmListItem, ListQuery as PmListQuery, FollowStatus } from './tpm/pm'
+
+// tgm/gc 模块（群体管控）
+export { gc } from './tgm/gc'
+export type { TreeNode as GcTreeNode, ListItem as GcListItem, ListQuery as GcListQuery, DictItem as GcDictItem } from './tgm/gc'

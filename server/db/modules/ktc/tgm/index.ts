@@ -14,5 +14,8 @@ export const tgmModule: DbModule = {
   seedDefaults: (db: Database) => {
     gcModule.seedDefaults(db)
     gwModule.seedDefaults(db)
+  },
+  seedFakeData: (db: Database) => {
+    gcModule.seedFakeData?.(db)
   }
 }

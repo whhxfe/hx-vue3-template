@@ -51,12 +51,12 @@ export const getRoutes = (): RouteRecordRaw[] => {
 					component: () => import('../views/tgm/gc/index.vue'),
 					meta: { title: '群体管控' }
 				},
-				{
-					name: 'Ktc-PersonManage',
-					path: '/ktc/tgm/gc/pmg',
-					component: () => import('../views/tgm/gc/pmg/index.vue'),
-					meta: { title: '人员管理' }
-				},
+			{
+				name: 'Ktc-PersonManage',
+				path: '/ktc/tgm/gc/pmg',
+				component: () => import('../views/tgm/gc/pmg/index.vue'),
+				meta: { title: '人员管理', activeMenu: '/ktc/tgm/gc' }
+			},
 				{
 					name: 'Ktc-GroupManage',
 					path: '/ktc/tgm/gc/gm',

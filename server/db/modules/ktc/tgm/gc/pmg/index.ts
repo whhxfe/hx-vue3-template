@@ -3,12 +3,11 @@
  */
 import type { Database } from "sql.js"
 import type { DbModule } from "@db/types"
+import { createPmgTables } from "./schema"
+import { seedPmgDefaults, seedPmgFakeData } from "./seed"
 
 export const pmgModule: DbModule = {
-  createTables: (_db: Database) => {
-    // TODO: 创建表结构
-  },
-  seedDefaults: (_db: Database) => {
-    // TODO: 初始化默认数据
-  }
+  createTables: (db: Database) => createPmgTables(db),
+  seedDefaults: (db: Database) => seedPmgDefaults(db),
+  seedFakeData: (db: Database) => seedPmgFakeData(db)
 }
