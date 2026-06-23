@@ -62,10 +62,10 @@
 			<HxTable
 				ref="tableRef"
 				border
+				v-loading="tableLoading"
 				height="calc(100vh - 200px)"
 				:columns="tableColumns"
 				:data="tableData"
-				:loading="tableLoading"
 				:show-pagination="true"
 				:current-page="pagination.currentPage"
 				:page-size="pagination.pageSize"

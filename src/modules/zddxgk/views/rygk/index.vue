@@ -110,9 +110,9 @@
 						ref="tableRef"
 						border
 						height="596px"
+						v-loading="tableLoading"
 						:columns="tableColumns"
 						:data="tableData"
-						:loading="tableLoading"
 						:show-pagination="true"
 						:current-page="pagination.currentPage"
 						:page-size="pagination.pageSize"
