@@ -1,0 +1,339 @@
+// ==================== CSS 变量定义 ====================
+.pc-container {
+	// 主题颜色变量（基�?Element Plus CSS 变量�?	--pc-bg: var(--el-bg-color-page, #f5f7fa);
+	--pc-bg: var(--el-bg-color-page, #f5f7fa);
+	--pc-card-bg: var(--el-bg-color, #fff);
+	--pc-text-primary: var(--el-text-color-primary, #303133);
+	--pc-text-regular: var(--el-text-color-regular, #606266);
+	--pc-text-secondary: var(--el-text-color-secondary, #909399);
+	--pc-border: var(--el-border-color, #ebeef5);
+	--pc-border-light: var(--el-border-color-light, #f0f2f5);
+	--pc-primary: var(--el-color-primary, #409eff);
+	--pc-primary-light: var(--el-color-primary-light-9, #ecf5ff);
+	--pc-hover-bg: var(--el-fill-color-light, #f5f7fa);
+	--pc-success: var(--el-color-success, #67c23a);
+	--pc-warning: var(--el-color-warning, #e6a23c);
+	--pc-danger: var(--el-color-danger, #f56c6c);
+	--pc-info: var(--el-color-info, #909399);
+
+	display: flex;
+	height: 100%;
+	gap: 16px;
+	padding: 16px;
+	background: var(--pc-bg);
+
+	// ==================== 左侧面板 ====================
+	.left-panel {
+		width: 280px;
+		min-width: 280px;
+		background: var(--pc-card-bg);
+		border-radius: 8px;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+		.tab-header {
+			display: flex;
+			border-bottom: 1px solid var(--pc-border);
+			padding: 0 8px;
+
+			.tab-item {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
+				padding: 12px 8px;
+				cursor: pointer;
+				font-size: 14px;
+				color: var(--pc-text-secondary);
+				border-bottom: 2px solid transparent;
+				transition: all 0.3s;
+
+				&:hover {
+					color: var(--pc-primary);
+				}
+
+				&.active {
+					color: var(--pc-primary);
+					border-bottom-color: var(--pc-primary);
+				}
+
+				.tab-icon {
+					font-size: 14px;
+				}
+			}
+		}
+
+		.tree-container {
+			flex: 1;
+			padding: 12px;
+			overflow-y: auto;
+
+			:deep(.el-tree) {
+				background: transparent;
+
+				.el-tree-node__content {
+					height: 36px;
+					border-radius: 6px;
+					margin-bottom: 4px;
+					color: var(--pc-text-regular);
+					transition: background-color 0.2s;
+
+					&:hover {
+						background: var(--pc-hover-bg);
+					}
+				}
+
+				.el-tree-node.is-current > .el-tree-node__content {
+					background: var(--pc-primary-light);
+					color: var(--pc-primary);
+				}
+
+				.el-tree-node__expand-icon {
+					color: var(--pc-text-secondary);
+				}
+			}
+
+			.tree-node {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				font-size: 14px;
+
+				.node-icon {
+					color: var(--pc-text-secondary);
+				}
+
+				.node-label {
+					flex: 1;
+				}
+
+				.node-count {
+					color: var(--pc-text-secondary);
+					font-size: 12px;
+				}
+			}
+		}
+	}
+
+	// ==================== 右侧面板 ====================
+	.right-panel {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		min-width: 0;
+		min-height: 0;
+		overflow: hidden;
+
+		.filter-section {
+			background: var(--pc-card-bg);
+			border-radius: 8px;
+			padding: 16px;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		}
+
+		.data-section {
+			flex: 1;
+			background: var(--pc-card-bg);
+			border-radius: 8px;
+			padding: 16px;
+			display: flex;
+			flex-direction: column;
+			min-height: 0;
+			overflow: hidden;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+			.data-header {
+				flex-shrink: 0;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 16px;
+
+				.view-toggle {
+					:deep(.el-radio-button__inner) {
+						display: flex;
+						align-items: center;
+						gap: 4px;
+					}
+				}
+
+				.action-buttons {
+					display: flex;
+					gap: 8px;
+				}
+			}
+
+			.table-container {
+				flex: 1;
+				min-height: 0;
+				overflow: auto;
+
+				:deep(.el-table) {
+					width: 100%;
+				}
+
+				:deep(.el-pagination) {
+					// justify-content: flex-end;
+					// margin-top: 16px;
+				}
+			}
+
+			.card-container {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+				min-height: 0;
+
+				// HxCardList 样式适配
+				:deep(.hx-card-list) {
+					height: 100%;
+					display: flex;
+					flex-direction: column;
+
+					.hx-card-list__body {
+						flex: 1;
+						overflow-y: auto;
+						padding-bottom: 16px;
+					}
+
+					.hx-card-list__item {
+						.data-card {
+							border: 1px solid var(--pc-border);
+							border-radius: 8px;
+							padding: 16px;
+							transition: all 0.3s;
+							height: 100%;
+							display: flex;
+							flex-direction: column;
+
+							&:hover {
+								border-color: var(--pc-primary);
+								box-shadow: 0 2px 12px rgba(64, 158, 255, 0.15);
+							}
+
+							.card-header {
+								display: flex;
+								align-items: center;
+								gap: 12px;
+								margin-bottom: 12px;
+
+								.card-avatar {
+									flex-shrink: 0;
+								}
+
+								.card-title-wrap {
+									flex: 1;
+									min-width: 0;
+
+									.card-title {
+										display: block;
+										font-size: 16px;
+										font-weight: 600;
+										color: var(--pc-text-primary);
+									}
+
+									.card-info {
+										display: block;
+										font-size: 12px;
+										color: var(--pc-text-secondary);
+										margin-top: 2px;
+									}
+								}
+							}
+
+							.card-body {
+								flex: 1;
+
+								.card-item {
+									display: flex;
+									margin-bottom: 8px;
+									font-size: 14px;
+
+									.label {
+										color: var(--pc-text-secondary);
+										min-width: 70px;
+									}
+
+									.value {
+										color: var(--pc-text-regular);
+										flex: 1;
+									}
+
+									.text-ellipsis-1 {
+										overflow: hidden;
+										text-overflow: ellipsis;
+										white-space: nowrap;
+									}
+								}
+
+								.card-tags {
+									display: flex;
+									flex-wrap: wrap;
+									gap: 6px;
+									margin-top: 8px;
+
+									.card-tag {
+										margin: 0;
+									}
+								}
+							}
+
+							.card-footer {
+								display: flex;
+								gap: 12px;
+								margin-top: 12px;
+								padding-top: 12px;
+								border-top: 1px solid var(--pc-border);
+							}
+						}
+					}
+
+					.hx-card-list__pagination {
+						display: flex;
+						justify-content: flex-end;
+						padding: 12px 0;
+						border-top: 1px solid var(--pc-border);
+						flex-shrink: 0;
+					}
+				}
+
+				.card-pagination {
+					display: flex;
+					justify-content: flex-end;
+					padding: 12px 0;
+					border-top: 1px solid var(--pc-border);
+				}
+			}
+		}
+	}
+}
+
+// ==================== 全局暗色主题覆盖 ====================
+:global(.dark) {
+	.pc-container {
+		--pc-bg: #1a1a2e;
+		--pc-card-bg: #16213e;
+		--pc-text-primary: #e4e7ed;
+		--pc-text-regular: #c0c4cc;
+		--pc-text-secondary: #909399;
+		--pc-border: #2d3748;
+		--pc-border-light: #1a1a2e;
+		--pc-primary: #409eff;
+		--pc-primary-light: rgba(64, 158, 255, 0.15);
+		--pc-hover-bg: rgba(255, 255, 255, 0.05);
+		--pc-success: #67c23a;
+		--pc-warning: #e6a23c;
+		--pc-danger: #f56c6c;
+		--pc-info: #909399;
+	}
+}
+
+.selected-count {
+	color: var(--pc-primary);
+	font-weight: 500;
+}

@@ -1,0 +1,239 @@
+// ==================== CSS 变量定义 ====================
+.pw-container {
+	// 主题颜色变量（基于 Element Plus CSS 变量）
+	--pw-bg: var(--el-bg-color-page, #f5f7fa);
+	--pw-card-bg: var(--el-bg-color, #fff);
+	--pw-text-primary: var(--el-text-color-primary, #303133);
+	--pw-text-regular: var(--el-text-color-regular, #606266);
+	--pw-text-secondary: var(--el-text-color-secondary, #909399);
+	--pw-border: var(--el-border-color, #ebeef5);
+	--pw-hover-bg: var(--el-fill-color-light, #f5f7fa);
+
+	// 分值标签颜色（亮色主题）
+	--pw-score-high-bg: #f0f9eb;
+	--pw-score-high-color: #67c23a;
+	--pw-score-high-border: #e1f3d8;
+	--pw-score-medium-bg: #fdf6ec;
+	--pw-score-medium-color: #e6a23c;
+	--pw-score-medium-border: #faecd8;
+	--pw-score-low-bg: #fef0f0;
+	--pw-score-low-color: #f56c6c;
+	--pw-score-low-border: #fde2e2;
+
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding: 16px;
+	gap: 16px;
+	background: var(--pw-bg);
+
+	// ==================== 筛选区域 ====================
+	.filter-section {
+		flex-shrink: 0;
+		background: var(--pw-card-bg);
+		border-radius: 8px;
+		padding: 16px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	}
+
+	// ==================== 数据区域 ====================
+	.data-section {
+		flex: 1;
+		min-height: 0;
+		background: var(--pw-card-bg);
+		border-radius: 8px;
+		padding: 16px;
+		overflow: hidden;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		display: flex;
+		flex-direction: column;
+
+		// ==================== 操作栏 ====================
+		.action-bar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding-bottom: 12px;
+			border-bottom: 1px solid var(--pw-border);
+			margin-bottom: 12px;
+
+			.action-left {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.action-right {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+
+				.selected-count {
+					font-size: 13px;
+					color: var(--pw-text-secondary);
+				}
+			}
+		}
+
+		// ==================== 表格容器 ====================
+		.table-container {
+			flex: 1;
+			min-height: 0;
+			display: flex;
+			flex-direction: column;
+			overflow: hidden;
+
+			:deep(.el-table) {
+				flex: 1;
+				min-height: 200px;
+				overflow: auto;
+			}
+
+			.person-info-block {
+				display: flex;
+				padding: 12px 8px;
+				gap: 16px;
+
+				& + .person-info-block {
+					border-top: 1px dashed var(--pw-border);
+				}
+
+				// 左侧：证件照
+				.info-photo {
+					flex-shrink: 0;
+					width: 80px;
+					height: 100px;
+					border-radius: 4px;
+					overflow: hidden;
+					background: var(--pw-hover-bg);
+
+					.photo-img {
+						width: 100%;
+						height: 100%;
+					}
+
+					.photo-placeholder {
+						width: 100%;
+						height: 100%;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						background: var(--el-color-primary-light-9);
+						color: var(--el-color-primary);
+						font-size: 28px;
+						font-weight: 600;
+					}
+				}
+
+				// 右侧：信息区域
+				.info-content {
+					flex: 1;
+					min-width: 0;
+					display: flex;
+					flex-direction: column;
+
+					// 上部：基本信息单行
+					.info-header {
+						position: relative;
+						display: flex;
+						align-items: center;
+						flex-wrap: wrap;
+						gap: 6px 12px;
+						padding: 8px 12px;
+						padding-right: 36px;
+						background: var(--pw-hover-bg);
+						border-radius: 6px;
+
+						.name {
+							font-size: 16px;
+							font-weight: 600;
+							color: var(--pw-text-primary);
+						}
+
+						.separator {
+							color: var(--pw-text-secondary);
+						}
+
+						.gender-age,
+						.idcard,
+						.education,
+						.occupation {
+							font-size: 13px;
+							color: var(--pw-text-secondary);
+						}
+
+						// 分值标签样式
+						.score-high {
+							background: var(--pw-score-high-bg);
+							color: var(--pw-score-high-color);
+							border-color: var(--pw-score-high-border);
+						}
+
+						.score-medium {
+							background: var(--pw-score-medium-bg);
+							color: var(--pw-score-medium-color);
+							border-color: var(--pw-score-medium-border);
+						}
+
+						.score-low {
+							background: var(--pw-score-low-bg);
+							color: var(--pw-score-low-color);
+							border-color: var(--pw-score-low-border);
+						}
+
+						.header-right {
+							position: absolute;
+							top: 4px;
+							right: 4px;
+						}
+					}
+
+					// 下部：详细信息
+					.info-body {
+						display: grid;
+						gap: 4px 16px;
+						padding: 8px 0;
+					}
+				}
+			}
+
+			.pagination-wrapper {
+				margin-top: 12px;
+				display: flex;
+				justify-content: flex-end;
+			}
+		}
+	}
+
+	// ==================== 表格头部 ====================
+	.table-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 8px;
+
+		.header-title {
+			font-size: 14px;
+			font-weight: 600;
+			color: var(--pw-text-primary);
+		}
+
+		.header-actions {
+			display: flex;
+			align-items: center;
+			gap: 16px;
+		}
+	}
+
+	// ==================== 弹窗样式 ====================
+	:deep(.el-dialog) {
+		.el-dialog__body {
+			max-height: 60vh;
+			overflow-y: auto;
+		}
+	}
+
+	:deep(.el-form-item) {
+		margin-bottom: 18px;
+	}
+}
