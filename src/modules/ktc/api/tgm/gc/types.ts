@@ -45,6 +45,7 @@ export interface ListItem {
 	tags: string[]
 	tagsName?: string[]
 	entryTime: string
+	status?: number
 	sortField?: string
 	sortOrder?: string
 }

@@ -141,7 +141,11 @@
 				</div>
 			</div>
 
-			<el-empty v-if="!tableLoading && tableData.length === 0" description="暂无数据" />
+			<div v-if="!tableLoading && tableData.length === 0" class="empty-state">
+				<el-icon :size="48" color="#dcdfe6"><User /></el-icon>
+				<p class="empty-text">暂无人员数据</p>
+				<p class="empty-hint">点击上方「录入」按钮添加人员</p>
+			</div>
 		</div>
 
 		<!-- 分页 -->
@@ -227,6 +231,36 @@
 				</div>
 			</template>
 		</el-dialog>
+
+		<!-- 布控弹窗 -->
+		<el-dialog
+			v-model="controlDialogVisible"
+			title="再次布控"
+			width="520px"
+			:close-on-click-modal="false"
+		>
+			<el-form ref="controlFormRef" :model="controlFormData" :rules="controlFormRules" label-width="100px">
+				<el-form-item label="布控说明" prop="reason">
+					<el-input
+						v-model="controlFormData.reason"
+						type="textarea"
+						:rows="6"
+						maxlength="100"
+						show-word-limit
+						placeholder="请输入再次布控说明"
+					/>
+				</el-form-item>
+				<el-form-item label="指定审批人" prop="approver">
+					<el-select v-model="controlFormData.approver" placeholder="请选择" filterable style="width: 100%">
+						<el-option v-for="item in approverOptions" :key="item" :label="item" :value="item" />
+					</el-select>
+				</el-form-item>
+			</el-form>
+			<template #footer>
+				<el-button @click="controlDialogVisible = false">取消</el-button>
+				<el-button type="primary" :loading="controlSubmitLoading" @click="handleControlSubmit">提交审批</el-button>
+			</template>
+		</el-dialog>
 	</div>
 </template>
 
@@ -275,6 +309,38 @@ const formData = reactive({
 const formRules = {
 	name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
 	idCard: [{ required: true, message: "请输入身份证号", trigger: "blur" }]
+}
+
+// ==================== 布控弹窗 ====================
+const controlDialogVisible = ref(false)
+const controlSubmitLoading = ref(false)
+const controlFormRef = ref()
+const controlRow = ref<PmgPerson | null>(null)
+const approverOptions = ["张林芝", "李国安", "王建军", "刘志远", "陈卫民", "赵永强"]
+
+const controlFormData = reactive({
+	reason: "",
+	approver: ""
+})
+
+const controlFormRules = {
+	reason: [{ required: true, message: "请输入布控说明", trigger: "blur" }],
+	approver: [{ required: true, message: "请选择指定审批人", trigger: "change" }]
+}
+
+const handleControlSubmit = async () => {
+	const valid = await controlFormRef.value?.validate()
+	if (!valid) return
+
+	controlSubmitLoading.value = true
+	try {
+		ElMessage.success("布控审批已提交")
+		controlDialogVisible.value = false
+	} catch {
+		ElMessage.error("操作失败")
+	} finally {
+		controlSubmitLoading.value = false
+	}
 }
 
 const getSearchParams = () => {
@@ -454,7 +520,12 @@ const handleDialogClose = () => {
 	formRef.value?.resetFields()
 }
 
-const handleControl = (row: PmgPerson) => { ElMessage.info(`布控：${row.name}`) }
+const handleControl = (row: PmgPerson) => {
+	controlRow.value = row
+	controlFormRef.value?.resetFields()
+	Object.assign(controlFormData, { reason: "", approver: "" })
+	controlDialogVisible.value = true
+}
 
 const handleDelete = (row: PmgPerson) => {
 	ElMessageBox.confirm(`确认删除人员「${row.name}」吗？`, "提示", {
@@ -722,6 +793,28 @@ onMounted(() => {
 
 		:deep(.el-pagination) {
 			margin-left: auto;
+		}
+	}
+
+	.empty-state {
+		grid-column: 1 / -1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 60px 0;
+		color: var(--el-text-color-secondary);
+
+		.empty-text {
+			font-size: 15px;
+			margin: 16px 0 6px;
+			color: var(--el-text-color-regular);
+		}
+
+		.empty-hint {
+			font-size: 13px;
+			color: var(--el-text-color-placeholder);
+			margin: 0;
 		}
 	}
 }

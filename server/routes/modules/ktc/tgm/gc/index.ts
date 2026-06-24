@@ -111,6 +111,16 @@ export const gcRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 		return success({ id: Number(id) }, "删除成功")
 	})
 
+	// ========== 办结 ==========
+
+	app.put<{ Params: { id: string } }>("/close/:id", async (request) => {
+		const { id } = request.params
+		if (!id) return fail("请指定要办结的数据")
+
+		await service.closeGroup(Number(id))
+		return success({ id: Number(id) }, "办结成功")
+	})
+
 	// ========== 子模块路由 ==========
 
 	await app.register(pmgRoutes, { prefix: "/pmg" })

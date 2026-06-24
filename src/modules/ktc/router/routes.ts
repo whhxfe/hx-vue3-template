@@ -57,24 +57,24 @@ export const getRoutes = (): RouteRecordRaw[] => {
 				component: () => import('../views/tgm/gc/pmg/index.vue'),
 				meta: { title: '人员管理', activeMenu: '/ktc/tgm/gc' }
 			},
-				{
-					name: 'Ktc-GroupManage',
-					path: '/ktc/tgm/gc/gm',
-					component: () => import('../views/tgm/gc/gm/index.vue'),
-					meta: { title: '群组管理' }
-				},
-				{
-					name: 'Ktc-SubGroupManage',
-					path: '/ktc/tgm/gc/sgm',
-					component: () => import('../views/tgm/gc/sgm/index.vue'),
-					meta: { title: '子群体管理' }
-				},
-				{
-					name: 'Ktc-GroupArchive',
-					path: '/ktc/tgm/gc/ga',
-					component: () => import('../views/tgm/gc/ga/index.vue'),
-					meta: { title: '群体档案' }
-				},
+			{
+				name: 'Ktc-GroupManage',
+				path: '/ktc/tgm/gc/gm',
+				component: () => import('../views/tgm/gc/gm/index.vue'),
+				meta: { title: '群组管理', activeMenu: '/ktc/tgm/gc' }
+			},
+			{
+				name: 'Ktc-SubGroupManage',
+				path: '/ktc/tgm/gc/sgm',
+				component: () => import('../views/tgm/gc/sgm/index.vue'),
+				meta: { title: '子群体管理', activeMenu: '/ktc/tgm/gc' }
+			},
+			{
+				name: 'Ktc-GroupArchive',
+				path: '/ktc/tgm/gc/ga',
+				component: () => import('../views/tgm/gc/ga/index.vue'),
+				meta: { title: '群体档案', activeMenu: '/ktc/tgm/gc' }
+			},
 				{
 					name: 'Ktc-GroupWarning',
 					path: '/ktc/tgm/gw',

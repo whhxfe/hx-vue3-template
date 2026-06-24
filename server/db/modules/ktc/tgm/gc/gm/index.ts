@@ -3,12 +3,11 @@
  */
 import type { Database } from "sql.js"
 import type { DbModule } from "@db/types"
+import { createGmTables } from "./schema"
+import { seedGmDefaults, seedGmFakeData } from "./seed"
 
 export const gmModule: DbModule = {
-  createTables: (_db: Database) => {
-    // TODO: 创建表结构
-  },
-  seedDefaults: (_db: Database) => {
-    // TODO: 初始化默认数据
-  }
+  createTables: (db: Database) => createGmTables(db),
+  seedDefaults: (db: Database) => seedGmDefaults(db),
+  seedFakeData: (db: Database) => seedGmFakeData(db)
 }

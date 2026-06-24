@@ -1,9 +1,12 @@
 import request from '@/api/request'
 import type { TreeNode, DictItem, ListItem, ListQuery, ApiResponse } from './types'
 import { pmg } from './pmg'
+import { gm } from './gm'
+import { sgm } from './sgm'
+import { ga } from './ga'
 
 export type { TreeNode, DictItem, ListItem, ListQuery }
-export { pmg }
+export { pmg, gm, sgm, ga }
 
 /**
  * 新增群体参数
@@ -93,5 +96,12 @@ export const gc = {
 	 */
 	delete(id: number) {
 		return request.del(`/ktc/tgm/gc/${id}`) as Promise<ApiResponse<{ id: number }>>
+	},
+
+	/**
+	 * 办结群体
+	 */
+	close(id: number) {
+		return request.put<ApiResponse<{ id: number }>>(`/ktc/tgm/gc/close/${id}`)
 	}
 }

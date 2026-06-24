@@ -53,15 +53,14 @@
 									<el-dropdown-item command="activeCount">活跃人员</el-dropdown-item>
 								</el-dropdown-menu>
 							</template>
-						</el-dropdown>
-						<el-button link type="primary" @click="toggleSortOrder">
-							<el-icon>
-								<SortUp v-if="sortOrder === 'asc'" />
-								<SortDown v-else />
-							</el-icon>
-						</el-button>
-						<span class="selected-count">已选 {{ selectedRows.length }}/{{ pagination.total }}</span>
-					</div>
+					</el-dropdown>
+					<el-button link type="primary" @click="toggleSortOrder">
+						<el-icon>
+							<SortUp v-if="sortOrder === 'asc'" />
+							<SortDown v-else />
+						</el-icon>
+					</el-button>
+				</div>
 					<div class="header-right">
 						<el-button type="primary" @click="handleAdd">
 							<el-icon><Plus /></el-icon>
@@ -110,13 +109,14 @@
 								</el-avatar>
 								<div class="card-title-area">
 									<div class="card-title-row">
-										<span class="card-name">{{ item.name }}</span>
+										<span class="card-name" style="cursor: pointer" @click="handleViewArchive(item)">{{ item.name }}</span>
 										<el-tag v-for="tag in (item.tagsName || [])" :key="tag" size="small" type="info" class="card-tag">
 											{{ tag }}
 										</el-tag>
-										<el-tag v-if="item.categoryTypeName" size="small" type="warning" class="card-tag">
-											{{ item.categoryTypeName }}
-										</el-tag>
+							<el-tag v-if="item.categoryTypeName" size="small" type="warning" class="card-tag">
+										{{ item.categoryTypeName }}
+									</el-tag>
+										<el-tag v-if="item.status === 1" size="small" type="info" effect="dark" class="card-tag">已办结</el-tag>
 										<span v-if="item.isJudged" class="judged-stamp">已研判</span>
 									</div>
 								</div>
@@ -128,7 +128,7 @@
 								<el-button v-if="!item.isJudged" type="primary" link @click="handleJudge(item)">研判</el-button>
 								<el-button type="primary" link @click="handleEdit(item)">编辑</el-button>
 								<el-button type="danger" link @click="handleDelete(item)">删除</el-button>
-								<el-button type="primary" link @click="handleClose(item)">办结</el-button>
+								<el-button v-if="item.status !== 1" type="primary" link @click="handleClose(item)">办结</el-button>
 							</div>
 						</div>
 						<div class="card-body">
@@ -354,6 +354,34 @@
 				</div>
 			</template>
 		</el-dialog>
+
+		<!-- 研判弹窗 -->
+		<el-dialog
+			v-model="judgeDialogVisible"
+			title="研判"
+			width="520px"
+			:close-on-click-modal="false"
+		>
+			<el-form ref="judgeFormRef" :model="judgeFormData" :rules="judgeFormRules" label-width="90px">
+				<el-form-item label="管控类别" prop="categoryType">
+					<el-select v-model="judgeFormData.categoryType" placeholder="请选择" style="width: 100%">
+						<el-option v-for="item in categoryOptions" :key="item.value" :label="item.label" :value="item.value" />
+					</el-select>
+				</el-form-item>
+				<el-form-item label="研判依据" prop="basis">
+					<el-input
+						v-model="judgeFormData.basis"
+						type="textarea"
+						:rows="5"
+						placeholder="请输入研判依据"
+					/>
+				</el-form-item>
+			</el-form>
+			<template #footer>
+				<el-button @click="judgeDialogVisible = false">取消</el-button>
+				<el-button type="primary" :loading="judgeSubmitLoading" @click="handleJudgeSubmit">确定</el-button>
+			</template>
+		</el-dialog>
 	</div>
 </template>
 
@@ -452,6 +480,22 @@ const memberFormRules = {
 	gender: [{ required: true, message: "请选择性别", trigger: "change" }],
 	idCard: [{ required: true, message: "请输入身份证号", trigger: "blur" }],
 	phone: [{ required: true, message: "请输入手机号", trigger: "blur" }]
+}
+
+// ==================== 研判弹窗 ====================
+const judgeDialogVisible = ref(false)
+const judgeSubmitLoading = ref(false)
+const judgeFormRef = ref()
+const judgeRow = ref<ListItem | null>(null)
+
+const judgeFormData = reactive({
+	categoryType: "",
+	basis: ""
+})
+
+const judgeFormRules = {
+	categoryType: [{ required: true, message: "请选择管控类别", trigger: "change" }],
+	basis: [{ required: true, message: "请输入研判依据", trigger: "blur" }]
 }
 
 // ==================== 字典下拉 ====================
@@ -788,20 +832,60 @@ const handleDelete = (row: ListItem) => {
 		})
 }
 
+const handleViewArchive = (row: ListItem) => {
+	const route = router.resolve({ path: '/ktc/tgm/gc/ga', query: { groupId: String(row.id), groupName: row.name } })
+	window.open(route.href, '_blank')
+}
+
 const handlePersonManage = (row: ListItem) => {
-	router.push({ path: '/ktc/tgm/gc/pmg', query: { groupId: row.id, groupName: row.name } })
+	const route = router.resolve({ path: '/ktc/tgm/gc/pmg', query: { groupId: String(row.id), groupName: row.name } })
+	window.open(route.href, '_blank')
 }
 
 const handleGroupManage = (row: ListItem) => {
-	ElMessage.info(`群组管理：${row.name}`)
+	const route = router.resolve({ path: '/ktc/tgm/gc/gm', query: { groupId: String(row.id), groupName: row.name } })
+	window.open(route.href, '_blank')
 }
 
 const handleSubGroupManage = (row: ListItem) => {
-	ElMessage.info(`子群体管理：${row.name}`)
+	const r = router.resolve({ path: '/ktc/tgm/gc/sgm', query: { parentGroupId: String(row.id), parentGroupName: row.name } })
+	window.open(r.href, '_blank')
 }
 
 const handleJudge = (row: ListItem) => {
-	ElMessage.info(`研判：${row.name}`)
+	judgeRow.value = row
+	judgeFormRef.value?.resetFields()
+	Object.assign(judgeFormData, { categoryType: row.categoryType || "", basis: "" })
+	judgeDialogVisible.value = true
+}
+
+const handleJudgeSubmit = async () => {
+	const valid = await judgeFormRef.value?.validate()
+	if (!valid) return
+
+	judgeSubmitLoading.value = true
+	try {
+		const res = await gc.update({
+			id: judgeRow.value!.id!,
+			name: judgeRow.value!.name,
+			categoryType: judgeFormData.categoryType,
+			territory: judgeRow.value!.territory,
+			policeName: judgeRow.value!.policeName,
+			unitName: judgeRow.value!.unitName,
+			reason: judgeRow.value!.reason,
+			tags: judgeRow.value!.tags
+		})
+		if ((res as any)?.state === 2000) {
+			ElMessage.success("研判成功")
+			judgeDialogVisible.value = false
+			loadTableData()
+			loadTreeData()
+		}
+	} catch {
+		ElMessage.error("研判失败")
+	} finally {
+		judgeSubmitLoading.value = false
+	}
 }
 
 const handleClose = (row: ListItem) => {
@@ -809,9 +893,16 @@ const handleClose = (row: ListItem) => {
 		confirmButtonText: "确定",
 		cancelButtonText: "取消",
 		type: "warning"
-	}).then(() => {
-		ElMessage.success("办结成功")
-		loadTableData()
+	}).then(async () => {
+		try {
+			const res = await gc.close(row.id!)
+			if ((res as any)?.state === 2000) {
+				ElMessage.success("办结成功")
+				loadTableData()
+			}
+		} catch {
+			ElMessage.error("办结失败")
+		}
 	}).catch(() => {})
 }
 

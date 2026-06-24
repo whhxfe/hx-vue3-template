@@ -28,5 +28,7 @@ export const gcModule: DbModule = {
   seedFakeData: (db: Database) => {
     seedGcFakeData(db)
     pmgModule.seedFakeData?.(db)
+    gmModule.seedFakeData?.(db)
+    sgmModule.seedFakeData?.(db)
   }
 }

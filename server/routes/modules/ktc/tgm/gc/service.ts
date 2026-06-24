@@ -139,6 +139,7 @@ export async function getGroups(query: ListQuery): Promise<{ list: ListItem[]; t
 		item.categoryTypeName = categoryMap[item.categoryType] || item.categoryType
 		item.tagsName = item.tags
 		item.warningTypeNames = item.warningTypes
+		item.status = (row as any).status || 0
 		return item
 	})
 
@@ -229,4 +230,8 @@ export async function updateGroup(
 
 export async function deleteGroup(id: number): Promise<void> {
 	runAndSave("DELETE FROM ktc_gc_groups WHERE id = ?", [id])
+}
+
+export async function closeGroup(id: number): Promise<void> {
+	runAndSave("UPDATE ktc_gc_groups SET status = 1, updated_at = datetime('now') WHERE id = ?", [id])
 }
