@@ -92,5 +92,61 @@ export const ga = {
 
 	getJudgments(groupId: number) {
 		return request.get<ApiResponse<GaJudgment[]>>(`/ktc/tgm/gc/ga/judgments?groupId=${groupId}`)
+	},
+
+	getMyDay(groupId: number, keyword?: string) {
+		return request.get<ApiResponse<any[]>>(`/ktc/tgm/gc/ga/my-day?groupId=${groupId}&keyword=${keyword || ""}`)
+	},
+
+	getOpLogs(groupId: number, keyword?: string) {
+		return request.get<ApiResponse<any[]>>(`/ktc/tgm/gc/ga/op-logs?groupId=${groupId}&keyword=${keyword || ""}`)
+	},
+
+	getOnlineTimeChart(groupId: number) {
+		return request.get<ApiResponse<{ hours: string[]; values: number[] }>>(`/ktc/tgm/gc/ga/online-time-chart?groupId=${groupId}`)
+	},
+
+	getOnlineTimeList(groupId: number, query?: Record<string, unknown>) {
+		return request.post<ApiResponse<{ list: any[]; total: number }>>(`/ktc/tgm/gc/ga/online-time-list?groupId=${groupId}`, query)
+	},
+
+	getOnlineLocations(groupId: number) {
+		return request.get<ApiResponse<{ list: any[]; total: number }>>(`/ktc/tgm/gc/ga/online-locations?groupId=${groupId}`)
+	},
+
+	getAppAnalysis(groupId: number) {
+		return request.get<ApiResponse<any>>(`/ktc/tgm/gc/ga/app-analysis?groupId=${groupId}`)
+	},
+
+	getAppDetailList(groupId: number, appName: string, query?: Record<string, unknown>) {
+		return request.post<ApiResponse<{ list: any[]; total: number }>>(`/ktc/tgm/gc/ga/app-detail-list?groupId=${groupId}&appName=${appName}`, query)
+	},
+
+	getWebsiteList(groupId: number, query?: Record<string, unknown>) {
+		return request.post<ApiResponse<{ list: any[]; total: number; totalCount: number }>>(`/ktc/tgm/gc/ga/website-list?groupId=${groupId}`, query)
+	},
+
+	getWebsiteDetailList(groupId: number, domain: string, query?: Record<string, unknown>) {
+		return request.post<ApiResponse<{ list: any[]; total: number }>>(`/ktc/tgm/gc/ga/website-detail-list?groupId=${groupId}&domain=${domain}`, query)
+	},
+
+	getContentList(groupId: number, tab: string) {
+		return request.get<ApiResponse<{ list: any[]; total: number }>>(`/ktc/tgm/gc/ga/content-list?groupId=${groupId}&tab=${tab}`)
+	},
+
+	getMediaList(groupId: number, tab: string) {
+		return request.get<ApiResponse<{ list: any[]; total: number }>>(`/ktc/tgm/gc/ga/media-list?groupId=${groupId}&tab=${tab}`)
+	},
+
+	getLargeFileList(groupId: number, query?: Record<string, unknown>) {
+		return request.post<ApiResponse<{ list: any[]; total: number; totalCount: number }>>(`/ktc/tgm/gc/ga/large-file-list?groupId=${groupId}`, query)
+	},
+
+	getKeyPortList(groupId: number, query?: Record<string, unknown>) {
+		return request.post<ApiResponse<{ list: any[]; total: number; totalCount: number }>>(`/ktc/tgm/gc/ga/key-port-list?groupId=${groupId}`, query)
+	},
+
+	submitJudgment(groupId: number, categoryType: string, basis: string) {
+		return request.post<ApiResponse<{ id: number }>>(`/ktc/tgm/gc/ga/judgment`, { groupId, categoryType, basis })
 	}
 }

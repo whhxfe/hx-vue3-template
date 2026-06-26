@@ -23,6 +23,7 @@ const sharedGlobals = {
   ...globals.browser,
   ...globals.node,
   SYS_CONFIG: "readonly",
+  MAP_CONFIG: "readonly",
   MenuItem: "readonly",
   StatItem: "readonly",
   OverviewData: "readonly",

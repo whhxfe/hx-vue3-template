@@ -6,7 +6,7 @@ const SYS_CONFIG = {
 	// API_BASE_URL: "http://192.168.7.65:8011", // 后台url
 	// API_BASE_URL: "http://192.168.7.14:8011", // 后台url
 	// API_BASE_URL: "http://192.168.6.58:38011", // 后台url
-	MAP_URL: "http://192.168.6.68:9080/normalMap",
+	MAP_URL: "http://localhost:9003/map",
 	ICONIFY_CDN_URL: "https://api.iconify.design",
 	IMAGE_CDN_URL: "https://img.iconify.design",
 	API_PREFIX: "/wzsys",
@@ -14,8 +14,8 @@ const SYS_CONFIG = {
 }
 
 const MAP_CONFIG = {
-	normalUrl: "http://192.168.6.68:9080/normalMap",
-	satelliteUrl: "http://localhost:5555/satellite",
+	normalUrl: "http://localhost:9003/map",
+	satelliteUrl: "http://localhost:9003/satellite",
 	center: [114.536107, 30.431758],
 	zoom: 11,
 	maxZoom: 12,
