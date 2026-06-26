@@ -25,3 +25,10 @@ export type {
 // tum/uc 模块（单元管控）
 export { uc } from "./tum/uc"
 export type { ListItem as UcListItem, ListQuery as UcListQuery } from "./tum/uc"
+
+// tum/um 模块（单元上图）
+export { um } from "./tum/um"
+export type { ListItem as UmListItem, ListQuery as UmListQuery } from "./tum/um"
+
+// tum/uc/ua 模块（单元档案）
+export { ua } from "./tum/uc/ua"

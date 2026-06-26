@@ -81,6 +81,7 @@
 							<el-button type="primary" link @click="handleJudge(row)">研判</el-button>
 							<el-button type="default" link @click="handleEdit(row)">编辑</el-button>
 							<el-button type="warning" link @click="handleControl(row)">布控</el-button>
+							<el-button type="success" link @click="handleOpenArchive(row)">档案</el-button>
 							<el-button type="danger" link @click="handleDelete(row)">删除</el-button>
 						</template>
 					</HxTable>
@@ -263,7 +264,8 @@
 
 <script setup lang="tsx">
 import { ref, reactive, computed, onMounted } from "vue"
-import { ElMessage, ElMessageBox,ElTag } from "element-plus"
+import { useRouter } from "vue-router"
+import { ElMessage, ElMessageBox, ElTag, ElLink } from "element-plus"
 import { HxForm, HxTable, HxIcon, HxImporter, HxExporter } from "@whhx/ui"
 import type { FormField, TableColumn } from "@whhx/ui"
 import { useElementSize, useDebounceFn } from "@vueuse/core"
@@ -458,8 +460,17 @@ const tableColumns = computed<TableColumn[]>(() => [
 	},
 	{
 		prop: "ip",
-		label: "IP信息",
-		width: 150
+		label: "IP/ADSL",
+		width: 150,
+		render: (row: UnitItem) => (
+			<ElLink
+				type="primary"
+				underline={false}
+				onClick={() => router.push({ path: '/ktc/tum/uc/ua', query: { id: String(row.id) } })}
+			>
+				{row.ip || row.adsl || '—'}
+			</ElLink>
+		)
 	},
 	{
 		prop: "unitTypeName",
@@ -467,7 +478,7 @@ const tableColumns = computed<TableColumn[]>(() => [
 		width: 100,
 		align: "center",
 		render: (row: UnitItem) => {
-			const typeMap: Record<string, string> = {
+			const typeMap: Record<string, "primary" | "success" | "warning" | "danger" | "info"> = {
 				"固定IP": "primary",
 				"ADSL": "success"
 			}
@@ -480,10 +491,10 @@ const tableColumns = computed<TableColumn[]>(() => [
 		width: 100,
 		align: "center",
 		render: (row: UnitItem) => {
-			const typeMap: Record<string, string> = {
+			const typeMap: Record<string, "primary" | "success" | "warning" | "danger" | "info"> = {
 				"重点关注": "danger",
 				"一级": "warning",
-				"二级": "",
+				"二级": "info",
 				"三级": "info",
 				"其他": "info"
 			}
@@ -673,6 +684,14 @@ const handleEdit = useDebounceFn((row: UnitItem) => {
 		focusReason: row.focusReason
 	})
 	addDialogVisible.value = true
+}, 300)
+
+const router = useRouter()
+const handleOpenArchive = useDebounceFn((row: ListItem) => {
+	router.push({
+		path: "/ktc/tum/uc/ua",
+		query: { id: String(row.id), ip: row.ip }
+	})
 }, 300)
 
 const handleAddSubmit = async () => {

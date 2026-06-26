@@ -40,9 +40,6 @@ const eslintConfig: Linter.FlatConfig[] = [
       "**/.clinerules/**",
       "**/public/**",
       "**/*.d.ts",
-      // JSX 在 Vue 文件中需要特殊配置，暂跳过
-      "**/modules/zddxgk/views/rygk/**",
-      "**/modules/zddxgk/views/ryst/**",
     ]
   },
   {
@@ -67,6 +64,10 @@ const eslintConfig: Linter.FlatConfig[] = [
       parserOptions: {
         parser: tseslint.parser,
         extraFileExtensions: [".vue"],
+        ecmaFeatures: {
+          // 允许 <script setup lang="tsx"> 中使用 JSX（ua 多个组件在 render 字段中使用）
+          jsx: true
+        }
       }
     }
   },

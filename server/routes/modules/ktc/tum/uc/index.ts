@@ -151,6 +151,17 @@ export const ucRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 		return success(unit, "布控成功")
 	})
 
+	// ========== 详情 ==========
+
+	// 获取单元详情
+	app.get<{ Params: { id: string } }>("/detail/:id", async (request) => {
+		const id = Number(request.params.id)
+		if (!id) return fail("缺少 id")
+		const unit = service.getUnitsByIds([id])[0]
+		if (!unit) return fail("数据不存在")
+		return success(unit)
+	})
+
 	// ========== 模板下载 ==========
 
 	// 下载导入模板

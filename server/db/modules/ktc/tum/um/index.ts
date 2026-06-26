@@ -3,12 +3,14 @@
  */
 import type { Database } from "sql.js"
 import type { DbModule } from "@db/types"
+import { createUmTables } from "./schema"
+import { seedUmDefaults } from "./seed"
 
 export const umModule: DbModule = {
-  createTables: (_db: Database) => {
-    // TODO: 创建表结构
-  },
-  seedDefaults: (_db: Database) => {
-    // TODO: 初始化默认数据
-  }
+	createTables: (db: Database) => {
+		createUmTables(db)
+	},
+	seedDefaults: (db: Database) => {
+		seedUmDefaults(db)
+	}
 }

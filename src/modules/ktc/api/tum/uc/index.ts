@@ -59,6 +59,20 @@ export interface JudgeParams {
 	judgeReason: string
 }
 
+/**
+ * 研判历史记录（被 ua 模块 re-import 使用）
+ */
+export interface JudgeRecord {
+	id: number
+	unitId: number
+	controlCategory: string
+	controlCategoryName: string
+	judgeReason: string
+	judgeUser: string
+	judgeUnit: string
+	judgeTime: string
+}
+
 export interface ControlParams {
 	id: number
 	controlResource: string
@@ -111,6 +125,15 @@ export const uc = {
 			page: number
 			pageSize: number
 		}>>('/ktc/tum/uc/list', query)
+	},
+
+	// ==================== 详情 ====================
+
+	/**
+	 * 获取单元详情
+	 */
+	getDetail(id: number) {
+		return request.get<ApiResponse<ListItem>>(`/ktc/tum/uc/detail/${id}`)
 	},
 
 	// ==================== 新增 ====================
