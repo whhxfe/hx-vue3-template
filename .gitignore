@@ -18,6 +18,7 @@ deprecated
 # 自动生成的文件
 auto-imports.d.ts
 components.d.ts
+*.tsbuildinfo
 
 # 过时的项目结构文档
 tree.md

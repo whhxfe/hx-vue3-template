@@ -4,7 +4,7 @@
  *
  * 使用方式：
  *   await baseAuthHook.register(app, { prefix: "/wzsys" })
- *   会自动对 /wzsys/admin/... 和 /wzsys/zddxgk/... 等路径校验 token
+ *   会自动对 /wzsys/admin/... 和 /wzsys/pbct/... 等路径校验 token
  *
  * token 来源（按优先级）：
  *   1. header: Authorization (Bearer xxx)
@@ -19,7 +19,7 @@ import { tokenExpired } from "./response"
 export interface BaseAuthOptions {
 	/** 路由前缀，例如 "/wzsys" */
 	prefix: string
-	/** 需要校验的路径 pattern 列表，默认 ["/admin/", "/zddxgk/", "/pbct/", "/templates/"] */
+	/** 需要校验的路径 pattern 列表，默认 ["/admin/", "/pbct/", "/templates/"] */
 	protectPatterns?: string[]
 }
 
@@ -52,7 +52,7 @@ export const baseAuthHook = {
 	 */
 	async register(app: FastifyInstance, options: BaseAuthOptions) {
 		const { prefix, protectPatterns } = options
-		const patterns = protectPatterns ?? ["/admin/", "/zddxgk/", "/pbct/", "/templates/"]
+		const patterns = protectPatterns ?? ["/admin/", "/pbct/", "/templates/"]
 
 		app.addHook("onRequest", async (request: FastifyRequest & { currentUser?: Record<string, unknown> }, reply: FastifyReply) => {
 			const url = request.url

@@ -40,7 +40,7 @@ export function seedUcenterFakeData(db: Database) {
   })
 
   // super 角色拥有全部模块
-  const allModules = ["ucenter", "sysconfig", "syslog", "dict", "notice", "_templates", "zddxgk", "pbct", "amc", "ktc"]
+  const allModules = ["ucenter", "sysconfig", "syslog", "dict", "notice", "_templates", "pbct", "amc", "ktc"]
   for (const mod of allModules) {
     db.run("INSERT INTO role_menus (role_id, module_key) VALUES (?, ?)", [roleMap.super, mod])
   }

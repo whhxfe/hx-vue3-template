@@ -40,4 +40,4 @@ const startServer = async (retryCount = 0) => {
 // 设置优雅关闭信号监听
 setupGracefulShutdown(() => appInstance, serverConfig.port)
 
-startServer()
+startServer()// restart trigger 2026-06-28 23:32:48

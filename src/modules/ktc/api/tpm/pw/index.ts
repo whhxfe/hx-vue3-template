@@ -4,7 +4,7 @@ import type { ListItem, ListQuery } from './types'
 
 export type { ListItem, ListQuery }
 
-export { DictItem, ListResult, ApiResponse }
+export type { DictItem, ListResult, ApiResponse }
 
 /**
  * 新增数据参数

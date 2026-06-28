@@ -363,7 +363,7 @@ const handleMapReady = () => {
 /**
  * 卡片点击 - 定位到对应点位并打开弹窗
  */
-const handleCardClick = (item: RystListItem) => {
+const handleCardClick = (item: PmListItem) => {
 	selectedCardId.value = item.id
 
 	if (!item.longitude || !item.latitude) return
@@ -383,7 +383,7 @@ const handleCardClick = (item: RystListItem) => {
 /**
  * 查看详情
  */
-const handleViewDetail = (item: RystListItem) => {
+const handleViewDetail = (item: PmListItem) => {
 	detailRow.value = item
 	detailDialogVisible.value = true
 }

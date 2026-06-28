@@ -1,5 +1,5 @@
 /**
- * rygk 模块数据库操作层
+ * pc 模块数据库操作层（人员管控）
  */
 import { getDb, saveDatabase } from "@db/manager"
 import type { ListItem, ListQuery, TreeNode, DictItem, PersonRow } from "./types"
@@ -31,7 +31,7 @@ function rowToListItem(row: PersonRow): ListItem {
 
 export async function getTreeData(type: "yhgl" | "gxjg"): Promise<TreeNode[]> {
 	const rows = queryAll(
-		"SELECT * FROM rygk_trees WHERE type = ? AND status = 1 ORDER BY sort_order ASC",
+		"SELECT * FROM ktc_pc_trees WHERE type = ? AND status = 1 ORDER BY sort_order ASC",
 		[type]
 	)
 
@@ -41,7 +41,7 @@ export async function getTreeData(type: "yhgl" | "gxjg"): Promise<TreeNode[]> {
 
 	// 计算每个节点的 count
 	const countMap: Record<number, number> = {}
-	const allPersons = queryAll("SELECT tree_id, tree_type FROM rygk_persons")
+	const allPersons = queryAll("SELECT tree_id, tree_type FROM ktc_pc_persons")
 	for (const p of allPersons) {
 		if (p.tree_id && p.tree_type === type) {
 			countMap[p.tree_id] = (countMap[p.tree_id] || 0) + 1
@@ -68,10 +68,14 @@ export async function getTreeData(type: "yhgl" | "gxjg"): Promise<TreeNode[]> {
 // ========== 字典下拉 ==========
 
 export async function getSourceOptions(): Promise<DictItem[]> {
-	// 从 dict_items 中获取数据来源选项
-	const rows = queryAll("SELECT value, label FROM dict_items WHERE type = 'data_source' AND status = 1 ORDER BY sort_order ASC")
-	if (rows.length > 0) {
-		return rows.map((r) => ({ label: r.label, value: r.value }))
+	// 从 dict_items 中获取数据来源选项（容错：表不存在时回退到默认值）
+	try {
+		const rows = queryAll("SELECT value, label FROM dict_items WHERE type = 'data_source' AND status = 1 ORDER BY sort_order ASC")
+		if (rows.length > 0) {
+			return rows.map((r) => ({ label: r.label, value: r.value }))
+		}
+	} catch {
+		// 表不存在时回退到默认值
 	}
 	// 默认值
 	return [
@@ -84,11 +88,16 @@ export async function getSourceOptions(): Promise<DictItem[]> {
 }
 
 export async function getCategoryOptions(): Promise<DictItem[]> {
-	const rows = queryAll(
-		"SELECT code as value, name as label FROM rygk_categories WHERE status = 1 ORDER BY sort_order ASC"
-	)
-	if (rows.length > 0) {
-		return rows
+	// 容错：表不存在时回退到默认值
+	try {
+		const rows = queryAll(
+			"SELECT code as value, name as label FROM ktc_pc_categories WHERE status = 1 ORDER BY sort_order ASC"
+		)
+		if (rows.length > 0) {
+			return rows
+		}
+	} catch {
+		// 表不存在时回退到默认值
 	}
 	// 默认值
 	return [
@@ -100,10 +109,14 @@ export async function getCategoryOptions(): Promise<DictItem[]> {
 }
 
 export async function getAddressOptions(): Promise<DictItem[]> {
-	// 从 dict_items 中获取地址选项
-	const rows = queryAll("SELECT value, label FROM dict_items WHERE type = 'hubei_city' AND status = 1 ORDER BY sort_order ASC")
-	if (rows.length > 0) {
-		return rows.map((r) => ({ label: r.label, value: r.value }))
+	// 从 dict_items 中获取地址选项（容错：表不存在时回退到默认值）
+	try {
+		const rows = queryAll("SELECT value, label FROM dict_items WHERE type = 'hubei_city' AND status = 1 ORDER BY sort_order ASC")
+		if (rows.length > 0) {
+			return rows.map((r) => ({ label: r.label, value: r.value }))
+		}
+	} catch {
+		// 表不存在时回退到默认值
 	}
 	// 默认值
 	return [
@@ -153,11 +166,13 @@ export async function getPersons(query: ListQuery): Promise<{ list: ListItem[]; 
 	}
 	if (query.entryTimeStart) {
 		where += " AND entry_time >= ?"
-		params.push(query.entryTimeStart)
+		// 若前端只传了 YYYY-MM-DD，则补齐为当天 00:00:00，便于字符串字典序比较
+		params.push(/^\d{4}-\d{2}-\d{2}$/.test(query.entryTimeStart) ? `${query.entryTimeStart} 00:00:00` : query.entryTimeStart)
 	}
 	if (query.entryTimeEnd) {
 		where += " AND entry_time <= ?"
-		params.push(query.entryTimeEnd)
+		// 若前端只传了 YYYY-MM-DD，则补齐为当天 23:59:59，确保区间包含结束日
+		params.push(/^\d{4}-\d{2}-\d{2}$/.test(query.entryTimeEnd) ? `${query.entryTimeEnd} 23:59:59` : query.entryTimeEnd)
 	}
 	if (query.treeId) {
 		where += " AND tree_id = ?"
@@ -175,9 +190,9 @@ export async function getPersons(query: ListQuery): Promise<{ list: ListItem[]; 
 		params.push(keywordPattern, keywordPattern)
 	}
 
-	const total = queryScalar(`SELECT COUNT(*) FROM rygk_persons ${where}`, params) as number
+	const total = queryScalar(`SELECT COUNT(*) FROM ktc_pc_persons ${where}`, params) as number
 	const rows = queryAll(
-		`SELECT * FROM rygk_persons ${where} ORDER BY id DESC LIMIT ? OFFSET ?`,
+		`SELECT * FROM ktc_pc_persons ${where} ORDER BY id DESC LIMIT ? OFFSET ?`,
 		[...params, pageSize, offset]
 	)
 
@@ -217,8 +232,8 @@ export async function createPerson(data: {
 }): Promise<number> {
 	const db = getDb()
 	db.run(
-		`INSERT INTO rygk_persons 
-		(name, gender, age, phone, id_card, residence_address, category, data_source, tags, tree_id, tree_type) 
+		`INSERT INTO ktc_pc_persons
+		(name, gender, age, phone, id_card, residence_address, category, data_source, tags, tree_id, tree_type)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		[
 			data.name,
@@ -234,8 +249,10 @@ export async function createPerson(data: {
 			data.treeType || null
 		]
 	)
+	// 必须在 saveDatabase() 之前获取 last_insert_rowid()，否则 sqlite 会话被重置
+	const result = db.exec("SELECT last_insert_rowid() as id")
 	saveDatabase()
-	return db.exec("SELECT last_insert_rowid()")[0]?.values[0]?.[0] as number
+	return (result[0]?.values[0]?.[0] as number) ?? 0
 }
 
 export async function updatePerson(
@@ -313,18 +330,18 @@ export async function updatePerson(
 	values.push(id)
 
 	const db = getDb()
-	db.run(`UPDATE rygk_persons SET ${fields.join(", ")} WHERE id = ?`, values)
+	db.run(`UPDATE ktc_pc_persons SET ${fields.join(", ")} WHERE id = ?`, values)
 	saveDatabase()
 }
 
 export async function deletePerson(id: number): Promise<void> {
-	runAndSave("DELETE FROM rygk_persons WHERE id = ?", [id])
+	runAndSave("DELETE FROM ktc_pc_persons WHERE id = ?", [id])
 }
 
 export async function batchUpdateStatus(ids: number[], status: "0" | "1"): Promise<number> {
 	if (ids.length === 0) return 0
 	const placeholders = ids.map(() => "?").join(",")
-	runAndSave(`UPDATE rygk_persons SET follow_status = ?, updated_at = datetime('now') WHERE id IN (${placeholders})`, [
+	runAndSave(`UPDATE ktc_pc_persons SET follow_status = ?, updated_at = datetime('now') WHERE id IN (${placeholders})`, [
 		status,
 		...ids
 	])
@@ -337,7 +354,7 @@ export async function assignCategory(personIds: number[], categoryCode: string):
 	if (personIds.length === 0) return 0
 	const placeholders = personIds.map(() => "?").join(",")
 	runAndSave(
-		`UPDATE rygk_persons SET category = ?, updated_at = datetime('now') WHERE id IN (${placeholders})`,
+		`UPDATE ktc_pc_persons SET category = ?, updated_at = datetime('now') WHERE id IN (${placeholders})`,
 		[categoryCode, ...personIds]
 	)
 	return personIds.length
@@ -349,7 +366,7 @@ export async function getPersonsByIds(ids: number[]): Promise<any[]> {
 	if (ids.length === 0) return []
 
 	const placeholders = ids.map(() => "?").join(",")
-	const rows = queryAll(`SELECT * FROM rygk_persons WHERE id IN (${placeholders})`, ids)
+	const rows = queryAll(`SELECT * FROM ktc_pc_persons WHERE id IN (${placeholders})`, ids)
 
 	// 填充名称字段
 	const sourceOptions = await getSourceOptions()
